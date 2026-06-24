@@ -101,7 +101,7 @@ export const Navbar = () => {
           <button
             onClick={() => scrollTo("#contact")}
             data-testid="nav-cta-button"
-            className="group inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:shadow-[0_0_28px_rgba(131,56,236,0.55)] transition-all duration-300"
+            className="btn-grad shine group inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-full"
           >
             Solicită ofertă
             <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
@@ -170,7 +170,7 @@ export const Navbar = () => {
                       setTimeout(() => scrollTo("#contact"), 220);
                     }}
                     data-testid="mobile-nav-cta"
-                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-6 py-3.5 rounded-full"
+                    className="btn-grad shine w-full inline-flex items-center justify-center gap-2 text-white font-semibold px-6 py-3.5 rounded-full"
                   >
                     Solicită ofertă
                     <ArrowRight className="h-4 w-4" />

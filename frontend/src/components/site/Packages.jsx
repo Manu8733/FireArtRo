@@ -1,6 +1,6 @@
 import { Check, Star, ArrowRight, Info } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import { SectionHeader } from "@/components/site/cinematic";
+import { SectionHeader, TiltCard } from "@/components/site/cinematic";
 import { PACKAGES, PRICING_FACTORS } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -41,10 +41,11 @@ export const Packages = () => {
             const Icon = p.icon;
             return (
               <Reveal key={p.name} delay={(i % 4) * 0.08} className="snap-center shrink-0 w-[80%] xs:w-[72%] sm:w-auto">
+                <TiltCard className="rounded-3xl" max={7}>
                 <div
-                  className={`relative h-full rounded-3xl p-6 sm:p-7 flex flex-col transition-all duration-300 md:hover:-translate-y-1.5 ${
+                  className={`relative h-full rounded-3xl p-6 sm:p-7 flex flex-col shine transition-colors duration-300 ${
                     p.popular
-                      ? "bg-gradient-to-b from-[#8338EC]/22 to-[#0A0712] border border-[#8338EC]/50 glow-ring"
+                      ? "conic-border bg-gradient-to-b from-[#8338EC]/22 to-[#0A0712] border border-[#8338EC]/50 glow-ring"
                       : "glass hover:border-white/20"
                   }`}
                   data-testid={`package-card-${i}`}
@@ -86,9 +87,9 @@ export const Packages = () => {
                   <button
                     onClick={() => selectPackage(p.name)}
                     data-testid={`package-cta-${i}`}
-                    className={`mt-4 inline-flex items-center justify-center gap-2 w-full font-semibold px-5 py-3 rounded-full transition-all duration-300 ${
+                    className={`mt-4 inline-flex items-center justify-center gap-2 w-full font-semibold px-5 py-3 rounded-full shine transition-all duration-300 ${
                       p.popular
-                        ? "bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white hover:shadow-[0_0_24px_rgba(131,56,236,0.5)]"
+                        ? "btn-grad text-white"
                         : "glass text-white hover:bg-white/10"
                     }`}
                   >
@@ -96,6 +97,7 @@ export const Packages = () => {
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
+                </TiltCard>
               </Reveal>
             );
           })}

@@ -1,11 +1,11 @@
 import { Star, Quote } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import { SectionHeader } from "@/components/site/cinematic";
+import { SectionHeader, TiltCard } from "@/components/site/cinematic";
 import { TESTIMONIALS, PARTNERS } from "@/data/content";
 
 const Card = ({ t, i }) => (
   <div
-    className="h-full glass border-gradient rounded-2xl p-6 sm:p-8 hover:border-white/20 transition-colors duration-300"
+    className="h-full glass border-gradient rounded-2xl p-6 sm:p-8 shine hover:border-white/20 transition-colors duration-300"
     data-testid={`testimonial-card-${i}`}
   >
     <Quote className="h-7 w-7 text-[#8338EC]/60" />
@@ -37,7 +37,9 @@ export const Testimonials = () => {
         <div className="mt-12 flex md:grid md:grid-cols-3 gap-5 overflow-x-auto md:overflow-visible snap-x snap-mandatory hide-scrollbar -mx-5 px-5 md:mx-0 md:px-0 pb-1">
           {TESTIMONIALS.map((t, i) => (
             <Reveal key={t.name} delay={i * 0.08} className="snap-center shrink-0 w-[85%] md:w-auto">
-              <Card t={t} i={i} />
+              <TiltCard className="rounded-2xl" max={6}>
+                <Card t={t} i={i} />
+              </TiltCard>
             </Reveal>
           ))}
         </div>

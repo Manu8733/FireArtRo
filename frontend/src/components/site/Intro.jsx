@@ -9,7 +9,7 @@ const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavi
 export const Intro = () => {
   return (
     <section id="intro" className="relative py-20 sm:py-28 md:py-36 overflow-hidden" data-testid="intro-section">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[44vw] rounded-full bg-[#8338EC]/8 blur-[140px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[44vw] rounded-full bg-[#8338EC]/8 blur-[140px] animate-breathe" />
 
       <div className="relative max-w-4xl mx-auto px-5 sm:px-6 md:px-12 text-center">
         <Reveal>

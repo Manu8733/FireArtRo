@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform, useInView, useReducedMotion } from "framer-motion";
 import { useIsMobile, getScrollDir } from "@/hooks/useMediaQuery";
 
-export const EASE = [0.22, 1, 0.36, 1];
+export const EASE = [0.16, 1, 0.3, 1];
 
 const useReveal = (amount = 0.2) => {
   const ref = useRef(null);
@@ -74,8 +74,8 @@ export const Stagger = ({ children, className, amount = 0.18, gap = 0.08 }) => {
 };
 
 export const fadeUpVariant = {
-  hidden: { opacity: 0, y: 22, filter: "blur(6px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: EASE } },
+  hidden: { opacity: 0, y: 26, scale: 0.96, filter: "blur(8px)" },
+  show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: { duration: 0.7, ease: EASE } },
 };
 
 export const StaggerItem = ({ children, className }) => {
@@ -120,6 +120,74 @@ export const Floating = ({ children, delay = 0, className }) => (
     {children}
   </div>
 );
+
+/* ---------------- 3D tilt card with cursor glare (desktop only) ---------------- */
+export const TiltCard = ({ children, className, max = 9, glare = true }) => {
+  const reduce = useReducedMotion();
+  const mobile = useIsMobile();
+  const ref = useRef(null);
+
+  if (reduce || mobile) return <div className={`h-full ${className || ""}`}>{children}</div>;
+
+  const onMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    el.style.setProperty("--rx", `${(0.5 - py) * max}deg`);
+    el.style.setProperty("--ry", `${(px - 0.5) * max}deg`);
+    el.style.setProperty("--mx", `${px * 100}%`);
+    el.style.setProperty("--my", `${py * 100}%`);
+  };
+  const onLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--rx", "0deg");
+    el.style.setProperty("--ry", "0deg");
+  };
+
+  return (
+    <div className={`tilt-card h-full ${className || ""}`}>
+      <div ref={ref} className="tilt-inner" onMouseMove={onMove} onMouseLeave={onLeave}>
+        {children}
+        {glare && <span className="tilt-glare" />}
+      </div>
+    </div>
+  );
+};
+
+/* ---------------- Magnetic button (follows cursor, desktop only) ---------------- */
+export const MagneticButton = ({ children, className, strength = 0.28, ...rest }) => {
+  const reduce = useReducedMotion();
+  const mobile = useIsMobile();
+  const ref = useRef(null);
+
+  if (reduce || mobile)
+    return (
+      <button className={className} {...rest}>
+        {children}
+      </button>
+    );
+
+  const onMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width / 2;
+    const y = e.clientY - r.top - r.height / 2;
+    el.style.transform = `translate(${x * strength}px, ${y * strength * 1.15}px)`;
+  };
+  const onLeave = () => {
+    if (ref.current) ref.current.style.transform = "translate(0px, 0px)";
+  };
+
+  return (
+    <button ref={ref} className={`magnetic ${className || ""}`} onMouseMove={onMove} onMouseLeave={onLeave} {...rest}>
+      {children}
+    </button>
+  );
+};
 
 /* ---------------- Scroll parallax (disabled on mobile / reduced-motion) ---------------- */
 export const Parallax = ({ children, range = 60, className }) => {

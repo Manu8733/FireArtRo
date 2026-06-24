@@ -44,7 +44,7 @@ const MobileProcess = () => (
       <button
         onClick={() => scrollTo("#contact")}
         data-testid="process-cta"
-        className="mt-9 inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-6 py-3.5 rounded-full"
+        className="btn-grad shine mt-9 inline-flex items-center gap-2 text-white font-semibold px-6 py-3.5 rounded-full"
       >
         Începe-ți proiectul
         <ArrowRight className="h-4 w-4" />
@@ -77,8 +77,8 @@ const DesktopProcess = () => {
       data-testid="process-section"
     >
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden py-14">
-        <div className="absolute top-0 right-0 w-[45vw] h-[45vw] rounded-full bg-[#8338EC]/8 blur-[140px]" />
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] rounded-full bg-[#3A86FF]/8 blur-[140px]" />
+        <div className="absolute top-0 right-0 w-[45vw] h-[45vw] rounded-full bg-[#8338EC]/8 blur-[140px] animate-breathe" />
+        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] rounded-full bg-[#3A86FF]/8 blur-[140px] animate-breathe" style={{ animationDelay: "3s" }} />
 
         <div className="relative max-w-7xl mx-auto px-6 md:px-12 w-full">
           <div className="cine-kicker text-[#9D7BFF] text-xs sm:text-sm font-semibold">Cum lucrăm</div>
@@ -156,7 +156,7 @@ const DesktopProcess = () => {
             <button
               onClick={() => scrollTo("#contact")}
               data-testid="process-cta"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-7 py-3.5 rounded-full hover:shadow-[0_0_28px_rgba(131,56,236,0.5)] transition-all duration-300"
+              className="btn-grad shine inline-flex items-center gap-2 text-white font-semibold px-7 py-3.5 rounded-full"
             >
               Începe-ți proiectul
               <ArrowRight className="h-4 w-4" />

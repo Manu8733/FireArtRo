@@ -37,8 +37,8 @@ export const Gallery = () => {
 
   return (
     <section id="galerie" className="relative py-20 sm:py-28 md:py-32 overflow-hidden" data-testid="gallery-section">
-      <div className="absolute top-1/4 -left-1/4 w-[45vw] h-[45vw] rounded-full bg-[#8338EC]/8 blur-[150px]" />
-      <div className="absolute bottom-0 -right-1/4 w-[40vw] h-[40vw] rounded-full bg-[#3A86FF]/8 blur-[150px]" />
+      <div className="absolute top-1/4 -left-1/4 w-[45vw] h-[45vw] rounded-full bg-[#8338EC]/8 blur-[150px] animate-breathe" />
+      <div className="absolute bottom-0 -right-1/4 w-[40vw] h-[40vw] rounded-full bg-[#3A86FF]/8 blur-[150px] animate-breathe" style={{ animationDelay: "3s" }} />
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
         <SectionHeader kicker="Galerie" title="Lumină, culoare, emoție" subtitle="Câteva cadre din spectacolele și atmosfera pe care le creăm." />
 

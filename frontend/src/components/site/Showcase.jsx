@@ -52,7 +52,7 @@ export const Showcase = () => {
 
   return (
     <section id="spectacole" className="relative py-20 sm:py-28 md:py-32 overflow-hidden" data-testid="showcase-section">
-      <div className="absolute top-1/3 -right-1/4 w-[50vw] h-[50vw] rounded-full bg-[#3A86FF]/8 blur-[140px]" />
+      <div className="absolute top-1/3 -right-1/4 w-[50vw] h-[50vw] rounded-full bg-[#3A86FF]/8 blur-[140px] animate-breathe" />
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
@@ -228,7 +228,7 @@ export const Showcase = () => {
             <button
               onClick={() => scrollTo("#contact")}
               data-testid="showcase-cta"
-              className="inline-flex items-center gap-2 glass text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors"
+              className="shine inline-flex items-center gap-2 glass text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition-colors"
             >
               Vreau un spectacol ca acesta
               <ArrowRight className="h-4 w-4 text-[#8338EC]" />

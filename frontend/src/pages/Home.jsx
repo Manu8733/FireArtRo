@@ -16,6 +16,7 @@ import FinalCta from "@/components/site/FinalCta";
 import QuoteForm from "@/components/site/QuoteForm";
 import Footer from "@/components/site/Footer";
 import SocialDock from "@/components/site/SocialDock";
+import ScrollProgress from "@/components/site/ScrollProgress";
 
 export default function Home() {
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function Home() {
 
   return (
     <main className="bg-[#050308] min-h-screen overflow-x-clip">
+      <ScrollProgress />
       <Navbar />
       <Hero />
       <Intro />

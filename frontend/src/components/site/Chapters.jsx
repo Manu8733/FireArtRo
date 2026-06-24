@@ -103,7 +103,7 @@ const MobileStory = () => {
       </div>
 
       <div className="text-center mt-2">
-        <button onClick={() => scrollTo("#contact")} className="inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-6 py-3.5 rounded-full">
+        <button onClick={() => scrollTo("#contact")} className="btn-grad shine inline-flex items-center gap-2 text-white font-semibold px-6 py-3.5 rounded-full">
           Hai să scriem povestea ta <ArrowRight className="h-4 w-4" />
         </button>
       </div>

@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import { Stagger, StaggerItem } from "@/components/site/cinematic";
+import { Stagger, StaggerItem, TiltCard } from "@/components/site/cinematic";
 import { WHY } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -8,7 +8,7 @@ const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavi
 export const WhyUs = () => {
   return (
     <section id="de-ce-noi" className="relative py-20 sm:py-28 md:py-32 overflow-hidden" data-testid="why-section">
-      <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[80vw] h-[40vw] rounded-full bg-[#8338EC]/8 blur-[150px]" />
+      <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[80vw] h-[40vw] rounded-full bg-[#8338EC]/8 blur-[150px] animate-breathe" />
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
         <div className="grid lg:grid-cols-[0.9fr_1.4fr] gap-10 lg:gap-16">
           {/* Intro */}
@@ -26,7 +26,7 @@ export const WhyUs = () => {
               </p>
               <button
                 onClick={() => scrollTo("#contact")}
-                className="mt-8 inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-6 py-3.5 rounded-full hover:shadow-[0_0_28px_rgba(131,56,236,0.5)] transition-all duration-300"
+                className="btn-grad shine mt-8 inline-flex items-center gap-2 text-white font-semibold px-6 py-3.5 rounded-full"
               >
                 Hai să vorbim
                 <ArrowRight className="h-4 w-4" />
@@ -38,8 +38,9 @@ export const WhyUs = () => {
           <Stagger className="grid grid-cols-2 gap-3 sm:gap-5">
             {WHY.map((w, i) => (
               <StaggerItem key={w.title}>
+                <TiltCard className="rounded-2xl" max={6}>
                 <div
-                  className="group h-full glass rounded-2xl p-4 sm:p-6 hover:border-white/20 md:hover:-translate-y-1 transition-all duration-300"
+                  className="group h-full glass rounded-2xl p-4 sm:p-6 shine hover:border-white/20 transition-colors duration-300"
                   data-testid={`why-card-${i}`}
                 >
                   <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 border border-white/10 flex items-center justify-center group-hover:glow-ring transition-all duration-300">
@@ -52,6 +53,7 @@ export const WhyUs = () => {
                     {w.desc}
                   </p>
                 </div>
+                </TiltCard>
               </StaggerItem>
             ))}
           </Stagger>

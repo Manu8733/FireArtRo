@@ -4,6 +4,7 @@ import { ArrowRight, Play, Sparkles, Plane, Zap, ShieldCheck, Star } from "lucid
 import HeroVideo from "@/components/site/HeroVideo";
 import Particles from "@/components/site/Particles";
 import FloatingLogos from "@/components/site/FloatingLogos";
+import { MagneticButton } from "@/components/site/cinematic";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -31,8 +32,12 @@ export const Hero = () => {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, mobile ? 60 : 140]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, mobile ? 70 : 180]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, mobile ? 1.08 : 1.22]);
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, mobile ? 30 : 80]);
+  const trailY1 = useTransform(scrollYProgress, [0, 1], [0, -140]);
+  const trailY2 = useTransform(scrollYProgress, [0, 1], [0, 120]);
 
   return (
     <section
@@ -41,15 +46,27 @@ export const Hero = () => {
       className="relative min-h-[100svh] flex items-center overflow-hidden"
       data-testid="hero-section"
     >
-      <HeroVideo />
+      {/* Background depth layer (cinematic zoom-in on scroll) */}
+      <motion.div
+        className="absolute inset-0 z-0"
+        style={reduce ? undefined : { scale: bgScale, y: bgY }}
+      >
+        <HeroVideo />
+      </motion.div>
       {!mobile && <FloatingLogos />}
       {!mobile && (
         <Particles density={60} className="absolute inset-0 z-10 w-full h-full pointer-events-none" />
       )}
 
-      {/* Floating aurora trails */}
-      <div className="absolute -top-1/4 -right-1/4 w-[60vw] h-[60vw] rounded-full bg-[#8338EC]/12 blur-[120px] z-[5] animate-float-eff" />
-      <div className="absolute bottom-0 -left-1/4 w-[50vw] h-[50vw] rounded-full bg-[#3A86FF]/12 blur-[120px] z-[5] animate-float-eff" style={{ animationDelay: "2s" }} />
+      {/* Floating + parallax aurora trails */}
+      <motion.div
+        style={reduce ? undefined : { y: trailY1 }}
+        className="absolute -top-1/4 -right-1/4 w-[60vw] h-[60vw] rounded-full bg-[#8338EC]/12 blur-[120px] z-[5] animate-float-eff"
+      />
+      <motion.div
+        style={reduce ? undefined : { y: trailY2 }}
+        className="absolute bottom-0 -left-1/4 w-[50vw] h-[50vw] rounded-full bg-[#3A86FF]/12 blur-[120px] z-[5] animate-float-eff"
+      />
 
       <motion.div
         style={reduce ? undefined : { y, opacity }}
@@ -82,30 +99,24 @@ export const Hero = () => {
           </motion.p>
 
           <motion.div variants={fadeItem} className="mt-8 flex flex-col xs:flex-row gap-3 sm:gap-4">
-            <motion.button
-              whileHover={{ scale: 1.03, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.3, ease: EASE }}
+            <MagneticButton
               onClick={() => scrollTo("#contact")}
               data-testid="hero-primary-cta"
-              className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-7 py-3.5 sm:px-8 sm:py-4 rounded-full hover:shadow-[0_0_40px_rgba(131,56,236,0.6)]"
+              className="btn-grad shine group inline-flex items-center justify-center gap-2 text-white font-semibold px-7 py-3.5 sm:px-8 sm:py-4 rounded-full"
             >
               Solicită ofertă
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.3, ease: EASE }}
+            </MagneticButton>
+            <MagneticButton
               onClick={() => scrollTo("#spectacole")}
               data-testid="hero-secondary-cta"
-              className="inline-flex items-center justify-center gap-2 glass text-white font-semibold px-7 py-3.5 sm:px-8 sm:py-4 rounded-full hover:bg-white/10"
+              className="shine inline-flex items-center justify-center gap-2 glass text-white font-semibold px-7 py-3.5 sm:px-8 sm:py-4 rounded-full hover:bg-white/10"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10">
                 <Play className="h-3 w-3 fill-white" />
               </span>
               Vezi spectacolele
-            </motion.button>
+            </MagneticButton>
           </motion.div>
 
           {/* Trust strip */}

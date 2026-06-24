@@ -106,10 +106,15 @@ section[id] {
 
 /* ---------- Gradients & text ---------- */
 .text-gradient {
-    background: linear-gradient(104deg, #5aa9ff 0%, #8338ec 52%, #c77dff 100%);
+    background: linear-gradient(104deg, #5aa9ff 0%, #8338ec 38%, #c77dff 58%, #5aa9ff 100%);
+    background-size: 220% auto;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    animation: text-shimmer 7s linear infinite;
+}
+@keyframes text-shimmer {
+    to { background-position: 220% center; }
 }
 
 /* Refined, restrained headline glow (no muddy global shadow) */
@@ -281,6 +286,111 @@ section[id] {
 }
 .animate-twinkle { animation: constellation-twinkle 4.5s ease-in-out infinite; }
 
+/* ============================================================
+   PREMIUM MOTION TOOLKIT
+   ============================================================ */
+@property --ang {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+
+/* Shine sweep on hover (buttons, cards) — uses ::before to avoid clashing with .border-gradient::after */
+.shine { position: relative; overflow: hidden; }
+.shine::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -160%;
+    width: 70%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.26), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    z-index: 2;
+}
+.shine:hover::before { left: 170%; }
+
+/* Animated gradient button */
+.btn-grad {
+    background-image: linear-gradient(110deg, #3a86ff 0%, #8338ec 38%, #c77dff 60%, #3a86ff 100%);
+    background-size: 220% auto;
+    animation: text-shimmer 6s linear infinite;
+    transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+.btn-grad:hover {
+    animation-duration: 2.6s;
+    box-shadow: 0 0 34px rgba(131, 56, 236, 0.6), 0 10px 40px -10px rgba(58, 134, 255, 0.6);
+}
+
+/* 3D tilt card + cursor glare */
+.tilt-card { perspective: 1000px; }
+.tilt-inner {
+    position: relative;
+    height: 100%;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transform-style: preserve-3d;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+.tilt-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    opacity: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.22), transparent 42%);
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 3;
+}
+.tilt-card:hover .tilt-glare { opacity: 1; }
+
+/* Magnetic interactive element */
+.magnetic { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
+
+/* Rotating conic spotlight border (featured) */
+.conic-border::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: conic-gradient(from var(--ang), transparent 0 58%, #5aa9ff 72%, #8338ec 84%, #c77dff 92%, transparent 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: conic-spin 4.5s linear infinite;
+    pointer-events: none;
+}
+@keyframes conic-spin { to { --ang: 360deg; } }
+
+/* Animated aurora-pan gradient surface */
+.bg-aurora-pan {
+    background: linear-gradient(120deg, rgba(58, 134, 255, 0.16), rgba(131, 56, 236, 0.16), rgba(199, 125, 255, 0.12), rgba(58, 134, 255, 0.16));
+    background-size: 320% 320%;
+    animation: gradient-pan 14s ease infinite;
+}
+@keyframes gradient-pan {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Sparkle dots */
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1); }
+}
+.animate-sparkle { animation: sparkle 3.4s ease-in-out infinite; }
+
+/* Soft breathing glow */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.12); opacity: 0.9; }
+}
+.animate-breathe { animation: breathe 6s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .animate-marquee,
@@ -290,8 +400,15 @@ section[id] {
     .animate-glow-pulse,
     .animate-trail,
     .animate-twinkle,
+    .animate-sparkle,
+    .animate-breathe,
+    .btn-grad,
+    .conic-border::before,
+    .bg-aurora-pan,
+    .text-gradient,
     .aurora::before,
     .aurora::after { animation: none !important; }
+    .tilt-inner { transform: none !important; }
 }
 
 /* Custom scrollbar */

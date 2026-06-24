@@ -54,7 +54,7 @@ export const Faq = () => {
               href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center gap-2 glass text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
+              className="shine mt-3 inline-flex items-center gap-2 glass text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
             >
               <MessageCircle className="h-4 w-4 text-[#25D366]" />
               Întreabă-ne pe WhatsApp

@@ -322,7 +322,7 @@ export const QuoteForm = () => {
                     type="submit"
                     disabled={loading}
                     data-testid="quote-submit"
-                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-8 py-4 rounded-full hover:shadow-[0_0_28px_rgba(131,56,236,0.5)] transition-all duration-300 disabled:opacity-60"
+                    className="btn-grad shine w-full inline-flex items-center justify-center gap-2 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 disabled:opacity-60"
                   >
                     {loading ? (
                       <>

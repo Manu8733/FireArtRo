@@ -1,6 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import { SectionHeader, Floating } from "@/components/site/cinematic";
+import { SectionHeader, Floating, TiltCard } from "@/components/site/cinematic";
 import { SERVICES } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -19,8 +19,9 @@ export const Services = () => {
         <div className="mt-10 sm:mt-14 flex md:grid md:grid-cols-2 gap-5 md:gap-7 overflow-x-auto md:overflow-visible snap-x snap-mandatory hide-scrollbar -mx-5 px-5 md:mx-0 md:px-0 pb-1">
           {SERVICES.map((s, i) => (
             <Reveal key={s.title} delay={(i % 2) * 0.1} className="snap-center shrink-0 w-[84%] xs:w-[78%] md:w-auto">
+              <TiltCard className="rounded-3xl" max={7}>
               <div
-                className="group relative h-full rounded-3xl overflow-hidden glass border-gradient hover:border-white/20 md:hover:-translate-y-1.5 transition-all duration-300"
+                className="group relative h-full rounded-3xl overflow-hidden glass border-gradient shine hover:border-white/20 transition-colors duration-300"
                 data-testid={`service-card-${i}`}
               >
                 <div className="relative h-44 sm:h-52 overflow-hidden">
@@ -66,6 +67,7 @@ export const Services = () => {
                   </button>
                 </div>
               </div>
+              </TiltCard>
             </Reveal>
           ))}
         </div>

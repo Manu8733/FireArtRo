@@ -17,7 +17,8 @@ import Reveal from "@/components/site/Reveal";
 import { EVENT_TYPES, PACKAGES, SERVICE_OPTIONS } from "@/data/content";
 import { whatsappLink, PHONE_DISPLAY, EMAIL } from "@/lib/constants";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/$/, "");
+const API = `${BACKEND_URL}/api`;
 
 const empty = {
   name: "",
@@ -102,19 +103,21 @@ export const QuoteForm = () => {
               </div>
 
               <div className="mt-10 space-y-4">
-                <a
-                  href={`tel:${PHONE_DISPLAY.replace(/\s/g, "")}`}
-                  data-testid="contact-phone"
-                  className="flex items-center gap-4 glass rounded-2xl p-4 hover:border-white/20 transition-colors"
-                >
-                  <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 flex items-center justify-center">
-                    <Phone className="h-5 w-5 text-[#9D7BFF]" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-white/45">Telefon</div>
-                    <div className="text-white font-medium">{PHONE_DISPLAY}</div>
-                  </div>
-                </a>
+                {PHONE_DISPLAY && (
+                  <a
+                    href={`tel:${PHONE_DISPLAY.replace(/\s/g, "")}`}
+                    data-testid="contact-phone"
+                    className="flex items-center gap-4 glass rounded-2xl p-4 hover:border-white/20 transition-colors"
+                  >
+                    <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 flex items-center justify-center">
+                      <Phone className="h-5 w-5 text-[#9D7BFF]" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-white/45">Telefon</div>
+                      <div className="text-white font-medium">{PHONE_DISPLAY}</div>
+                    </div>
+                  </a>
+                )}
                 <a
                   href={`mailto:${EMAIL}`}
                   data-testid="contact-email"
@@ -128,21 +131,23 @@ export const QuoteForm = () => {
                     <div className="text-white font-medium">{EMAIL}</div>
                   </div>
                 </a>
-                <a
-                  href={whatsappLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-testid="contact-whatsapp"
-                  className="flex items-center gap-4 glass rounded-2xl p-4 hover:border-white/20 transition-colors"
-                >
-                  <div className="h-11 w-11 rounded-xl bg-[#25D366]/15 flex items-center justify-center">
-                    <MessageCircle className="h-5 w-5 text-[#25D366]" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-white/45">WhatsApp</div>
-                    <div className="text-white font-medium">Scrie-ne acum</div>
-                  </div>
-                </a>
+                {whatsappLink() && (
+                  <a
+                    href={whatsappLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-testid="contact-whatsapp"
+                    className="flex items-center gap-4 glass rounded-2xl p-4 hover:border-white/20 transition-colors"
+                  >
+                    <div className="h-11 w-11 rounded-xl bg-[#25D366]/15 flex items-center justify-center">
+                      <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-white/45">WhatsApp</div>
+                      <div className="text-white font-medium">Scrie-ne acum</div>
+                    </div>
+                  </a>
+                )}
               </div>
             </div>
           </Reveal>
@@ -174,8 +179,9 @@ export const QuoteForm = () => {
                 <form onSubmit={submit} className="space-y-5" data-testid="quote-form">
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Nume *</Label>
+                      <Label htmlFor="quote-name" className="text-white/70 text-sm">Nume *</Label>
                       <Input
+                        id="quote-name"
                         data-testid="quote-input-name"
                         value={form.name}
                         onChange={(e) => update("name")(e.target.value)}
@@ -184,8 +190,9 @@ export const QuoteForm = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Telefon *</Label>
+                      <Label htmlFor="quote-phone" className="text-white/70 text-sm">Telefon *</Label>
                       <Input
+                        id="quote-phone"
                         data-testid="quote-input-phone"
                         value={form.phone}
                         onChange={(e) => update("phone")(e.target.value)}
@@ -197,8 +204,9 @@ export const QuoteForm = () => {
 
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Email</Label>
+                      <Label htmlFor="quote-email" className="text-white/70 text-sm">Email</Label>
                       <Input
+                        id="quote-email"
                         data-testid="quote-input-email"
                         type="email"
                         value={form.email}
@@ -208,8 +216,9 @@ export const QuoteForm = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Data evenimentului</Label>
+                      <Label htmlFor="quote-date" className="text-white/70 text-sm">Data evenimentului</Label>
                       <Input
+                        id="quote-date"
                         data-testid="quote-input-date"
                         type="date"
                         value={form.event_date}
@@ -221,9 +230,11 @@ export const QuoteForm = () => {
 
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Tip eveniment *</Label>
+                      <Label htmlFor="quote-event-type" className="text-white/70 text-sm">Tip eveniment *</Label>
                       <Select value={form.event_type} onValueChange={update("event_type")}>
                         <SelectTrigger
+                          id="quote-event-type"
+                          aria-label="Tip eveniment"
                           data-testid="quote-select-event"
                           className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-[#8338EC]"
                         >
@@ -239,9 +250,11 @@ export const QuoteForm = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Pachet dorit</Label>
+                      <Label htmlFor="quote-package" className="text-white/70 text-sm">Pachet dorit</Label>
                       <Select value={form.package} onValueChange={update("package")}>
                         <SelectTrigger
+                          id="quote-package"
+                          aria-label="Pachet dorit"
                           data-testid="quote-select-package"
                           className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-[#8338EC]"
                         >
@@ -260,8 +273,9 @@ export const QuoteForm = () => {
 
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Locație</Label>
+                      <Label htmlFor="quote-location" className="text-white/70 text-sm">Locație</Label>
                       <Input
+                        id="quote-location"
                         data-testid="quote-input-location"
                         value={form.location}
                         onChange={(e) => update("location")(e.target.value)}
@@ -270,9 +284,11 @@ export const QuoteForm = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Serviciu preferat</Label>
+                      <Label htmlFor="quote-service" className="text-white/70 text-sm">Serviciu preferat</Label>
                       <Select value={form.preferred_service} onValueChange={update("preferred_service")}>
                         <SelectTrigger
+                          id="quote-service"
+                          aria-label="Serviciu preferat"
                           data-testid="quote-select-service"
                           className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-[#8338EC]"
                         >
@@ -290,8 +306,9 @@ export const QuoteForm = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white/70 text-sm">Mesaj</Label>
+                    <Label htmlFor="quote-message" className="text-white/70 text-sm">Mesaj</Label>
                     <Textarea
+                      id="quote-message"
                       data-testid="quote-input-message"
                       value={form.message}
                       onChange={(e) => update("message")(e.target.value)}
@@ -311,7 +328,7 @@ export const QuoteForm = () => {
                     />
                     <Label htmlFor="consent" className="text-white/55 text-sm font-light leading-relaxed cursor-pointer">
                       Sunt de acord cu prelucrarea datelor mele pentru a primi o ofertă, conform{" "}
-                      <a href="/legal/confidentialitate" target="_blank" className="text-[#9D7BFF] underline">
+                      <a href="/legal/confidentialitate" className="text-[#9D7BFF] underline">
                         politicii de confidențialitate
                       </a>
                       .
@@ -335,7 +352,7 @@ export const QuoteForm = () => {
                     )}
                   </button>
                   <p className="text-center text-xs text-white/40">
-                    Răspuns în 24h · Fără obligații · Datele tale sunt în siguranță
+                    Analizăm detaliile evenimentului înainte de direcția de ofertă.
                   </p>
                 </form>
               )}

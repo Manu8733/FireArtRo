@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Plus } from "lucide-react";
 import { YouTubeIcon, FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/site/BrandIcons";
@@ -13,7 +13,7 @@ const ITEMS = [
   { key: "instagram", label: "Instagram", href: INSTAGRAM, Icon: InstagramIcon, color: "#E1306C", external: true },
   { key: "whatsapp", label: "WhatsApp", href: whatsappLink(), Icon: WhatsAppIcon, color: "#25D366", external: true },
   { key: "phone", label: "Sună acum", href: `tel:${PHONE_TEL}`, Icon: Phone, color: "#5AA9FF", external: false },
-];
+].filter((item) => item.href && !item.href.endsWith("tel:"));
 
 const DockButton = ({ item, size = "md", showTooltip = true }) => {
   const { label, href, Icon, color, external } = item;
@@ -52,6 +52,7 @@ const DesktopDock = () => (
   <motion.div
     initial={{ opacity: 0, x: 36 }}
     animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: 28 }}
     transition={{ duration: 0.7, delay: 0.6, ease: EASE }}
     className="fixed right-4 lg:right-5 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center gap-3"
     data-testid="social-dock"
@@ -76,7 +77,13 @@ const DesktopDock = () => (
 const MobileDock = () => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="fixed right-4 bottom-24 z-40 md:hidden flex flex-col items-center gap-3" data-testid="social-dock">
+    <motion.div
+      initial={{ opacity: 0, x: 18 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 24 }}
+      className="fixed right-4 bottom-24 z-40 md:hidden flex flex-col items-center gap-3"
+      data-testid="social-dock"
+    >
       <AnimatePresence>
         {open && (
           <motion.div
@@ -112,13 +119,30 @@ const MobileDock = () => {
           <Plus className="h-6 w-6" />
         </motion.span>
       </button>
-    </div>
+    </motion.div>
   );
 };
 
 export const SocialDock = () => {
   const mobile = useIsMobile();
-  return mobile ? <MobileDock /> : <DesktopDock />;
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const hero = document.getElementById("acasa");
+    if (!hero) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.08 }
+    );
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {visible && (mobile ? <MobileDock key="mobile-dock" /> : <DesktopDock key="desktop-dock" />)}
+    </AnimatePresence>
+  );
 };
 
 export default SocialDock;

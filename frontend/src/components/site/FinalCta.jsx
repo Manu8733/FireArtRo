@@ -22,13 +22,13 @@ export const FinalCta = () => {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-5 font-display font-bold text-white display-lg">
-            Transformă-ți evenimentul într-un{" "}
-            <span className="text-gradient">spectacol memorabil</span>
+            Pregătit să transformi evenimentul într-un{" "}
+            <span className="text-gradient">spectacol memorabil?</span>
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-6 text-white/65 lead font-light max-w-2xl mx-auto">
-            Spune-ne câteva detalii despre eveniment și primești o ofertă personalizată rapid.
+            Trimite-ne câteva detalii, iar noi propunem o direcție vizuală potrivită locației, momentului și atmosferei.
           </p>
         </Reveal>
         <Reveal delay={0.15}>
@@ -38,19 +38,21 @@ export const FinalCta = () => {
               data-testid="final-cta-primary"
               className="btn-grad shine group inline-flex items-center justify-center gap-2 text-white font-semibold px-8 py-4 rounded-full"
             >
-              Trimite brief-ul evenimentului
+              Solicită ofertă
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </MagneticButton>
-            <a
-              href={whatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="final-cta-whatsapp"
-              className="shine inline-flex items-center justify-center gap-2 glass text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-all duration-300"
-            >
-              <MessageCircle className="h-4 w-4 text-[#25D366]" />
-              Contact rapid pe WhatsApp
-            </a>
+            {whatsappLink() && (
+              <a
+                href={whatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="final-cta-whatsapp"
+                className="shine inline-flex items-center justify-center gap-2 glass text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-all duration-300"
+              >
+                <MessageCircle className="h-4 w-4 text-[#25D366]" />
+                Contact rapid pe WhatsApp
+              </a>
+            )}
           </div>
         </Reveal>
       </div>

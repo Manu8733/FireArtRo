@@ -17,37 +17,36 @@ import {
   Wrench,
   Rocket,
   Crown,
-  Building2,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /*  Cinematic media                                                    */
 /* ------------------------------------------------------------------ */
 export const HERO_POSTER =
-  "https://images.unsplash.com/photo-1557393512-3c3f34c4ad70?crop=entropy&cs=srgb&fm=jpg&q=85&w=1920";
+  "/media/fireart-hero-poster.webp";
 
 export const HERO_VIDEOS = [
-  { src: "https://assets.mixkit.co/videos/46028/46028-720.mp4", label: "Artificii" },
-  { src: "https://assets.mixkit.co/videos/49846/49846-720.mp4", label: "Drone" },
-  { src: "https://assets.mixkit.co/videos/21718/21718-720.mp4", label: "Momente" },
-  { src: "https://assets.mixkit.co/videos/28375/28375-720.mp4", label: "Spectacol" },
+  { src: "/media/fireart-hero.mp4", mobileSrc: "/media/fireart-hero-mobile.mp4", label: "Artificii" },
+  { src: "/media/fireart-drone.mp4", mobileSrc: "/media/fireart-drone-mobile.mp4", label: "Drone" },
+  { src: "/media/fireart-moments.mp4", mobileSrc: "/media/fireart-moments-mobile.mp4", label: "Momente" },
+  { src: "/media/fireart-spectacle.mp4", mobileSrc: "/media/fireart-spectacle-mobile.mp4", label: "Spectacol" },
 ];
 
 // Curated cinematic stills (drone light shows · fireworks · cold sparks)
 export const MEDIA = {
-  fireworksSky: "https://images.unsplash.com/photo-1557393512-3c3f34c4ad70?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
-  droneShow: "https://images.unsplash.com/photo-1704072979498-df7f24b04e05?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
-  droneShow2: "https://images.pexels.com/photos/35439843/pexels-photo-35439843.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
-  droneShow3: "https://images.pexels.com/photos/10555659/pexels-photo-10555659.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
-  coldSparks: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
-  coldSparks2: "https://images.unsplash.com/photo-1583245823946-0d3aac6562ad?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
-  coldSparks3: "https://images.pexels.com/photos/5858809/pexels-photo-5858809.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
-  crowd: "https://images.unsplash.com/photo-1704073321423-e2db80cb304b?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
-  crowd2: "https://images.pexels.com/photos/34408550/pexels-photo-34408550.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
-  crowd3: "https://images.pexels.com/photos/34408521/pexels-photo-34408521.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
-  wedding: "https://images.pexels.com/photos/3397027/pexels-photo-3397027.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
-  corporate: "https://images.unsplash.com/photo-1497911270199-1c552ee64aa4?crop=entropy&cs=srgb&fm=jpg&q=85&w=1280",
-  hybrid: "https://images.pexels.com/photos/3385614/pexels-photo-3385614.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+  fireworksSky: "/media/fireworks-sky.webp",
+  droneShow: "/media/drone-show.webp",
+  droneShow2: "/media/drone-show-2.webp",
+  droneShow3: "/media/drone-show-3.webp",
+  coldSparks: "/media/cold-sparks.webp",
+  coldSparks2: "/media/cold-sparks-2.webp",
+  coldSparks3: "/media/cold-sparks-3.webp",
+  crowd: "/media/crowd.webp",
+  crowd2: "/media/crowd-2.webp",
+  crowd3: "/media/crowd-3.webp",
+  wedding: "/media/wedding.webp",
+  corporate: "/media/corporate.webp",
+  hybrid: "/media/hybrid.webp",
 };
 
 export const IMG = {
@@ -84,7 +83,7 @@ export const SERVICES = [
   {
     icon: Plane,
     title: "Spectacole cu drone",
-    desc: "Coregrafii luminoase 3D pe cerul nopții — animații, logo-uri și mesaje create special pentru evenimentul tău.",
+    desc: "Coregrafii luminoase, forme și mesaje create pentru cerul evenimentului.",
     ideal: "Nunți · Corporate · Festivaluri · Lansări",
     benefits: ["Animații 3D personalizate", "Logo & mesaje în aer", "Zero zgomot, zero fum"],
     image: MEDIA.droneShow,
@@ -92,7 +91,7 @@ export const SERVICES = [
   {
     icon: Flame,
     title: "Artificii profesionale",
-    desc: "Spectacole pirotehnice sincronizate pe muzică, cu efecte de mare înălțime și culori spectaculoase.",
+    desc: "Spectacol pirotehnic regizat pe muzică pentru momentul central al serii.",
     ideal: "Nunți · Aniversări · Sărbători",
     benefits: ["Sincronizare pe muzică", "Efecte de mare înălțime", "Echipă autorizată"],
     image: MEDIA.fireworksSky,
@@ -100,7 +99,7 @@ export const SERVICES = [
   {
     icon: Sparkles,
     title: "Drone + artificii sincronizate",
-    desc: "Combinația supremă: drone show și artificii rulate împreună, pentru un final imposibil de uitat.",
+    desc: "Drone și artificii construite ca un singur final vizual.",
     ideal: "Evenimente premium · Festivaluri",
     benefits: ["Show hibrid premium", "Impact vizual maxim", "Regie tehnică completă"],
     image: MEDIA.hybrid,
@@ -108,7 +107,7 @@ export const SERVICES = [
   {
     icon: Zap,
     title: "Cold sparks & efecte speciale",
-    desc: "Fântâni de scântei reci, fum greu, lasere și efecte de scenă pentru momentele cheie ale serii.",
+    desc: "Scântei reci și efecte de scenă pentru intrări, dans și momente-cheie.",
     ideal: "Primul dans · Intrări · Scenă",
     benefits: ["Scântei reci, sigure", "Fum greu & lasere", "Montaj indoor & outdoor"],
     image: MEDIA.coldSparks,
@@ -133,14 +132,12 @@ export const SHOWCASE_CATEGORIES = ["Nunți", "Corporate", "Festivaluri", "Lans�
 /*  Storytelling — cinematic 8-scene journey                           */
 /* ------------------------------------------------------------------ */
 export const STORY = [
-  { no: "01", kicker: "Momentul", title: "Totul începe cu o așteptare", text: "Lumini stinse, priviri ridicate spre cer, respirații ținute. E clipa dinaintea clipei — momentul în care orice devine posibil.", image: MEDIA.crowd2, glow: "#3A86FF" },
-  { no: "02", kicker: "Viziunea", title: "Dintr-o idee, un scenariu de lumină", text: "Ascultăm povestea evenimentului tău și o transformăm într-un concept vizual unic, gândit pentru momentul și locul tău.", image: MEDIA.droneShow2, glow: "#5AA9FF" },
-  { no: "03", kicker: "Designul", title: "Construit milimetric în jurul tău", text: "Muzică, ritm, locație, mesaj, forme și culori — fiecare detaliu al show-ului este desenat special pentru tine.", image: MEDIA.hybrid, glow: "#8338EC" },
-  { no: "04", kicker: "Tehnologia", title: "Sute de drone, sincronizate pe beat", text: "Drone, artificii și efecte coordonate digital și sincronizate la fracțiune de secundă — tehnologie invizibilă, emoție vizibilă.", image: MEDIA.droneShow, glow: "#9D7BFF" },
-  { no: "05", kicker: "Pregătirea", title: "Energia crește. Cerul așteaptă.", text: "Echipa e la poziții, sistemele sunt armate, tensiunea se simte în aer. Numărătoarea inversă tocmai a început.", image: MEDIA.coldSparks3, glow: "#C77DFF" },
-  { no: "06", kicker: "Spectacolul", title: "Cerul explodează în lumină", text: "Drone, artificii și scântei prind viață într-o coregrafie care taie respirația. Acesta este momentul „wow”.", image: MEDIA.fireworksSky, glow: "#8338EC" },
-  { no: "07", kicker: "Reacția", title: "Fețe luminate, telefoane ridicate", text: "Aplauze, emoție, priviri pierdute în lumină. Momentul devine deja amintirea pe care toți o vor povesti.", image: MEDIA.crowd, glow: "#5AA9FF" },
-  { no: "08", kicker: "Amintirea", title: "Un moment de neuitat", text: "Ultima scânteie se stinge, dar emoția rămâne. FIREARTRO nu creează doar efecte — creează amintiri.", image: MEDIA.coldSparks2, glow: "#3A86FF" },
+  { no: "01", kicker: "Momentul", title: "Noaptea așteaptă", text: "Luminile scad. Privirile se ridică.", image: MEDIA.crowd2, glow: "#3A86FF" },
+  { no: "02", kicker: "Viziunea", title: "Ideea capătă formă", text: "Povestea evenimentului devine un concept vizual.", image: MEDIA.droneShow2, glow: "#5AA9FF" },
+  { no: "03", kicker: "Design & tehnologie", title: "Ritmul devine lumină", text: "Muzica, spațiul și sistemele urmează aceeași coregrafie.", image: MEDIA.hybrid, glow: "#8338EC" },
+  { no: "04", kicker: "Build-up", title: "Energia începe să urce", text: "Totul este verificat. Numărătoarea inversă începe.", image: MEDIA.coldSparks3, glow: "#C77DFF" },
+  { no: "05", kicker: "Spectacolul", title: "Cerul se deschide", text: "Lumină, ritm și profunzime într-un singur vârf vizual.", image: MEDIA.fireworksSky, glow: "#8338EC" },
+  { no: "06", kicker: "Amintirea", title: "Lumina pleacă. Emoția rămâne.", text: "Reacția publicului devine partea care continuă povestea.", image: MEDIA.crowd, glow: "#5AA9FF" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -176,7 +173,7 @@ export const CHAPTERS = [
 export const WHY = [
   { icon: Wand2, title: "Design 100% personalizat", desc: "Fiecare spectacol este creat de la zero, în jurul poveștii evenimentului tău." },
   { icon: ShieldCheck, title: "Siguranță & autorizații", desc: "Echipă autorizată, planificare tehnică riguroasă și respectarea tuturor normelor." },
-  { icon: Sparkles, title: "Efect „wow” garantat", desc: "Momente vizuale spectaculoase care lasă invitații fără cuvinte." },
+  { icon: Sparkles, title: "Impact vizual regizat", desc: "Momente construite pentru ritmul evenimentului și reacția publicului." },
   { icon: HeartHandshake, title: "Consultanță dedicată", desc: "Te ghidăm pas cu pas, din prima idee până la ultimul detaliu." },
   { icon: Gauge, title: "Execuție profesionistă", desc: "Tehnică de top, operatori cu experiență și o regie milimetrică." },
   { icon: Layers, title: "Show-uri combinate", desc: "Drone, artificii și efecte speciale, într-un singur spectacol coerent." },
@@ -202,7 +199,7 @@ export const PROCESS = [
   { step: "02", title: "Concept vizual", desc: "Creăm conceptul show-ului: coregrafie, culori și sincronizare pe muzică.", icon: Palette },
   { step: "03", title: "Planificare tehnică", desc: "Verificăm locația, obținem autorizațiile și pregătim echipamentul.", icon: Settings2 },
   { step: "04", title: "Pregătire & sincronizare", desc: "Montaj, testare și verificări de siguranță înainte de start.", icon: Wrench },
-  { step: "05", title: "Spectacol", desc: "Rulăm show-ul live, milimetric, pentru efectul „wow” garantat.", icon: Rocket },
+  { step: "05", title: "Spectacol", desc: "Rulăm show-ul live, coordonat atent pentru momentul central al evenimentului.", icon: Rocket },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -215,7 +212,7 @@ export const PACKAGES = [
     tagline: "Clasic & spectaculos",
     best: "Nunți și aniversări",
     impact: "Impact vizual ridicat",
-    desc: "Spectacol pirotehnic sincronizat pe muzică, regizat pentru momentul tău cheie.",
+    desc: "Final pirotehnic regizat pentru momentul-cheie.",
     features: ["Artificii sincronizate pe muzică", "Durată personalizată", "Echipă autorizată"],
     popular: false,
   },
@@ -225,7 +222,7 @@ export const PACKAGES = [
     tagline: "Modern & futurist",
     best: "Corporate & lansări",
     impact: "Impact vizual premium",
-    desc: "Coregrafie 3D cu drone, cu logo, mesaje și animații create pentru brandul tău.",
+    desc: "Coregrafie de drone cu forme, mesaje și identitate vizuală.",
     features: ["Coregrafie 3D cu drone", "Logo & mesaje în aer", "Zero zgomot, zero fum"],
     popular: true,
   },
@@ -235,18 +232,18 @@ export const PACKAGES = [
     tagline: "Experiența supremă",
     best: "Evenimente premium",
     impact: "Impact vizual maxim",
-    desc: "Drone, artificii și cold sparks într-un singur show, pentru un final memorabil.",
+    desc: "Drone, artificii și cold sparks într-un singur scenariu.",
     features: ["Drone + artificii sincronizate", "Cold sparks la momentele cheie", "Regie tehnică completă"],
     popular: false,
   },
   {
-    icon: Building2,
-    name: "Pachet Corporate / Festival",
-    tagline: "Custom & scalabil",
-    best: "Festivaluri & branduri",
-    impact: "Show la scară mare",
-    desc: "Producție de mari dimensiuni, gândită în jurul brandului și al publicului tău.",
-    features: ["Concept custom de brand", "Producție de mari dimensiuni", "Coordonare completă eveniment"],
+    icon: Sparkles,
+    name: "Pachet Efecte Speciale",
+    tagline: "Accent & atmosferă",
+    best: "Intrări, dans, scenă",
+    impact: "Moment vizual precis",
+    desc: "Cold sparks și efecte adaptate momentelor-cheie.",
+    features: ["Cold sparks", "Configurație indoor / outdoor", "Integrare în desfășurător"],
     popular: false,
   },
 ];
@@ -278,13 +275,9 @@ export const GALLERY = [
 /* ------------------------------------------------------------------ */
 /*  Social proof                                                       */
 /* ------------------------------------------------------------------ */
-export const TESTIMONIALS = [
-  { name: "Andreea & Mihai", role: "Nuntă · Cluj", text: "Drone show-ul a fost momentul serii. Invitații încă vorbesc despre el!", rating: 5 },
-  { name: "Robert Ionescu", role: "Director Marketing", text: "Lansarea noastră de produs a arătat incredibil. Profesioniști de la cap la coadă.", rating: 5 },
-  { name: "Elena Pop", role: "Organizator festival", text: "Sincronizarea artificii + drone a ridicat tot festivalul la alt nivel.", rating: 5 },
-];
-
-export const PARTNERS = ["LUMEN EVENTS", "AURORA WEDDINGS", "NOVA CORP", "VERTEX FEST", "STELLAR PR", "GRAND HOTEL", "SUMMIT GROUP"];
+// Populate only with verified client-approved testimonials and partner names.
+export const TESTIMONIALS = [];
+export const PARTNERS = [];
 
 /* ------------------------------------------------------------------ */
 /*  FAQ                                                                */
@@ -298,6 +291,8 @@ export const FAQS = [
   { q: "Se pot face spectacole corporate sau festivaluri?", a: "Da. Realizăm show-uri custom pentru branduri, lansări de produs, gale corporate și festivaluri, la scară mică sau mare." },
   { q: "Cât durează un spectacol?", a: "În funcție de pachet și concept, un spectacol durează de regulă între 3 și 12 minute. Durata se personalizează în funcție de moment și buget." },
   { q: "Ce informații trebuie trimise pentru ofertă?", a: "Tipul evenimentului, data, locația aproximativă și ce tip de show îți dorești (drone, artificii sau combinat). Restul detaliilor le stabilim împreună la consultanță." },
+  { q: "Sunt disponibile efecte speciale indoor?", a: "Da, în funcție de locație și condițiile tehnice. Cold sparks și alte efecte de scenă se aleg după verificarea spațiului, a distanțelor și a regulilor locației." },
+  { q: "De ce prețul este personalizat?", a: "Costul depinde de locație, durată, complexitatea designului, numărul de drone, tipul efectelor, cerințele de siguranță și logistica necesară." },
 ];
 
 /* ------------------------------------------------------------------ */

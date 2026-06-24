@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { NAV_LINKS } from "@/data/content";
 import { LOGO_URL } from "@/lib/constants";
 
-const scrollTo = (href) => {
+const scrollTo = (href, behavior = "smooth") => {
   const el = document.querySelector(href);
-  if (el) el.scrollIntoView({ behavior: "smooth" });
+  if (el) el.scrollIntoView({ behavior, block: "start" });
 };
 
 const Logo = ({ onClick }) => (
@@ -20,17 +20,41 @@ const Logo = ({ onClick }) => (
     data-testid="nav-logo"
     className="flex items-center gap-3 shrink-0"
   >
-    <img src={LOGO_URL} alt="FIREARTRO" className="h-8 w-auto md:h-10 object-contain" />
+    <img src={LOGO_URL} alt="FIREARTRO" width="720" height="311" className="h-8 w-auto md:h-10 object-contain" />
   </a>
 );
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#acasa");
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const updateNavigation = () => {
+      const currentY = Math.max(window.scrollY, 0);
+      const delta = currentY - lastScrollY.current;
+
+      setScrolled(currentY > 24);
+      if (currentY < 72) {
+        setVisible(true);
+      } else if (Math.abs(delta) > 8) {
+        setVisible(delta < 0);
+      }
+
+      lastScrollY.current = currentY;
+      ticking.current = false;
+    };
+
+    const onScroll = () => {
+      if (ticking.current) return;
+      ticking.current = true;
+      window.requestAnimationFrame(updateNavigation);
+    };
+
+    lastScrollY.current = window.scrollY;
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -56,8 +80,8 @@ export const Navbar = () => {
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      animate={{ y: visible || open ? 0 : -104, opacity: 1 }}
+      transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled
           ? "backdrop-blur-xl bg-[#050308]/75 border-b border-white/10 py-2.5"
@@ -142,14 +166,14 @@ export const Navbar = () => {
                 </div>
 
                 <div className="flex flex-col px-5 py-6 gap-0.5 flex-1 overflow-y-auto">
-                  {NAV_LINKS.map((l, i) => (
+                  {NAV_LINKS.filter((link) => link.href !== "#acasa").map((l, i) => (
                     <motion.a
                       key={l.href}
                       href={l.href}
                       onClick={(e) => {
                         e.preventDefault();
                         setOpen(false);
-                        setTimeout(() => scrollTo(l.href), 220);
+                        setTimeout(() => scrollTo(l.href, "auto"), 220);
                       }}
                       data-testid={`mobile-nav-link-${l.href.replace("#", "")}`}
                       initial={{ opacity: 0, x: 24 }}
@@ -167,7 +191,7 @@ export const Navbar = () => {
                   <button
                     onClick={() => {
                       setOpen(false);
-                      setTimeout(() => scrollTo("#contact"), 220);
+                      setTimeout(() => scrollTo("#contact", "auto"), 220);
                     }}
                     data-testid="mobile-nav-cta"
                     className="btn-grad shine w-full inline-flex items-center justify-center gap-2 text-white font-semibold px-6 py-3.5 rounded-full"

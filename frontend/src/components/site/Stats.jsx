@@ -1,31 +1,35 @@
+import { Compass, MapPin, Radio, ShieldCheck } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import CountUp from "@/components/site/CountUp";
-import { TiltCard } from "@/components/site/cinematic";
-import { STATS } from "@/data/content";
+import { SectionHeader } from "@/components/site/cinematic";
 
-export const Stats = () => {
-  return (
-    <section className="relative py-16 sm:py-20 md:py-24 border-y border-white/5" data-testid="stats-section">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#8338EC]/40 to-transparent" />
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-          {STATS.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.08}>
-              <TiltCard className="rounded-2xl" max={6}>
-              <div className="group relative glass rounded-2xl p-5 sm:p-7 md:p-8 text-center shine hover:border-[#8338EC]/40 transition-colors duration-300 overflow-hidden">
-                <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="font-display font-bold text-[1.9rem] sm:text-4xl text-gradient">
-                  <CountUp end={s.value} suffix={s.suffix} />
-                </div>
-                <div className="mt-2.5 text-[13px] sm:text-base text-white/55 leading-snug">{s.label}</div>
-              </div>
-              </TiltCard>
-            </Reveal>
-          ))}
-        </div>
+const PROOF = [
+  { icon: Compass, title: "Concept personalizat", text: "Show-ul pornește de la eveniment, nu de la un șablon." },
+  { icon: MapPin, title: "Adaptat locației", text: "Spațiul, publicul și momentul dictează soluția vizuală." },
+  { icon: Radio, title: "Sincronizare controlată", text: "Dronele, artificiile și efectele urmează același scenariu." },
+  { icon: ShieldCheck, title: "Plan tehnic clar", text: "Deciziile de siguranță și logistică sunt definite înainte de show." },
+];
+
+export const Stats = () => (
+  <section className="relative border-y border-white/5 py-16 sm:py-20 md:py-24" data-testid="stats-section">
+    <div className="mx-auto max-w-7xl px-5 sm:px-6 md:px-12">
+      <SectionHeader
+        kicker="Dovezi înainte de promisiuni"
+        title="Spectacolul începe cu un proces bine construit"
+        subtitle="Încrederea vine din claritate: ce proiectăm, cum adaptăm și cum pregătim fiecare moment."
+      />
+      <div className="mt-9 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        {PROOF.map((item, index) => (
+          <Reveal key={item.title} delay={index * 0.06}>
+            <article className="h-full rounded-2xl border border-white/9 bg-white/[0.035] p-4 sm:p-5">
+              <item.icon className="h-5 w-5 text-[#9D7BFF]" />
+              <h3 className="mt-4 font-display text-sm font-semibold text-white sm:text-base">{item.title}</h3>
+              <p className="mt-2 text-xs leading-relaxed text-white/52 sm:text-sm">{item.text}</p>
+            </article>
+          </Reveal>
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default Stats;

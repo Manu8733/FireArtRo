@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-// Lightweight canvas particle field — glowing drifting sparks.
+// Lightweight canvas spark field. Rendering pauses outside the viewport.
 export const Particles = ({ density = 70, className }) => {
   const ref = useRef(null);
 
@@ -10,56 +10,76 @@ export const Particles = ({ density = 70, className }) => {
     const ctx = canvas.getContext("2d");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const colors = ["#3A86FF", "#8338EC", "#9D7BFF", "#5AA9FF", "#C77DFF"];
-    let w, h, particles, raf;
+    let width = 0;
+    let height = 0;
+    let particles = [];
+    let raf = 0;
+    let visible = true;
+    let lastFrame = 0;
 
     const init = () => {
-      w = canvas.width = canvas.offsetWidth;
-      h = canvas.height = canvas.offsetHeight;
-      const count = Math.max(18, Math.min(density, Math.floor(w / 14)));
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.35);
+      width = canvas.offsetWidth;
+      height = canvas.offsetHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const count = Math.max(18, Math.min(density, Math.floor(width / 14)));
       particles = Array.from({ length: count }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: Math.random() * 1.9 + 0.4,
-        vy: -(Math.random() * 0.35 + 0.08),
-        vx: (Math.random() - 0.5) * 0.18,
-        a: Math.random() * 0.6 + 0.2,
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 1.7 + 0.35,
+        vy: -(Math.random() * 0.28 + 0.06),
+        vx: (Math.random() - 0.5) * 0.14,
+        a: Math.random() * 0.5 + 0.18,
         c: colors[Math.floor(Math.random() * colors.length)],
         tw: Math.random() * Math.PI * 2,
       }));
     };
 
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-      for (const p of particles) {
-        p.y += p.vy;
-        p.x += p.vx;
-        p.tw += 0.025;
-        if (p.y < -12) {
-          p.y = h + 12;
-          p.x = Math.random() * w;
+    const draw = (time = 0) => {
+      raf = requestAnimationFrame(draw);
+      if (!visible || document.hidden || time - lastFrame < 33) return;
+      lastFrame = time;
+      ctx.clearRect(0, 0, width, height);
+
+      for (const particle of particles) {
+        particle.y += particle.vy;
+        particle.x += particle.vx;
+        particle.tw += 0.025;
+        if (particle.y < -12) {
+          particle.y = height + 12;
+          particle.x = Math.random() * width;
         }
-        const alpha = p.a * (0.55 + 0.45 * Math.sin(p.tw));
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.c;
-        ctx.globalAlpha = alpha;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = p.c;
+        ctx.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+        ctx.fillStyle = particle.c;
+        ctx.globalAlpha = particle.a * (0.55 + 0.45 * Math.sin(particle.tw));
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = particle.c;
         ctx.fill();
       }
       ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(draw);
     };
 
     init();
-    draw();
-    if (reduce) cancelAnimationFrame(raf);
+    if (!reduce) draw();
 
-    const onResize = () => init();
-    window.addEventListener("resize", onResize);
+    const resizeObserver = new ResizeObserver(init);
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+      },
+      { threshold: 0.02 }
+    );
+    resizeObserver.observe(canvas);
+    visibilityObserver.observe(canvas);
+
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
     };
   }, [density]);
 

@@ -7,13 +7,18 @@ import {
   useTransform,
   useReducedMotion,
 } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { STORY } from "@/data/content";
-import { useIsMobile } from "@/hooks/useMediaQuery";
 
 const EASE = [0.22, 1, 0.36, 1];
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const SCENE_VISUALS = [
+  { clipPath: "circle(72% at 50% 50%)", rotate: -1.2, scale: 1.02 },
+  { clipPath: "polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%)", rotate: 1.1, scale: 1.035 },
+  { clipPath: "inset(3% 7% 3% 7% round 28px)", rotate: 0, scale: 1.045 },
+  { clipPath: "polygon(0% 7%, 93% 0%, 100% 93%, 7% 100%)", rotate: -0.8, scale: 1.055 },
+  { clipPath: "circle(100% at 56% 44%)", rotate: 0, scale: 1.085 },
+  { clipPath: "inset(0% 0% 0% 0% round 34px)", rotate: 0.6, scale: 1.02 },
+];
 
 /* ---------------- Drone-dot constellation (desktop, cheap) ---------------- */
 const DOTS = [
@@ -61,56 +66,6 @@ const RailSeg = ({ progress, index, total, active, onClick, no }) => {
   );
 };
 
-/* ---------------- Mobile: one scene per screen (reversible) ---------------- */
-const MobileStory = () => {
-  const reduce = useReducedMotion();
-  return (
-    <section id="povestea" className="relative bg-[#050308] py-16" data-testid="chapters-section">
-      <div className="aurora opacity-50" />
-      <div className="relative max-w-md mx-auto px-5 text-center">
-        <span className="cine-kicker text-[10px] font-semibold text-[#9D7BFF]">Călătoria FIREARTRO</span>
-        <h2 className="mt-3 font-display font-bold text-white display-md">De la idee la momentul de neuitat</h2>
-      </div>
-
-      <div className="relative mt-6">
-        {STORY.map((s, i) => (
-          <motion.article
-            key={s.no}
-            data-testid={`chapter-media-${i}`}
-            className="relative min-h-[78vh] flex flex-col justify-center px-5 max-w-md mx-auto"
-            initial={reduce ? false : { opacity: 0, y: 24, filter: "blur(8px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ amount: 0.35, margin: "-4% 0px -4% 0px" }}
-            transition={{ duration: 0.6, ease: EASE }}
-          >
-            <div className="relative rounded-3xl overflow-hidden glass">
-              <div className="relative h-56 overflow-hidden">
-                <img src={s.image} alt={s.title} loading="lazy" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0712] via-[#0A0712]/30 to-transparent" />
-                <div className="absolute top-4 left-4 font-display font-bold text-white/90 text-3xl text-bloom">{s.no}</div>
-                <div className="absolute bottom-4 left-4 glass-strong rounded-full px-3 py-1.5">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-white">{s.kicker}</span>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-display font-semibold title-card text-white">{s.title}</h3>
-                <p className="mt-2.5 text-white/60 body-sm font-light">{s.text}</p>
-              </div>
-            </div>
-            <div className="mt-3 text-center text-[11px] font-mono text-white/30">{s.no} / 0{STORY.length}</div>
-          </motion.article>
-        ))}
-      </div>
-
-      <div className="text-center mt-2">
-        <button onClick={() => scrollTo("#contact")} className="btn-grad shine inline-flex items-center gap-2 text-white font-semibold px-6 py-3.5 rounded-full">
-          Hai să scriem povestea ta <ArrowRight className="h-4 w-4" />
-        </button>
-      </div>
-    </section>
-  );
-};
-
 /* ---------------- Desktop: pinned cinematic journey ---------------- */
 const DesktopStory = () => {
   const ref = useRef(null);
@@ -147,7 +102,7 @@ const DesktopStory = () => {
       ref={ref}
       id="povestea"
       className="relative bg-[#050308]"
-      style={{ height: `${STORY.length * 85}vh` }}
+      style={{ height: `${STORY.length * 74}vh` }}
       data-testid="chapters-section"
     >
       <div className="sticky top-0 h-screen overflow-hidden flex items-center">
@@ -167,13 +122,13 @@ const DesktopStory = () => {
         <div className="absolute left-1/3 bottom-1/4 h-32 w-px bg-gradient-to-b from-transparent via-[#C77DFF]/40 to-transparent animate-trail" style={{ animationDelay: "0.8s" }} />
 
         {/* Progress rail */}
-        <div className="absolute right-5 lg:right-8 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2.5">
+        <div className="absolute right-5 lg:right-8 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col gap-2.5">
           {STORY.map((s, i) => (
             <RailSeg key={s.no} progress={scrollYProgress} index={i} total={STORY.length} active={i === active} no={s.no} onClick={() => goTo(i)} />
           ))}
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-7 lg:gap-16 items-center pt-16 pb-14 md:py-0">
           {/* Left — text */}
           <div className="relative order-2 md:order-1">
             <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#9D7BFF]">Călătoria FIREARTRO</span>
@@ -185,7 +140,7 @@ const DesktopStory = () => {
                 exit={{ opacity: 0, y: -28, filter: "blur(12px)" }}
                 transition={{ duration: 0.55, ease: EASE }}
               >
-                <div className="font-display font-bold text-white leading-[0.85] text-[4.5rem] xl:text-[6.5rem] text-bloom mt-2">{sc.no}</div>
+                <div className="font-display font-bold text-white/12 leading-none text-[2.6rem] sm:text-[3.6rem] xl:text-[4.8rem] mt-2">{sc.no}</div>
                 <div className="cine-kicker text-[#9D7BFF] label-xs mt-3">{sc.kicker}</div>
                 <h3 className="font-display font-semibold text-white display-md mt-3 max-w-md">{sc.title}</h3>
                 <p className="mt-3.5 text-white/60 lead font-light max-w-sm">{sc.text}</p>
@@ -199,7 +154,7 @@ const DesktopStory = () => {
           {/* Right — 3D media card */}
           <div className="relative order-1 md:order-2 perspective" onMouseMove={onMove} onMouseLeave={onLeave}>
             <motion.div
-              className="relative h-[360px] lg:h-[480px] preserve-3d"
+              className="relative h-[255px] sm:h-[330px] md:h-[380px] lg:h-[500px] preserve-3d"
               animate={{ rotateX: tilt.x, rotateY: tilt.y }}
               transition={{ type: "spring", stiffness: 120, damping: 18 }}
             >
@@ -210,12 +165,26 @@ const DesktopStory = () => {
                   className="absolute inset-0 rounded-[1.6rem] overflow-hidden glass backface-hidden"
                   data-testid={`chapter-media-${i}`}
                   style={{ transform: "translateZ(40px)", zIndex: i === active ? 2 : 1 }}
-                  animate={{ opacity: i === active ? 1 : 0, scale: i === active ? 1 : 1.05 }}
-                  transition={{ duration: 0.9, ease: EASE }}
+                  animate={{
+                    opacity: i === active ? 1 : 0,
+                    scale: i === active ? 1 : SCENE_VISUALS[i]?.scale || 1.05,
+                    rotate: i === active ? 0 : SCENE_VISUALS[i]?.rotate || 0,
+                    clipPath: i === active ? SCENE_VISUALS[i]?.clipPath : "inset(12% 10% 12% 10% round 38px)",
+                  }}
+                  transition={{ duration: 0.82, ease: EASE }}
                 >
-                  <img src={s.image} alt={s.title} loading="lazy" className={`w-full h-full object-cover ${i === active ? "animate-ken-burns" : ""}`} />
+                  <img src={s.image} alt={s.title} width="1280" height="853" loading="lazy" decoding="async" className={`w-full h-full object-cover ${i === active ? "animate-ken-burns" : ""}`} />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050308] via-[#050308]/10 to-transparent" />
                   <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[1.6rem] pointer-events-none" />
+                  <div
+                    className={`absolute inset-0 pointer-events-none ${
+                      i === 4
+                        ? "bg-[radial-gradient(circle_at_56%_42%,rgba(199,125,255,0.26),transparent_42%)]"
+                        : i === 5
+                          ? "bg-gradient-to-t from-[#050308]/70 via-transparent to-transparent"
+                          : "bg-transparent"
+                    }`}
+                  />
                   <div className="absolute bottom-5 left-5 glass-strong rounded-full px-4 py-2" style={{ transform: "translateZ(60px)" }}>
                     <span className="text-xs font-semibold uppercase tracking-wider text-white">{s.kicker}</span>
                   </div>
@@ -225,19 +194,26 @@ const DesktopStory = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.25em] text-white/30 flex items-center gap-2">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-white/30 hidden sm:flex items-center gap-2">
           <span className="inline-block w-5 h-px bg-white/20" />
           Derulează pentru a trăi povestea
           <span className="inline-block w-5 h-px bg-white/20" />
+        </div>
+        <div className="absolute bottom-5 left-5 right-5 z-20 flex items-center gap-1.5 sm:hidden">
+          {STORY.map((story, index) => (
+            <span
+              key={story.no}
+              className={`h-1 flex-1 rounded-full transition-colors duration-500 ${
+                index === active ? "bg-gradient-to-r from-[#3A86FF] to-[#8338EC]" : "bg-white/16"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 };
 
-export const Chapters = () => {
-  const mobile = useIsMobile();
-  return mobile ? <MobileStory /> : <DesktopStory />;
-};
+export const Chapters = () => <DesktopStory />;
 
 export default Chapters;

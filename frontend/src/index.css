@@ -39,6 +39,7 @@
 }
 
 html {
+    position: relative;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
 }
@@ -46,6 +47,7 @@ html {
 body {
     margin: 0;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: clamp(0.86rem, 0.9vw, 0.98rem);
     background-color: #050308;
     color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
@@ -63,22 +65,22 @@ body {
 
 /* ---------- Fluid display type (refined & premium — elegant, not shouting) ---------- */
 .display-xl {
-    font-size: clamp(2rem, 4.8vw, 4.4rem);
+    font-size: clamp(1.8rem, 4.4vw, 4rem);
     line-height: 1.07;
     letter-spacing: -0.035em;
 }
 .display-lg {
-    font-size: clamp(1.6rem, 3.4vw, 2.9rem);
+    font-size: clamp(1.45rem, 3vw, 2.6rem);
     line-height: 1.12;
     letter-spacing: -0.028em;
 }
 .display-md {
-    font-size: clamp(1.4rem, 2.8vw, 2.35rem);
+    font-size: clamp(1.32rem, 2.5vw, 2.2rem);
     line-height: 1.16;
     letter-spacing: -0.02em;
 }
 .display-sm {
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-size: clamp(1.08rem, 1.8vw, 1.42rem);
     line-height: 1.24;
     letter-spacing: -0.015em;
 }
@@ -102,6 +104,218 @@ body {
 /* Section scroll offset for sticky nav */
 section[id] {
     scroll-margin-top: 96px;
+}
+
+/* ---------- Scroll-directed cinematic scene system ---------- */
+.cinema-scene-shell {
+    position: relative;
+    isolation: isolate;
+    scroll-margin-top: 72px;
+    perspective: 1600px;
+    background:
+        radial-gradient(48% 22% at 50% 0%, color-mix(in srgb, var(--scene-accent) 11%, transparent), transparent 72%),
+        #050308;
+}
+
+.story-flow-node {
+    position: absolute;
+    left: 50%;
+    top: -1px;
+    z-index: 50;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+    background: var(--scene-accent);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--scene-accent) 78%, transparent);
+}
+
+.cinema-scene-shell::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -34px;
+    z-index: 45;
+    width: 1px;
+    height: 68px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--scene-accent) 58%, transparent), transparent);
+}
+
+.cinema-scene-frame {
+    position: relative;
+    z-index: 1;
+    overflow: clip;
+    transform-origin: 50% 50%;
+    background: #050308;
+    box-shadow:
+        0 40px 120px rgba(0, 0, 0, 0.48),
+        0 0 0 1px color-mix(in srgb, var(--scene-accent) 12%, transparent);
+}
+
+.cinema-scene-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    opacity: 0.22;
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--scene-accent) 18%, transparent), transparent 7%, transparent 93%, color-mix(in srgb, var(--scene-accent) 14%, transparent)),
+        radial-gradient(60% 18% at 50% 0%, color-mix(in srgb, var(--scene-accent) 12%, transparent), transparent 72%);
+    mix-blend-mode: screen;
+}
+
+.cinema-scene-light {
+    position: absolute;
+    inset: -20%;
+    z-index: 39;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(112deg, transparent 38%, color-mix(in srgb, var(--scene-accent) 16%, white 4%) 50%, transparent 62%);
+}
+
+.cinema-scene-shell[data-motion="curtain"] .cinema-scene-light {
+    opacity: 0.55;
+    transform: translateY(-44%);
+}
+
+.cinema-scene-shell[data-motion="aperture"] .cinema-scene-light {
+    opacity: 0.35;
+    background: radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--scene-accent) 24%, transparent), transparent 46%);
+}
+
+.cinema-scene-shell[data-motion="depth"] .cinema-scene-frame {
+    transform-origin: 50% 18%;
+}
+
+.cinema-scene-shell[data-motion="fold"] .cinema-scene-frame {
+    transform-origin: 50% 50%;
+}
+
+.cinema-scene-edge {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    z-index: 45;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--scene-accent) 65%, white 10%), transparent);
+    opacity: 0.5;
+}
+.cinema-scene-edge-top { top: 0; }
+.cinema-scene-edge-bottom { bottom: 0; }
+
+.cinema-scene-meta {
+    position: absolute;
+    top: clamp(5.5rem, 8vw, 7.5rem);
+    right: clamp(1rem, 3vw, 3.5rem);
+    z-index: 42;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: rgba(255, 255, 255, 0.34);
+    font-family: "Inter", sans-serif;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    pointer-events: none;
+    writing-mode: vertical-rl;
+}
+.cinema-scene-meta span:first-child {
+    color: color-mix(in srgb, var(--scene-accent) 82%, white 18%);
+    font-family: "Sora", sans-serif;
+    font-size: 0.78rem;
+}
+
+.cinema-hero-frame {
+    transform-origin: 50% 45%;
+    box-shadow: 0 48px 140px rgba(0, 0, 0, 0.65);
+}
+
+.hero-media-video {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: paint;
+}
+
+.cinema-scanline {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0.18;
+    background:
+        linear-gradient(90deg, transparent 0 49.94%, rgba(255, 255, 255, 0.09) 50%, transparent 50.06%),
+        repeating-linear-gradient(0deg, transparent 0 6px, rgba(255, 255, 255, 0.018) 7px);
+    mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+}
+
+.prologue-atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+.prologue-atmosphere-rise {
+    background: linear-gradient(to top, rgba(58, 134, 255, 0.14), transparent 42%);
+    animation: prologue-rise 5s ease-in-out infinite;
+}
+
+.prologue-atmosphere-orbit {
+    background: radial-gradient(circle at 70% 38%, rgba(131, 56, 236, 0.2), transparent 28%);
+    animation: prologue-orbit 9s ease-in-out infinite;
+}
+
+.prologue-atmosphere-split {
+    background: linear-gradient(90deg, transparent 46%, rgba(157, 123, 255, 0.17) 50%, transparent 54%);
+    animation: prologue-scan 4.8s ease-in-out infinite;
+}
+
+.prologue-atmosphere-pulse {
+    background: radial-gradient(circle at 55% 58%, rgba(199, 125, 255, 0.22), transparent 24%);
+    animation: breathe 3.8s ease-in-out infinite;
+}
+
+.prologue-atmosphere-burst {
+    background: radial-gradient(circle at 60% 40%, rgba(90, 169, 255, 0.18), transparent 42%);
+    animation: prologue-burst 5s ease-in-out infinite;
+}
+
+@keyframes prologue-rise {
+    0%, 100% { transform: translateY(5%); opacity: .45; }
+    50% { transform: translateY(-4%); opacity: .82; }
+}
+@keyframes prologue-orbit {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(-7%, 6%, 0) scale(1.14); }
+}
+@keyframes prologue-scan {
+    0%, 100% { transform: translateX(-28%); opacity: .2; }
+    50% { transform: translateX(28%); opacity: .75; }
+}
+@keyframes prologue-burst {
+    0%, 100% { transform: scale(.92); opacity: .35; }
+    50% { transform: scale(1.12); opacity: .8; }
+}
+
+@media (max-width: 767px) {
+    .hero-media-video {
+        object-position: 58% center;
+    }
+
+    .cinema-scene-frame {
+        box-shadow: none;
+        overflow: hidden;
+    }
+    .cinema-scene-frame::before,
+    .cinema-scene-edge,
+    .cinema-scene-meta {
+        display: none;
+    }
 }
 
 /* ---------- Gradients & text ---------- */

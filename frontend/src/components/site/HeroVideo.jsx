@@ -1,55 +1,114 @@
-import { useEffect, useState } from "react";
-import { HERO_VIDEOS, HERO_POSTER } from "@/data/content";
-
-// Cinematic video collage — clips autoplay natively; we crossfade opacity between them.
-const CLIPS = HERO_VIDEOS.slice(0, 3);
+import { useEffect, useRef, useState } from "react";
+import { HERO_POSTER, HERO_VIDEOS } from "@/data/content";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 export const HeroVideo = () => {
+  const containerRef = useRef(null);
+  const videoRef = useRef(null);
+  const mobile = useIsMobile();
+  const [enabled, setEnabled] = useState(true);
+  const [ready, setReady] = useState(false);
   const [active, setActive] = useState(0);
-  const [enabled, setEnabled] = useState(false);
+  const item = HERO_VIDEOS[active];
+  const source = mobile ? item.mobileSrc : item.src;
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const small = window.matchMedia("(max-width: 768px)").matches;
-    if (reduce || small) return; // mobile & reduced-motion: poster only (perf)
-    setEnabled(true);
-    const id = setInterval(() => setActive((a) => (a + 1) % CLIPS.length), 6500);
-    return () => clearInterval(id);
+    const saveData = navigator.connection?.saveData;
+    if (reduce || saveData) setEnabled(false);
   }, []);
 
+  useEffect(() => {
+    if (!enabled) return;
+    const next = HERO_VIDEOS[(active + 1) % HERO_VIDEOS.length];
+    const preload = document.createElement("video");
+    preload.preload = "metadata";
+    preload.muted = true;
+    preload.src = mobile ? next.mobileSrc : next.src;
+    return () => {
+      preload.removeAttribute("src");
+      preload.load();
+    };
+  }, [active, enabled, mobile]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !container || !enabled) return;
+
+    let visible = true;
+    const syncPlayback = () => {
+      if (document.hidden || !visible) {
+        video.pause();
+        return;
+      }
+      video.play().catch(() => {});
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        syncPlayback();
+      },
+      { threshold: 0.08 }
+    );
+    const onVisibilityChange = () => syncPlayback();
+
+    observer.observe(container);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [active, enabled, source]);
+
+  const queueNext = () => {
+    setReady(false);
+    setActive((current) => (current + 1) % HERO_VIDEOS.length);
+  };
+
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden">
+    <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden">
       <img
         src={HERO_POSTER}
         alt="Spectacol de drone și artificii FIREARTRO"
-        className="absolute inset-0 w-full h-full object-cover scale-105"
+        width="800"
+        height="1600"
+        className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
         fetchPriority="high"
+        decoding="async"
       />
 
-      {enabled &&
-        CLIPS.map((clip, i) => (
-          <video
-            key={clip.src}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity ease-in-out"
-            style={{ opacity: i === active ? 1 : 0, transitionDuration: "1600ms" }}
-            src={clip.src}
-            poster={HERO_POSTER}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-hidden="true"
-          />
-        ))}
+      {enabled && (
+        <video
+          key={source}
+          ref={videoRef}
+          className="hero-media-video absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
+          style={{ opacity: ready ? 1 : 0 }}
+          poster={HERO_POSTER}
+          autoPlay
+          muted
+          playsInline
+          preload={active === 0 ? "auto" : "metadata"}
+          disablePictureInPicture
+          controlsList="nodownload noplaybackrate nofullscreen"
+          onPlaying={() => setReady(true)}
+          onTimeUpdate={(event) => {
+            const video = event.currentTarget;
+            if (video.duration - video.currentTime < 0.45) setReady(false);
+          }}
+          onEnded={queueNext}
+          aria-label={`Fundal video: ${item.label}`}
+        >
+          <source src={source} type="video/mp4" />
+        </video>
+      )}
 
-      {/* Cinematic overlays — depth, mood and strong text legibility */}
-      <div className="absolute inset-0 bg-black/45" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_22%,_rgba(131,56,236,0.32),_transparent_60%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/65 via-[#050308]/35 to-[#050308]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#050308] via-[#050308]/30 to-transparent" />
-      {/* subtle vignette */}
-      <div className="absolute inset-0 shadow-[inset_0_0_180px_60px_rgba(5,3,8,0.9)] pointer-events-none" />
+      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_56%_30%,_rgba(131,56,236,0.2),_transparent_62%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/46 via-transparent to-[#050308]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#050308]/94 via-[#050308]/24 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_130px_34px_rgba(5,3,8,0.72)]" />
     </div>
   );
 };

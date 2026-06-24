@@ -1,80 +1,106 @@
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import { SectionHeader, Floating, TiltCard } from "@/components/site/cinematic";
+import { SectionHeader } from "@/components/site/cinematic";
 import { SERVICES } from "@/data/content";
 
+const EASE = [0.22, 1, 0.36, 1];
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
 export const Services = () => {
+  const [active, setActive] = useState(0);
+  const service = SERVICES[active];
+  const Icon = service.icon;
+
   return (
-    <section id="servicii" className="relative py-20 sm:py-28 md:py-32 section-grid-bg" data-testid="services-section">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
+    <section className="relative overflow-hidden py-20 sm:py-24 md:py-28" data-testid="services-section">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 md:px-12">
         <SectionHeader
-          kicker="Ce oferim"
-          title="Servicii premium pentru evenimente memorabile"
-          subtitle="De la drone show-uri futuriste la artificii clasice și efecte de scenă — construim spectacolul perfect pentru momentul tău."
+          kicker="Ce poți construi"
+          title="Patru instrumente. Un singur scenariu vizual."
+          subtitle="Alegi direcția, iar combinația finală se adaptează evenimentului și locației."
         />
 
-        {/* Mobile: swipeable row · Desktop: 2-col grid */}
-        <div className="mt-10 sm:mt-14 flex md:grid md:grid-cols-2 gap-5 md:gap-7 overflow-x-auto md:overflow-visible snap-x snap-mandatory hide-scrollbar -mx-5 px-5 md:mx-0 md:px-0 pb-1">
-          {SERVICES.map((s, i) => (
-            <Reveal key={s.title} delay={(i % 2) * 0.1} className="snap-center shrink-0 w-[84%] xs:w-[78%] md:w-auto">
-              <TiltCard className="rounded-3xl" max={7}>
-              <div
-                className="group relative h-full rounded-3xl overflow-hidden glass border-gradient shine hover:border-white/20 transition-colors duration-300"
-                data-testid={`service-card-${i}`}
+        <div className="mt-10 grid overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#08050f] lg:grid-cols-[1.08fr_0.92fr]">
+          <div className="relative min-h-[420px] overflow-hidden sm:min-h-[520px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={service.image}
+                className="absolute inset-0"
+                initial={{ opacity: 0, scale: 1.08, clipPath: "inset(8% 8% 8% 8% round 24px)" }}
+                animate={{ opacity: 1, scale: 1, clipPath: "inset(0% 0% 0% 0% round 0px)" }}
+                exit={{ opacity: 0, scale: 0.985 }}
+                transition={{ duration: 0.72, ease: EASE }}
               >
-                <div className="relative h-44 sm:h-52 overflow-hidden">
-                  <img
-                    src={s.image}
-                    alt={s.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0712] via-[#0A0712]/40 to-transparent" />
-                  <Floating delay={i * 0.3} className="absolute top-4 left-4 sm:top-5 sm:left-5">
-                    <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl glass flex items-center justify-center glow-ring">
-                      <s.icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#9D7BFF]" />
-                    </div>
-                  </Floating>
+                <img src={service.image} alt={service.title} width="1280" height="853" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+              </motion.div>
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050308] via-[#050308]/15 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#050308]/40" />
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={service.title}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -18 }}
+                transition={{ duration: 0.5, ease: EASE }}
+                className="absolute bottom-0 left-0 right-0 p-6 sm:p-8"
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/12 bg-black/35 backdrop-blur-md">
+                  <Icon className="h-5 w-5 text-[#9D7BFF]" />
+                </span>
+                <h3 className="mt-4 max-w-lg font-display text-[clamp(1.45rem,2.7vw,2.5rem)] font-semibold leading-tight text-white">
+                  {service.title}
+                </h3>
+                <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/64">{service.desc}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {service.benefits.map((benefit) => (
+                    <span key={benefit} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] text-white/68 backdrop-blur-md">
+                      <Check className="h-3 w-3 text-[#9D7BFF]" />
+                      {benefit}
+                    </span>
+                  ))}
                 </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-                <div className="p-6 sm:p-7">
-                  <h3 className="font-display font-semibold title-card text-white">{s.title}</h3>
-                  <p className="mt-3 text-white/60 text-sm sm:text-base font-light leading-relaxed">{s.desc}</p>
+          <div className="flex flex-col">
+            {SERVICES.map((item, index) => (
+              <button
+                type="button"
+                key={item.title}
+                onClick={() => setActive(index)}
+                onMouseEnter={() => setActive(index)}
+                data-testid={`service-card-${index}`}
+                className={`group flex flex-1 items-start gap-4 border-b border-white/8 p-5 text-left transition-colors last:border-b-0 sm:p-6 ${
+                  index === active ? "bg-white/[0.065]" : "bg-transparent hover:bg-white/[0.035]"
+                }`}
+              >
+                <span className={`mt-0.5 font-mono text-[10px] transition-colors ${index === active ? "text-[#9D7BFF]" : "text-white/28"}`}>
+                  0{index + 1}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-display text-base font-semibold text-white sm:text-lg">{item.title}</span>
+                  <span className="mt-1.5 block text-xs leading-relaxed text-white/65 sm:text-sm">{item.ideal}</span>
+                </span>
+                <ArrowRight className={`mt-1 h-4 w-4 transition-all ${index === active ? "translate-x-0 text-[#9D7BFF]" : "-translate-x-1 text-white/20"}`} />
+              </button>
+            ))}
 
-                  <div className="mt-5 text-[10px] uppercase tracking-[0.2em] text-[#5AA9FF]">
-                    Ideal pentru
-                  </div>
-                  <p className="mt-1 text-sm text-white/70">{s.ideal}</p>
-
-                  <ul className="mt-5 space-y-2">
-                    {s.benefits.map((b) => (
-                      <li key={b} className="flex items-center gap-2.5 text-sm text-white/70">
-                        <Check className="h-4 w-4 text-[#8338EC] shrink-0" />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => scrollTo("#contact")}
-                    data-testid={`service-cta-${i}`}
-                    className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-white group/btn"
-                  >
-                    Solicită acest show
-                    <ArrowRight className="h-4 w-4 text-[#8338EC] group-hover/btn:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-              </div>
-              </TiltCard>
-            </Reveal>
-          ))}
-        </div>
-
-        {/* mobile swipe hint */}
-        <div className="mt-4 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/30 md:hidden">
-          <span className="h-px w-5 bg-white/15" /> Glisează <ArrowRight className="h-3 w-3" />
+            <div className="p-5 sm:p-6">
+              <button
+                type="button"
+                onClick={() => scrollTo("#contact")}
+                className="btn-grad inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold text-white"
+              >
+                Configurează spectacolul
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

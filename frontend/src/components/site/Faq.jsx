@@ -1,65 +1,67 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { MessageCircle } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ArrowUpRight, MessageCircle } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import { SectionHeader } from "@/components/site/cinematic";
 import { FAQS } from "@/data/content";
 import { whatsappLink } from "@/lib/constants";
 
 export const Faq = () => {
+  const directContactHref = whatsappLink();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQS.map((f) => ({
+    mainEntity: FAQS.map((item) => ({
       "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
     })),
   };
 
   return (
-    <section id="intrebari" className="relative py-20 sm:py-28 md:py-32" data-testid="faq-section">
+    <section className="relative py-20 sm:py-24 md:py-28" data-testid="faq-section">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 md:px-12">
-        <SectionHeader center kicker="Întrebări frecvente" title="Tot ce trebuie să știi" />
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-6 md:px-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
+        <Reveal>
+          <div className="lg:sticky lg:top-28">
+            <span className="cine-kicker text-[10px] font-semibold text-[#9D7BFF]">Obiecții, clarificate</span>
+            <h2 className="mt-5 max-w-md font-display text-[clamp(1.6rem,3vw,2.8rem)] font-bold leading-[1.08] text-white">
+              Ce trebuie să știi înainte să ridicăm privirile spre cer.
+            </h2>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-white/56 sm:text-base">
+              Detaliile tehnice se schimbă de la o locație la alta. Aici găsești răspunsurile care te ajută să începi brief-ul corect.
+            </p>
+            <a
+              href={directContactHref || "#contact"}
+              {...(directContactHref ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-white"
+            >
+              <MessageCircle className="h-4 w-4 text-[#25D366]" />
+              Întreabă direct
+              <ArrowUpRight className="h-3.5 w-3.5 text-white/40" />
+            </a>
+          </div>
+        </Reveal>
 
-        <Reveal delay={0.1}>
-          <Accordion type="single" collapsible className="mt-10 sm:mt-12 space-y-3" data-testid="faq-accordion">
-            {FAQS.map((f, i) => (
+        <Reveal delay={0.08}>
+          <Accordion type="single" collapsible className="border-t border-white/10" data-testid="faq-accordion">
+            {FAQS.map((item, index) => (
               <AccordionItem
-                key={i}
-                value={`item-${i}`}
-                className="glass rounded-2xl px-5 sm:px-6 border-white/10"
-                data-testid={`faq-item-${i}`}
+                key={item.q}
+                value={`item-${index}`}
+                className="border-b border-white/10"
+                data-testid={`faq-item-${index}`}
               >
-                <AccordionTrigger className="text-left font-display font-medium text-white text-sm sm:text-base hover:no-underline py-4 sm:py-5">
-                  {f.q}
+                <AccordionTrigger className="py-5 text-left font-display text-sm font-medium text-white hover:no-underline sm:py-6 sm:text-base">
+                  <span className="flex items-start gap-4">
+                    <span className="mt-0.5 font-mono text-[9px] text-[#9D7BFF]">{String(index + 1).padStart(2, "0")}</span>
+                    <span>{item.q}</span>
+                  </span>
                 </AccordionTrigger>
-                <AccordionContent className="text-white/60 body-sm font-light leading-relaxed pb-5">
-                  {f.a}
+                <AccordionContent className="pb-6 pl-9 text-sm font-light leading-relaxed text-white/58">
+                  {item.a}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          <div className="mt-10 text-center">
-            <p className="text-white/55 text-sm">Nu ai găsit răspunsul căutat?</p>
-            <a
-              href={whatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shine mt-3 inline-flex items-center gap-2 glass text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
-            >
-              <MessageCircle className="h-4 w-4 text-[#25D366]" />
-              Întreabă-ne pe WhatsApp
-            </a>
-          </div>
         </Reveal>
       </div>
     </section>

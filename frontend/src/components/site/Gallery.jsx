@@ -14,6 +14,8 @@ const Tile = ({ g, i, onOpen }) => (
     <img
       src={g.image}
       alt={g.alt}
+      width="1280"
+      height="853"
       loading="lazy"
       className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
     />
@@ -36,7 +38,7 @@ export const Gallery = () => {
   const [active, setActive] = useState(null);
 
   return (
-    <section id="galerie" className="relative py-20 sm:py-28 md:py-32 overflow-hidden" data-testid="gallery-section">
+    <section className="relative py-20 sm:py-28 md:py-32 overflow-hidden" data-testid="gallery-section">
       <div className="absolute top-1/4 -left-1/4 w-[45vw] h-[45vw] rounded-full bg-[#8338EC]/8 blur-[150px] animate-breathe" />
       <div className="absolute bottom-0 -right-1/4 w-[40vw] h-[40vw] rounded-full bg-[#3A86FF]/8 blur-[150px] animate-breathe" style={{ animationDelay: "3s" }} />
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
@@ -69,6 +71,8 @@ export const Gallery = () => {
               <img
                 src={active.image}
                 alt={active.alt}
+                width="1280"
+                height="853"
                 className="w-full h-auto max-h-[80vh] object-contain rounded-xl"
               />
               <div className="px-3 pb-2 pt-1 flex items-center gap-2">

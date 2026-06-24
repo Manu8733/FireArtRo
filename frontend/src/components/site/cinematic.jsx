@@ -122,7 +122,7 @@ export const Floating = ({ children, delay = 0, className }) => (
 );
 
 /* ---------------- 3D tilt card with cursor glare (desktop only) ---------------- */
-export const TiltCard = ({ children, className, max = 9, glare = true }) => {
+export const TiltCard = ({ children, className, max = 9, glare = false }) => {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
   const ref = useRef(null);

@@ -36,10 +36,10 @@ export const Faq = () => {
                 className="glass rounded-2xl px-5 sm:px-6 border-white/10"
                 data-testid={`faq-item-${i}`}
               >
-                <AccordionTrigger className="text-left font-display font-medium text-white text-[15px] sm:text-lg hover:no-underline py-5">
+                <AccordionTrigger className="text-left font-display font-medium text-white text-sm sm:text-base hover:no-underline py-4 sm:py-5">
                   {f.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-white/60 text-sm sm:text-[15px] font-light leading-relaxed pb-5">
+                <AccordionContent className="text-white/60 body-sm font-light leading-relaxed pb-5">
                   {f.a}
                 </AccordionContent>
               </AccordionItem>

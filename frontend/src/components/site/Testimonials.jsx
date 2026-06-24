@@ -14,7 +14,7 @@ const Card = ({ t, i }) => (
         <Star key={s} className="h-4 w-4 fill-[#FFB703] text-[#FFB703]" />
       ))}
     </div>
-    <p className="mt-4 text-white/80 font-light leading-relaxed">“{t.text}”</p>
+    <p className="mt-4 text-white/80 body-sm font-light leading-relaxed">“{t.text}”</p>
     <div className="mt-6 flex items-center gap-3">
       <div className="h-11 w-11 rounded-full bg-gradient-to-br from-[#3A86FF] to-[#8338EC] flex items-center justify-center font-display font-semibold text-white">
         {t.name.charAt(0)}

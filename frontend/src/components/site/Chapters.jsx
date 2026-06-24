@@ -185,10 +185,10 @@ const DesktopStory = () => {
                 exit={{ opacity: 0, y: -28, filter: "blur(12px)" }}
                 transition={{ duration: 0.55, ease: EASE }}
               >
-                <div className="font-display font-bold text-white leading-[0.85] text-[7rem] xl:text-[9rem] text-bloom mt-2">{sc.no}</div>
-                <div className="cine-kicker text-[#9D7BFF] text-xs mt-2">{sc.kicker}</div>
-                <h3 className="font-display font-semibold text-white display-lg mt-3 max-w-md">{sc.title}</h3>
-                <p className="mt-4 text-white/60 lead font-light max-w-md">{sc.text}</p>
+                <div className="font-display font-bold text-white leading-[0.85] text-[4.5rem] xl:text-[6.5rem] text-bloom mt-2">{sc.no}</div>
+                <div className="cine-kicker text-[#9D7BFF] label-xs mt-3">{sc.kicker}</div>
+                <h3 className="font-display font-semibold text-white display-md mt-3 max-w-md">{sc.title}</h3>
+                <p className="mt-3.5 text-white/60 lead font-light max-w-sm">{sc.text}</p>
               </motion.div>
             </AnimatePresence>
             <div className="mt-8 font-mono text-sm text-white/40 tabular-nums">

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Expand } from "lucide-react";
-import Reveal from "@/components/site/Reveal";
-import { SectionHeader } from "@/components/site/cinematic";
+import { SectionHeader, Stagger, StaggerItem } from "@/components/site/cinematic";
 import { GALLERY } from "@/data/content";
 
 const Tile = ({ g, i, onOpen }) => (
@@ -37,8 +36,10 @@ export const Gallery = () => {
   const [active, setActive] = useState(null);
 
   return (
-    <section id="galerie" className="relative py-20 sm:py-28 md:py-32" data-testid="gallery-section">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
+    <section id="galerie" className="relative py-20 sm:py-28 md:py-32 overflow-hidden" data-testid="gallery-section">
+      <div className="absolute top-1/4 -left-1/4 w-[45vw] h-[45vw] rounded-full bg-[#8338EC]/8 blur-[150px]" />
+      <div className="absolute bottom-0 -right-1/4 w-[40vw] h-[40vw] rounded-full bg-[#3A86FF]/8 blur-[150px]" />
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
         <SectionHeader kicker="Galerie" title="Lumină, culoare, emoție" subtitle="Câteva cadre din spectacolele și atmosfera pe care le creăm." />
 
         {/* Mobile: swipe row */}
@@ -50,16 +51,14 @@ export const Gallery = () => {
           ))}
         </div>
 
-        {/* Desktop: bento grid */}
-        <div className="mt-12 hidden md:grid grid-cols-4 auto-rows-[220px] gap-4">
+        {/* Desktop: bento grid (revealed as a unit so tiles stay interactive) */}
+        <Stagger className="mt-12 hidden md:grid grid-cols-4 auto-rows-[210px] gap-4" gap={0.06}>
           {GALLERY.map((g, i) => (
-            <Reveal key={i} delay={(i % 4) * 0.06} className={g.big ? "col-span-2 row-span-2" : ""}>
-              <div className="w-full h-full">
-                <Tile g={g} i={i} onOpen={setActive} />
-              </div>
-            </Reveal>
+            <StaggerItem key={i} className={g.big ? "col-span-2 row-span-2" : ""}>
+              <Tile g={g} i={i} onOpen={setActive} />
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
 
       <Dialog open={!!active} onOpenChange={(o) => !o && setActive(null)}>

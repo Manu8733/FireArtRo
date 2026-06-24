@@ -75,11 +75,10 @@ export const Hero = () => {
 
           <motion.p
             variants={fadeItem}
-            className="mt-6 text-[15px] sm:text-lg text-white/72 font-light leading-relaxed max-w-2xl"
+            className="mt-5 text-sm sm:text-base text-white/70 font-light leading-relaxed max-w-xl"
           >
-            FIREARTRO transformă nunți, evenimente corporate, festivaluri și lansări în
-            experiențe vizuale cinematice — cu drone show-uri, artificii și efecte speciale
-            sincronizate.
+            Drone show-uri, artificii și efecte speciale sincronizate — pentru nunți,
+            evenimente corporate, festivaluri și lansări de neuitat.
           </motion.p>
 
           <motion.div variants={fadeItem} className="mt-8 flex flex-col xs:flex-row gap-3 sm:gap-4">
@@ -119,9 +118,12 @@ export const Hero = () => {
             </div>
           </motion.div>
 
-          <motion.div variants={fadeItem} className="mt-6 flex flex-wrap gap-x-6 gap-y-2.5">
-            {BADGES.map((b) => (
-              <div key={b.label} className="flex items-center gap-2 text-white/55">
+          <motion.div variants={fadeItem} className="mt-5 flex flex-wrap gap-x-5 gap-y-2.5">
+            {BADGES.map((b, i) => (
+              <div
+                key={b.label}
+                className={`${i > 1 ? "hidden sm:flex" : "flex"} items-center gap-2 text-white/55`}
+              >
                 <b.icon className="h-4 w-4 text-[#5AA9FF]" />
                 <span className="text-xs sm:text-sm font-medium">{b.label}</span>
               </div>

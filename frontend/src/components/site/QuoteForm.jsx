@@ -82,10 +82,24 @@ export const QuoteForm = () => {
               <h2 className="font-display font-bold text-white display-md mt-4">
                 Hai să creăm spectacolul tău
               </h2>
-              <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
-                Completează formularul cu detaliile evenimentului. Revenim rapid cu o ofertă
-                personalizată în funcție de locație, durată și complexitate.
+              <p className="mt-4 text-white/60 lead font-light">
+                Spune-ne câteva detalii despre eveniment și revenim rapid cu o ofertă
+                personalizată.
               </p>
+
+              <div className="mt-6">
+                <div className="label-xs uppercase tracking-[0.18em] text-[#5AA9FF]">
+                  Include în brief
+                </div>
+                <ul className="mt-3 grid grid-cols-2 gap-2.5">
+                  {["Tipul evenimentului", "Data și locația", "Tipul de show dorit", "Buget aproximativ"].map((t) => (
+                    <li key={t} className="flex items-center gap-2 text-[13px] text-white/70 glass rounded-xl px-3 py-2.5">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#8338EC] shrink-0" />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               <div className="mt-10 space-y-4">
                 <a

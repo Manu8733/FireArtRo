@@ -12,6 +12,10 @@ import {
   Radio,
   MapPin,
   MessagesSquare,
+  ClipboardList,
+  Palette,
+  Wrench,
+  Rocket,
 } from "lucide-react";
 
 // Hero cinematic video collage (drone · fireworks · wedding) — hotlinkable Mixkit loops.
@@ -140,11 +144,11 @@ export const WHY = [
 ];
 
 export const PROCESS = [
-  { step: "01", title: "Brief", desc: "Discutăm viziunea, locația și momentul cheie al evenimentului." },
-  { step: "02", title: "Concept vizual", desc: "Creăm conceptul show-ului: coregrafie, culori și sincronizare." },
-  { step: "03", title: "Planificare tehnică", desc: "Verificăm locația, obținem autorizațiile și pregătim echipamentul." },
-  { step: "04", title: "Setup & verificări", desc: "Montaj, testare și verificări de siguranță înainte de start." },
-  { step: "05", title: "Spectacol", desc: "Rulăm show-ul live, milimetric, pentru efectul wow garantat." },
+  { step: "01", title: "Brief", desc: "Discutăm viziunea, locația și momentul cheie al evenimentului.", icon: ClipboardList },
+  { step: "02", title: "Concept vizual", desc: "Creăm conceptul show-ului: coregrafie, culori și sincronizare.", icon: Palette },
+  { step: "03", title: "Planificare tehnică", desc: "Verificăm locația, obținem autorizațiile și pregătim echipamentul.", icon: Settings2 },
+  { step: "04", title: "Setup & verificări", desc: "Montaj, testare și verificări de siguranță înainte de start.", icon: Wrench },
+  { step: "05", title: "Spectacol", desc: "Rulăm show-ul live, milimetric, pentru efectul wow garantat.", icon: Rocket },
 ];
 
 export const PACKAGES = [

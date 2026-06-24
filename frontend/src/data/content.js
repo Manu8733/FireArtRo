@@ -130,7 +130,21 @@ export const PORTFOLIO = [
 export const SHOWCASE_CATEGORIES = ["Nunți", "Corporate", "Festivaluri", "Lansări", "Evenimente private", "City events"];
 
 /* ------------------------------------------------------------------ */
-/*  Storytelling chapters                                              */
+/*  Storytelling — cinematic 8-scene journey                           */
+/* ------------------------------------------------------------------ */
+export const STORY = [
+  { no: "01", kicker: "Momentul", title: "Totul începe cu o așteptare", text: "Lumini stinse, priviri ridicate spre cer, respirații ținute. E clipa dinaintea clipei — momentul în care orice devine posibil.", image: MEDIA.crowd2, glow: "#3A86FF" },
+  { no: "02", kicker: "Viziunea", title: "Dintr-o idee, un scenariu de lumină", text: "Ascultăm povestea evenimentului tău și o transformăm într-un concept vizual unic, gândit pentru momentul și locul tău.", image: MEDIA.droneShow2, glow: "#5AA9FF" },
+  { no: "03", kicker: "Designul", title: "Construit milimetric în jurul tău", text: "Muzică, ritm, locație, mesaj, forme și culori — fiecare detaliu al show-ului este desenat special pentru tine.", image: MEDIA.hybrid, glow: "#8338EC" },
+  { no: "04", kicker: "Tehnologia", title: "Sute de drone, sincronizate pe beat", text: "Drone, artificii și efecte coordonate digital și sincronizate la fracțiune de secundă — tehnologie invizibilă, emoție vizibilă.", image: MEDIA.droneShow, glow: "#9D7BFF" },
+  { no: "05", kicker: "Pregătirea", title: "Energia crește. Cerul așteaptă.", text: "Echipa e la poziții, sistemele sunt armate, tensiunea se simte în aer. Numărătoarea inversă tocmai a început.", image: MEDIA.coldSparks3, glow: "#C77DFF" },
+  { no: "06", kicker: "Spectacolul", title: "Cerul explodează în lumină", text: "Drone, artificii și scântei prind viață într-o coregrafie care taie respirația. Acesta este momentul „wow”.", image: MEDIA.fireworksSky, glow: "#8338EC" },
+  { no: "07", kicker: "Reacția", title: "Fețe luminate, telefoane ridicate", text: "Aplauze, emoție, priviri pierdute în lumină. Momentul devine deja amintirea pe care toți o vor povesti.", image: MEDIA.crowd, glow: "#5AA9FF" },
+  { no: "08", kicker: "Amintirea", title: "Un moment de neuitat", text: "Ultima scânteie se stinge, dar emoția rămâne. FIREARTRO nu creează doar efecte — creează amintiri.", image: MEDIA.coldSparks2, glow: "#3A86FF" },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Storytelling chapters (legacy short version, kept for reference)   */
 /* ------------------------------------------------------------------ */
 export const CHAPTERS = [
   {

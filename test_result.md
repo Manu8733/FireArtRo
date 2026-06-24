@@ -298,16 +298,70 @@ frontend:
         agent: "testing"
         comment: "✅ PASS - NO console errors found. 20 minor console warnings (Canvas2D willReadFrequently performance optimization, scroll offset container position) - all non-critical. NO 'DialogContent requires a DialogTitle' warnings. NO React/runtime errors. Ignored: posthog, mixkit video ERR_ABORTED, React DevTools notices as specified."
 
+  - task: "Storytelling journey — 8 cinematic scenes (desktop pinned 3D / mobile one-scene-per-screen)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/site/Chapters.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Expanded from 3 to 8 scenes (STORY in content.js). Desktop = pinned scroll journey (~680vh) with 3D hover-tilt media card, constellation, light trails, scroll-progress rail (chapter-dot-0..7), scene crossfade + AnimatePresence text (chapter-media-0..7). Mobile = one-scene-per-screen vertical reversible reveals (chapter-media-0..7), short text, NO scroll-jacking. Verify scenes advance on scroll (desktop) and render cleanly stacked (mobile), no horizontal overflow, rail clickable jumps."
+
+  - task: "Reversible scroll animations (enter + exit both directions)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/site/Reveal.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Reveal/cinematic primitives now use useInView (once:false) so content fades/slides/blurs IN on enter and OUT on leave, both scrolling down and back up (direction-aware exit). Mobile-lighter, prefers-reduced-motion safe. Verify elements re-animate on up/down scroll and are not permanently stuck; ensure no flicker/jank."
+
+  - task: "Floating social dock (YouTube/Facebook/Instagram/WhatsApp/Phone)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/site/SocialDock.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "New right-side vertical dock (data-testid=social-dock) with brand-glyph icons, glow+scale+lift hover, tooltips, aria-labels, focus rings. Desktop = always visible right-center. Mobile = compact expandable FAB (social-dock-toggle) bottom-right above the Emergent badge. Verify links (WhatsApp→wa.me, phone→tel:, YT/FB/IG external), no overlap with content/CTA/badge, mobile toggle expands/collapses, keyboard focusable."
+
+  - task: "Typography audit (controlled fluid clamp scale)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/index.css"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Reduced oversized headings/cards via retuned clamp utilities (display-xl/lg/md/sm, title-card, lead, body-sm). Verify text is balanced — not oversized/cramped on 360/390/430/768/820 and elegant on 1366/1440/1920."
+
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 2
+  version: "3.0"
+  test_sequence: 3
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Storytelling journey — 8 cinematic scenes (desktop pinned 3D / mobile one-scene-per-screen)"
+    - "Reversible scroll animations (enter + exit both directions)"
+    - "Floating social dock (YouTube/Facebook/Instagram/WhatsApp/Phone)"
+    - "Typography audit (controlled fluid clamp scale)"
+    - "Responsive QA — no horizontal scroll across viewports"
+    - "Quote Form submission (backend integration)"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
@@ -315,3 +369,5 @@ agent_communication:
     message: "Completed a large cinematic redesign of the FIREARTRO single-page site. Changed: typography (Sora display + Inter body) via index.html/index.css/tailwind.config; new motion primitives (cinematic.jsx, Reveal.jsx, useMediaQuery hook) that are mobile-light and reduced-motion aware; redesigned Navbar, Hero, HeroVideo, Intro, Stats, Services, Showcase, Chapters (mobile vertical fallback), new WhyUs section, Process (mobile vertical timeline fallback), Packages (pricing factors + prefill), Gallery (mobile swipe + lightbox), Testimonials, Faq, FinalCta, Footer; minor QuoteForm restyle (logic unchanged); content.js copy + curated cinematic images. Removed standalone Technology section from the page flow (file still exists). NOTE: restored missing backend/.env and frontend/.env (were gitignored) — backend healthy again. Please run full FRONTEND functional + RESPONSIVE QA per current_focus. Backend was not modified functionally."
   - agent: "testing"
     message: "✅ COMPREHENSIVE QA COMPLETE - ALL TESTS PASS. Tested PRIORITY 1 (Responsive QA across 7 viewports: 360x800, 390x844, 430x932, 768x1024, 1024x768, 1440x900, 1920x1080 - ALL PASS with 0px horizontal overflow). PRIORITY 2 (Desktop functionality: navbar scroll-spy, hero CTAs, showcase slider/pills/progress, packages prefill, gallery lightbox, FAQ accordion, quote form submission with backend integration, process pinned stepper, chapters pinned crossfade - ALL PASS). PRIORITY 3 (Mobile functionality: mobile nav drawer with ONE close button, mobile nav links, showcase dots, process vertical timeline, chapters vertical story - ALL PASS). Console: NO errors, 20 minor warnings (Canvas2D, scroll offset - non-critical), NO DialogTitle warnings. Backend API healthy (200 OK). Site is production-ready. All tasks marked working=true, needs_retesting=false."
+  - agent: "main"
+    message: "POLISH PASS v3. (1) Storytelling rebuilt into an 8-scene cinematic journey (Chapters.jsx): desktop pinned 3D split-screen with constellation/light-trails/progress-rail; mobile one-scene-per-screen. (2) Reversible scroll animations across Reveal.jsx + cinematic.jsx (enter AND exit, both scroll directions, mobile-lighter, reduced-motion safe). (3) New floating SocialDock.jsx (YouTube/Facebook/Instagram/WhatsApp/Phone) with brand icons, glow/scale hover, tooltips, mobile expandable FAB; removed old WhatsAppFloat; polished Footer socials. (4) Typography audit — smaller controlled clamp scale. Please run full FRONTEND functional + RESPONSIVE QA at 360x800, 390x844, 430x932, 768x1024, 820x1180, 1024x768, 1366x768, 1440x900, 1920x1080. Focus: reversible animations both directions, 8-scene storytelling (mobile+desktop), social dock (links + mobile FAB + no overlap), typography not oversized, no horizontal scroll, quote form still submits (POST /api/quotes 200)."

@@ -26,4 +26,25 @@ export const useIsMobile = () => useMediaQuery("(max-width: 767px)");
 
 export const useIsTablet = () => useMediaQuery("(min-width: 768px) and (max-width: 1023px)");
 
+/* ----------------------------------------------------------------------
+   Global scroll-direction tracker (for direction-aware exit animations).
+   Module-level singleton listener — cheap, shared across all reveals.
+---------------------------------------------------------------------- */
+let _scrollDir = "down";
+let _lastY = typeof window !== "undefined" ? window.scrollY : 0;
+if (typeof window !== "undefined") {
+  window.addEventListener(
+    "scroll",
+    () => {
+      const y = window.scrollY;
+      if (Math.abs(y - _lastY) > 2) {
+        _scrollDir = y > _lastY ? "down" : "up";
+        _lastY = y;
+      }
+    },
+    { passive: true }
+  );
+}
+export const getScrollDir = () => _scrollDir;
+
 export default useMediaQuery;

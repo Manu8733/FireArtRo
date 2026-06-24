@@ -119,7 +119,7 @@ const DesktopProcess = () => {
                   data-testid={`process-step-${active}`}
                 >
                   <div className="cine-kicker text-[#9D7BFF] text-xs mb-2">Pasul {step.step}</div>
-                  <h3 className="font-display font-bold text-white text-5xl xl:text-6xl text-bloom">
+                  <h3 className="font-display font-bold text-white text-4xl xl:text-5xl text-bloom">
                     {step.title}
                   </h3>
                   <p className="mt-4 text-white/60 lead font-light max-w-md">{step.desc}</p>

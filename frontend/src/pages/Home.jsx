@@ -15,7 +15,7 @@ import Faq from "@/components/site/Faq";
 import FinalCta from "@/components/site/FinalCta";
 import QuoteForm from "@/components/site/QuoteForm";
 import Footer from "@/components/site/Footer";
-import WhatsAppFloat from "@/components/site/WhatsAppFloat";
+import SocialDock from "@/components/site/SocialDock";
 
 export default function Home() {
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function Home() {
       <FinalCta />
       <QuoteForm />
       <Footer />
-      <WhatsAppFloat />
+      <SocialDock />
     </main>
   );
 }

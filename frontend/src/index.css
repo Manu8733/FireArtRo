@@ -61,30 +61,39 @@ body {
     font-feature-settings: "ss01";
 }
 
-/* ---------- Fluid display type (mobile-safe, never oversized) ---------- */
+/* ---------- Fluid display type (controlled, premium — never oversized) ---------- */
 .display-xl {
-    font-size: clamp(2.35rem, 7.2vw, 5.25rem);
-    line-height: 1.02;
+    font-size: clamp(2.25rem, 5vw, 4.75rem);
+    line-height: 1.05;
     letter-spacing: -0.035em;
 }
 .display-lg {
-    font-size: clamp(2rem, 5.4vw, 3.75rem);
-    line-height: 1.05;
+    font-size: clamp(1.9rem, 4vw, 3.4rem);
+    line-height: 1.08;
     letter-spacing: -0.03em;
 }
 .display-md {
-    font-size: clamp(1.65rem, 4vw, 2.75rem);
-    line-height: 1.1;
-    letter-spacing: -0.025em;
+    font-size: clamp(1.55rem, 3vw, 2.4rem);
+    line-height: 1.14;
+    letter-spacing: -0.022em;
 }
 .display-sm {
-    font-size: clamp(1.3rem, 3vw, 1.85rem);
-    line-height: 1.18;
-    letter-spacing: -0.02em;
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    line-height: 1.2;
+    letter-spacing: -0.018em;
+}
+.title-card {
+    font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
 }
 .lead {
-    font-size: clamp(1rem, 1.4vw, 1.15rem);
-    line-height: 1.7;
+    font-size: clamp(0.95rem, 1.15vw, 1.06rem);
+    line-height: 1.72;
+}
+.body-sm {
+    font-size: clamp(0.85rem, 1vw, 0.95rem);
+    line-height: 1.65;
 }
 
 /* Section scroll offset for sticky nav */
@@ -246,6 +255,29 @@ section[id] {
     100% { background-position: 200% 0; }
 }
 
+/* ---------- Cinematic 3D + storytelling helpers ---------- */
+.perspective {
+    perspective: 1400px;
+}
+.preserve-3d {
+    transform-style: preserve-3d;
+}
+.backface-hidden {
+    backface-visibility: hidden;
+}
+
+@keyframes trail-float {
+    0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.4; }
+    50% { transform: translate3d(0, -22px, 0); opacity: 0.9; }
+}
+.animate-trail { animation: trail-float 7s ease-in-out infinite; }
+
+@keyframes constellation-twinkle {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 0.9; }
+}
+.animate-twinkle { animation: constellation-twinkle 4.5s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .animate-marquee,
@@ -253,6 +285,8 @@ section[id] {
     .animate-float-eff,
     .animate-ken-burns,
     .animate-glow-pulse,
+    .animate-trail,
+    .animate-twinkle,
     .aurora::before,
     .aurora::after { animation: none !important; }
 }

@@ -1,25 +1,41 @@
-import { motion, useReducedMotion } from "framer-motion";
-import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useRef } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useIsMobile, getScrollDir } from "@/hooks/useMediaQuery";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-// Premium scroll reveal — lighter on mobile, disabled for reduced-motion.
-export const Reveal = ({ children, delay = 0, y = 26, className, blur = true }) => {
+/**
+ * Reversible cinematic reveal.
+ * - Enters viewport: opacity 0→1, translateY+→0, blur→0
+ * - Leaves viewport: reverses (direction-aware translate) so content
+ *   appears and disappears smoothly while scrolling both ways.
+ * Lighter on mobile, disabled for prefers-reduced-motion.
+ */
+export const Reveal = ({ children, delay = 0, y = 28, className, blur = true, amount = 0.18 }) => {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const ref = useRef(null);
+  const inView = useInView(ref, { amount, margin: "-6% 0px -6% 0px" });
 
-  if (reduce) return <div className={className}>{children}</div>;
+  if (reduce) return <div ref={ref} className={className}>{children}</div>;
 
-  const dy = mobile ? Math.min(y, 16) : y;
+  const dy = mobile ? Math.min(y, 14) : y;
+  const b = blur && !mobile ? 8 : 0;
+  const exitY = getScrollDir() === "down" ? -dy : dy;
+
   return (
     <motion.div
+      ref={ref}
       className={className}
-      initial={{ opacity: 0, y: dy, filter: blur && !mobile ? "blur(6px)" : "blur(0px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-60px" }}
+      initial={{ opacity: 0, y: dy, filter: `blur(${b}px)` }}
+      animate={
+        inView
+          ? { opacity: 1, y: 0, filter: "blur(0px)" }
+          : { opacity: 0, y: exitY, filter: `blur(${b}px)` }
+      }
       transition={{
-        duration: mobile ? 0.5 : 0.8,
-        delay: mobile ? Math.min(delay, 0.12) : delay,
+        duration: mobile ? 0.5 : 0.72,
+        delay: inView ? (mobile ? 0 : delay) : 0,
         ease: EASE,
       }}
     >

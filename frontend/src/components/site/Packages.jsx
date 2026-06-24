@@ -61,7 +61,7 @@ export const Packages = () => {
                     <Icon className="h-5 w-5 text-[#9D7BFF]" />
                   </div>
 
-                  <h3 className="mt-4 font-display font-semibold text-xl text-white">{p.name}</h3>
+                  <h3 className="mt-4 font-display font-semibold title-card text-white">{p.name}</h3>
                   <p className="mt-1 text-sm text-[#9D7BFF]">{p.tagline}</p>
                   <p className="mt-3 text-sm text-white/55 font-light leading-relaxed">{p.desc}</p>
 

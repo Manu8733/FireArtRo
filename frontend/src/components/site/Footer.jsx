@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { MessageCircle, Mail, Phone, Instagram } from "lucide-react";
-import { LOGO_URL, PHONE_DISPLAY, EMAIL, INSTAGRAM, whatsappLink } from "@/lib/constants";
+import { Mail, Phone } from "lucide-react";
+import { YouTubeIcon, FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/site/BrandIcons";
+import { LOGO_URL, PHONE_DISPLAY, EMAIL, INSTAGRAM, FACEBOOK, YOUTUBE, whatsappLink } from "@/lib/constants";
 import { NAV_LINKS } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -22,35 +23,30 @@ export const Footer = () => {
               Spectacole de drone, artificii și efecte speciale create pentru momente
               imposibil de uitat. Premium, sigur și cinematic.
             </p>
-            <div className="mt-6 flex gap-3">
-              <a
-                href={whatsappLink()}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="footer-whatsapp"
-                className="h-10 w-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition-colors"
-                aria-label="WhatsApp"
-              >
-                <MessageCircle className="h-5 w-5 text-[#25D366]" />
-              </a>
-              <a
-                href={INSTAGRAM}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="footer-instagram"
-                className="h-10 w-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-5 w-5 text-[#9D7BFF]" />
-              </a>
-              <a
-                href={`mailto:${EMAIL}`}
-                data-testid="footer-email"
-                className="h-10 w-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition-colors"
-                aria-label="Email"
-              >
-                <Mail className="h-5 w-5 text-[#5AA9FF]" />
-              </a>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {[
+                { label: "WhatsApp", href: whatsappLink(), Icon: WhatsAppIcon, color: "#25D366", external: true, testid: "footer-whatsapp" },
+                { label: "Instagram", href: INSTAGRAM, Icon: InstagramIcon, color: "#E1306C", external: true, testid: "footer-instagram" },
+                { label: "Facebook", href: FACEBOOK, Icon: FacebookIcon, color: "#1877F2", external: true, testid: "footer-facebook" },
+                { label: "YouTube", href: YOUTUBE, Icon: YouTubeIcon, color: "#FF0033", external: true, testid: "footer-youtube" },
+                { label: "Email", href: `mailto:${EMAIL}`, Icon: Mail, color: "#5AA9FF", external: false, testid: "footer-email" },
+              ].map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  {...(s.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  data-testid={s.testid}
+                  aria-label={s.label}
+                  title={s.label}
+                  className="group relative h-10 w-10 rounded-full glass flex items-center justify-center text-white/80 transition-all duration-300 hover:-translate-y-0.5 hover:scale-110 hover:text-white focus-visible:ring-2 focus-visible:ring-white/70 outline-none"
+                >
+                  <s.Icon className="h-[18px] w-[18px]" />
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ boxShadow: `0 0 16px 1px ${s.color}88` }}
+                  />
+                </a>
+              ))}
             </div>
           </div>
 

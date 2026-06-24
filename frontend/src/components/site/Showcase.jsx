@@ -144,7 +144,7 @@ export const Showcase = () => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <h3 className="font-display font-bold text-white text-2xl sm:text-4xl">
+                    <h3 className="font-display font-bold text-white text-xl sm:text-3xl">
                       {item.title}
                     </h3>
                     <p className="mt-2 text-white/70 text-sm sm:text-base font-light max-w-md">

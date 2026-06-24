@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { NAV_LINKS } from "@/data/content";
 import { LOGO_URL } from "@/lib/constants";
 
@@ -92,9 +92,13 @@ export const Navbar = () => {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="bg-[#0A0712] border-white/10 w-[300px] p-0"
+              className="bg-[#0A0712] border-white/10 w-[300px] p-0 [&>button]:hidden"
             >
               <div className="flex flex-col h-full">
+                <SheetTitle className="sr-only">Meniu de navigare</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Navighează către secțiunile site-ului FIREARTRO
+                </SheetDescription>
                 <div className="flex items-center justify-between p-6 border-b border-white/10">
                   <Logo />
                   <button

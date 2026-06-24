@@ -23,7 +23,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="bg-[#050308] min-h-screen overflow-x-hidden">
+    <main className="bg-[#050308] min-h-screen overflow-x-clip">
       <Navbar />
       <Hero />
       <Intro />

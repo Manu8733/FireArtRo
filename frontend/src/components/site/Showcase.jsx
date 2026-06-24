@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { SectionHeader } from "@/components/site/cinematic";
 import { PORTFOLIO } from "@/data/content";
 
 const DURATION = 5500;
@@ -58,14 +59,7 @@ export const Showcase = () => {
       <div className="relative max-w-7xl mx-auto px-6 md:px-12">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <div className="max-w-2xl">
-              <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-                Spectacole realizate
-              </span>
-              <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-                Showcase cinematic
-              </h2>
-            </div>
+            <SectionHeader kicker="Spectacole realizate" title="Showcase cinematic" />
             <div className="flex items-center gap-3">
               <button
                 onClick={() => go(-1)}

@@ -29,8 +29,8 @@ export const HeroVideo = () => {
         CLIPS.map((clip, i) => (
           <video
             key={clip.src}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-in-out"
-            style={{ opacity: i === active ? 1 : 0 }}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity ease-in-out"
+            style={{ opacity: i === active ? 1 : 0, transitionDuration: "1500ms" }}
             src={clip.src}
             poster={HERO_POSTER}
             autoPlay
@@ -42,9 +42,10 @@ export const HeroVideo = () => {
           />
         ))}
 
+      <div className="absolute inset-0 bg-black/55" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_28%,_rgba(131,56,236,0.30),_transparent_58%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/75 via-[#050308]/55 to-[#050308]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#050308] via-[#050308]/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/70 via-[#050308]/45 to-[#050308]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#050308] via-[#050308]/20 to-transparent" />
     </div>
   );
 };

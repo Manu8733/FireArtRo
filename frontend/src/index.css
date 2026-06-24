@@ -60,6 +60,19 @@ section[id] {
     color: transparent;
 }
 
+/* Cinematic text bloom — subtle glow on headlines (dark-room effect) */
+main h1,
+main h2 {
+    text-shadow: 0 0 28px rgba(131, 56, 236, 0.22), 0 0 60px rgba(58, 134, 255, 0.10);
+}
+.text-bloom {
+    text-shadow: 0 0 22px rgba(255, 255, 255, 0.28), 0 0 48px rgba(131, 56, 236, 0.35);
+}
+.cine-kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+}
+
 .glass {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(18px);
@@ -117,10 +130,28 @@ section[id] {
     50% { background-position: 100% 50%; }
 }
 
+/* Ambient micro-floating — handheld / floating-in-space realism */
+@keyframes float-eff {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.animate-float-eff {
+    animation: float-eff 6s ease-in-out infinite;
+}
+@keyframes line-float {
+    0%, 100% { transform: translateY(0); opacity: 0.55; }
+    50% { transform: translateY(8px); opacity: 1; }
+}
+.animate-line-float {
+    animation: line-float 5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .animate-marquee,
     .animate-float-slow,
+    .animate-float-eff,
+    .animate-line-float,
     .animate-glow-pulse { animation: none; }
 }
 

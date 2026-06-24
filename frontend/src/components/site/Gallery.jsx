@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Expand } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { SectionHeader } from "@/components/site/cinematic";
 import { GALLERY } from "@/data/content";
 
 export const Gallery = () => {
@@ -10,16 +11,7 @@ export const Gallery = () => {
   return (
     <section id="galerie" className="relative py-24 md:py-32" data-testid="gallery-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <Reveal>
-          <div className="max-w-2xl">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-              Galerie
-            </span>
-            <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-              Lumină, culoare, emoție
-            </h2>
-          </div>
-        </Reveal>
+        <SectionHeader kicker="Galerie" title="Lumină, culoare, emoție" />
 
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 auto-rows-[180px] md:auto-rows-[220px] gap-4">
           {GALLERY.map((g, i) => (

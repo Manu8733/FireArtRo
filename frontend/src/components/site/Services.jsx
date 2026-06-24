@@ -1,5 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { SectionHeader, Floating } from "@/components/site/cinematic";
 import { SERVICES } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -8,20 +9,11 @@ export const Services = () => {
   return (
     <section id="servicii" className="relative py-24 md:py-32 section-grid-bg" data-testid="services-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <Reveal>
-          <div className="max-w-2xl">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-              Ce oferim
-            </span>
-            <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-              Servicii premium pentru evenimente memorabile
-            </h2>
-            <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
-              De la drone show-uri futuriste la artificii clasice și efecte de scenă —
-              construim spectacolul perfect pentru momentul tău.
-            </p>
-          </div>
-        </Reveal>
+        <SectionHeader
+          kicker="Ce oferim"
+          title="Servicii premium pentru evenimente memorabile"
+          subtitle="De la drone show-uri futuriste la artificii clasice și efecte de scenă — construim spectacolul perfect pentru momentul tău."
+        />
 
         <div className="mt-14 grid md:grid-cols-2 gap-6 md:gap-8">
           {SERVICES.map((s, i) => (
@@ -38,9 +30,11 @@ export const Services = () => {
                     className="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0712] via-[#0A0712]/40 to-transparent" />
-                  <div className="absolute top-5 left-5 h-12 w-12 rounded-xl glass flex items-center justify-center glow-ring">
-                    <s.icon className="h-6 w-6 text-[#9D7BFF]" />
-                  </div>
+                  <Floating delay={i * 0.3} className="absolute top-5 left-5">
+                    <div className="h-12 w-12 rounded-xl glass flex items-center justify-center glow-ring">
+                      <s.icon className="h-6 w-6 text-[#9D7BFF]" />
+                    </div>
+                  </Floating>
                 </div>
 
                 <div className="p-7">

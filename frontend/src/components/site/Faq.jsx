@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Reveal from "@/components/site/Reveal";
+import { SectionHeader } from "@/components/site/cinematic";
 import { FAQS } from "@/data/content";
 
 export const Faq = () => {
@@ -22,16 +23,7 @@ export const Faq = () => {
     <section id="intrebari" className="relative py-24 md:py-32" data-testid="faq-section">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-3xl mx-auto px-6 md:px-12">
-        <Reveal>
-          <div className="text-center">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-              Întrebări frecvente
-            </span>
-            <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-              Tot ce trebuie să știi
-            </h2>
-          </div>
-        </Reveal>
+        <SectionHeader center kicker="Întrebări frecvente" title="Tot ce trebuie să știi" />
 
         <Reveal delay={0.1}>
           <Accordion type="single" collapsible className="mt-12 space-y-3" data-testid="faq-accordion">

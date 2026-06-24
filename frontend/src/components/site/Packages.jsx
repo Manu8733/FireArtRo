@@ -1,5 +1,6 @@
 import { Check, Star, ArrowRight } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { SectionHeader } from "@/components/site/cinematic";
 import { PACKAGES } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -13,21 +14,12 @@ export const Packages = () => {
   return (
     <section id="pachete" className="relative py-24 md:py-32 section-grid-bg" data-testid="packages-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <Reveal>
-          <div className="text-center max-w-2xl mx-auto">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-              Pachete
-            </span>
-            <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-              Alege experiența potrivită
-            </h2>
-            <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
-              Prețul final depinde de locație, durată, complexitatea designului, tipul efectelor,
-              numărul de drone, cerințele de siguranță și logistica evenimentului. Spune-ne ce îți
-              dorești, iar noi construim oferta.
-            </p>
-          </div>
-        </Reveal>
+        <SectionHeader
+          center
+          kicker="Pachete"
+          title="Alege experiența potrivită"
+          subtitle="Prețul final depinde de locație, durată, complexitatea designului, tipul efectelor, numărul de drone, cerințele de siguranță și logistica evenimentului. Spune-ne ce îți dorești, iar noi construim oferta."
+        />
 
         <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {PACKAGES.map((p, i) => (

@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { SectionHeader } from "@/components/site/cinematic";
 import { PROCESS } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
@@ -17,19 +18,11 @@ export const Process = () => {
   return (
     <section className="relative py-24 md:py-32 section-grid-bg" data-testid="process-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <Reveal>
-          <div className="max-w-2xl">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-              Cum lucrăm
-            </span>
-            <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-              De la idee la spectacol
-            </h2>
-            <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
-              Un proces clar și fără stres — tu te bucuri de eveniment, noi ne ocupăm de tot.
-            </p>
-          </div>
-        </Reveal>
+        <SectionHeader
+          kicker="Cum lucrăm"
+          title="De la idee la spectacol"
+          subtitle="Un proces clar și fără stres — tu te bucuri de eveniment, noi ne ocupăm de tot."
+        />
 
         <div ref={ref} className="mt-16 relative">
           {/* Desktop horizontal */}

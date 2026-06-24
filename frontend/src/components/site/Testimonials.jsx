@@ -1,21 +1,13 @@
 import { Star, Quote } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { SectionHeader } from "@/components/site/cinematic";
 import { TESTIMONIALS, PARTNERS } from "@/data/content";
 
 export const Testimonials = () => {
   return (
     <section className="relative py-24 md:py-32 section-grid-bg" data-testid="testimonials-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <Reveal>
-          <div className="text-center max-w-2xl mx-auto">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-              Testimoniale
-            </span>
-            <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-              Ce spun clienții noștri
-            </h2>
-          </div>
-        </Reveal>
+        <SectionHeader center kicker="Testimoniale" title="Ce spun clienții noștri" />
 
         <div className="mt-14 grid md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (

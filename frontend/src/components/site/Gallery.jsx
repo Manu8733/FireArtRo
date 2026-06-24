@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Expand } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 import { GALLERY } from "@/data/content";
@@ -55,11 +55,14 @@ export const Gallery = () => {
       <Dialog open={!!active} onOpenChange={(o) => !o && setActive(null)}>
         <DialogContent className="max-w-4xl bg-[#0A0712] border-white/10 p-2 sm:p-3" data-testid="gallery-lightbox">
           {active && (
-            <img
-              src={active.image}
-              alt={active.alt}
-              className="w-full h-auto max-h-[80vh] object-contain rounded-xl"
-            />
+            <>
+              <DialogTitle className="sr-only">{active.alt}</DialogTitle>
+              <img
+                src={active.image}
+                alt={active.alt}
+                className="w-full h-auto max-h-[80vh] object-contain rounded-xl"
+              />
+            </>
           )}
         </DialogContent>
       </Dialog>

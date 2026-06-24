@@ -5,6 +5,10 @@
   "outputDirectory": "frontend/build",
   "rewrites": [
     {
+      "source": "/galerie",
+      "destination": "/index.html"
+    },
+    {
       "source": "/legal/:path*",
       "destination": "/index.html"
     }

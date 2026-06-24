@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Home from "@/pages/Home";
 import LegalPage from "@/pages/LegalPage";
+import GalleryPage from "@/pages/GalleryPage";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/galerie" element={<GalleryPage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
         </Routes>
       </BrowserRouter>

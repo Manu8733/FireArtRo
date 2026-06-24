@@ -272,6 +272,45 @@ export const GALLERY = [
   { image: MEDIA.crowd3, alt: "Artificii vibrante luminând cerul nopții", category: "Artificii" },
 ];
 
+export const GALLERY_VIDEOS = [
+  {
+    title: "Show complet cu artificii",
+    desc: "Un cadru cinematic pentru finalul evenimentului, cu lumină, ritm și impact vizual.",
+    category: "Artificii",
+    youtubeUrl: "https://www.youtube.com/watch?v=AyU0-6KQJXc",
+    localSrc: "/media/fireart-hero.mp4",
+    mobileSrc: "/media/fireart-hero-mobile.mp4",
+    poster: HERO_POSTER,
+  },
+  {
+    title: "Drone show în mișcare",
+    desc: "Coregrafie luminoasă pe cer, pregătită pentru nunți, corporate și lansări.",
+    category: "Drone show",
+    youtubeUrl: "https://www.youtube.com/watch?v=vfuBWWr7-EE",
+    localSrc: "/media/fireart-drone.mp4",
+    mobileSrc: "/media/fireart-drone-mobile.mp4",
+    poster: MEDIA.droneShow,
+  },
+  {
+    title: "Momente de atmosferă",
+    desc: "Detalii vizuale și efecte speciale care leagă spectacolul de povestea evenimentului.",
+    category: "Behind the show",
+    youtubeUrl: "https://www.youtube.com/watch?v=_qfvKDitA0Q",
+    localSrc: "/media/fireart-moments.mp4",
+    mobileSrc: "/media/fireart-moments-mobile.mp4",
+    poster: MEDIA.crowd2,
+  },
+  {
+    title: "Spectacol premium",
+    desc: "Drone, artificii și efecte combinate într-o experiență construită ca un moment central.",
+    category: "Premium",
+    youtubeUrl: "",
+    localSrc: "/media/fireart-spectacle.mp4",
+    mobileSrc: "/media/fireart-spectacle-mobile.mp4",
+    poster: MEDIA.hybrid,
+  },
+];
+
 /* ------------------------------------------------------------------ */
 /*  Social proof                                                       */
 /* ------------------------------------------------------------------ */
@@ -314,7 +353,7 @@ export const NAV_LINKS = [
   { label: "Spectacole", href: "#spectacole" },
   { label: "Proces", href: "#proces" },
   { label: "Pachete", href: "#pachete" },
-  { label: "Galerie", href: "#galerie" },
+  { label: "Galerie", href: "/galerie" },
   { label: "Întrebări", href: "#intrebari" },
   { label: "Contact", href: "#contact" },
 ];

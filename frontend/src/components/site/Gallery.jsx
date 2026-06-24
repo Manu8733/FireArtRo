@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Expand } from "lucide-react";
+import { ArrowRight, Expand } from "lucide-react";
 import { SectionHeader, Stagger, StaggerItem } from "@/components/site/cinematic";
 import { GALLERY } from "@/data/content";
 
@@ -61,6 +62,15 @@ export const Gallery = () => {
             </StaggerItem>
           ))}
         </Stagger>
+
+        <div className="mt-10 flex justify-center">
+          <Link
+            to="/galerie"
+            className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.045] px-6 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/70"
+          >
+            Deschide galeria completă <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
       <Dialog open={!!active} onOpenChange={(o) => !o && setActive(null)}>

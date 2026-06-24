@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, Phone } from "lucide-react";
 import { YouTubeIcon, FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/site/BrandIcons";
 import { LOGO_URL, PHONE_DISPLAY, EMAIL, INSTAGRAM, FACEBOOK, YOUTUBE, whatsappLink } from "@/lib/constants";
 import { NAV_LINKS } from "@/data/content";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+const publicHref = (href) => (href.startsWith("#") ? `/${href}` : href);
 
 const LEGAL = [
   { label: "Politica de confidențialitate", to: "/legal/confidentialitate" },
@@ -13,6 +14,8 @@ const LEGAL = [
 ];
 
 export const Footer = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const socialLinks = [
     { label: "WhatsApp", href: whatsappLink(), Icon: WhatsAppIcon, color: "#25D366", external: true, testid: "footer-whatsapp" },
     { label: "Instagram", href: INSTAGRAM, Icon: InstagramIcon, color: "#E1306C", external: true, testid: "footer-instagram" },
@@ -58,10 +61,19 @@ export const Footer = () => {
               {NAV_LINKS.map((l) => (
                 <li key={l.href}>
                   <a
-                    href={l.href}
+                    href={publicHref(l.href)}
                     onClick={(e) => {
                       e.preventDefault();
-                      scrollTo(l.href);
+                      if (l.href.startsWith("#")) {
+                        if (location.pathname === "/") {
+                          scrollTo(l.href);
+                        } else {
+                          navigate(`/${l.href}`);
+                          window.setTimeout(() => scrollTo(l.href), 80);
+                        }
+                      } else {
+                        navigate(l.href);
+                      }
                     }}
                     className="text-white/55 hover:text-white text-sm transition-colors"
                   >

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { NAV_LINKS } from "@/data/content";
 import { LOGO_URL } from "@/lib/constants";
@@ -10,12 +11,14 @@ const scrollTo = (href, behavior = "smooth") => {
   if (el) el.scrollIntoView({ behavior, block: "start" });
 };
 
+const publicHref = (href) => (href.startsWith("#") ? `/${href}` : href);
+
 const Logo = ({ onClick }) => (
   <a
-    href="#acasa"
+    href="/#acasa"
     onClick={(e) => {
       e.preventDefault();
-      onClick ? onClick() : scrollTo("#acasa");
+      onClick?.();
     }}
     data-testid="nav-logo"
     className="flex items-center gap-3 shrink-0"
@@ -31,6 +34,35 @@ export const Navbar = () => {
   const [active, setActive] = useState("#acasa");
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const goHome = (behavior = "smooth") => {
+    if (location.pathname === "/") {
+      scrollTo("#acasa", behavior);
+      return;
+    }
+    navigate("/");
+    window.setTimeout(() => scrollTo("#acasa", "auto"), 80);
+  };
+
+  const goTo = (href, behavior = "smooth") => {
+    if (href.startsWith("#")) {
+      if (location.pathname === "/") {
+        scrollTo(href, behavior);
+        return;
+      }
+      navigate(`/${href}`);
+      window.setTimeout(() => scrollTo(href, "auto"), 90);
+      return;
+    }
+
+    if (location.pathname === href) {
+      window.scrollTo({ top: 0, behavior });
+      return;
+    }
+    navigate(href);
+  };
 
   useEffect(() => {
     const updateNavigation = () => {
@@ -62,7 +94,11 @@ export const Navbar = () => {
 
   // Scroll-spy: highlight the section currently in view.
   useEffect(() => {
-    const ids = NAV_LINKS.map((l) => l.href.replace("#", ""));
+    if (location.pathname !== "/") {
+      setActive(location.pathname);
+      return;
+    }
+    const ids = NAV_LINKS.filter((l) => l.href.startsWith("#")).map((l) => l.href.replace("#", ""));
     const sections = ids.map((id) => document.getElementById(id)).filter(Boolean);
     if (!sections.length) return;
     const observer = new IntersectionObserver(
@@ -75,7 +111,7 @@ export const Navbar = () => {
     );
     sections.forEach((s) => observer.observe(s));
     return () => observer.disconnect();
-  }, []);
+  }, [location.pathname]);
 
   return (
     <motion.header
@@ -90,7 +126,7 @@ export const Navbar = () => {
       data-testid="main-navbar"
     >
       <nav className="max-w-7xl mx-auto px-5 sm:px-6 md:px-12 flex items-center justify-between gap-6">
-        <Logo />
+        <Logo onClick={goHome} />
 
         <div className="hidden lg:flex items-center gap-1">
           {NAV_LINKS.map((l) => {
@@ -98,12 +134,12 @@ export const Navbar = () => {
             return (
               <a
                 key={l.href}
-                href={l.href}
+                href={publicHref(l.href)}
                 onClick={(e) => {
                   e.preventDefault();
-                  scrollTo(l.href);
+                  goTo(l.href);
                 }}
-                data-testid={`nav-link-${l.href.replace("#", "")}`}
+                data-testid={`nav-link-${l.href.replace(/[#/]/g, "") || "home"}`}
                 className={`relative text-sm font-medium px-3 py-2 rounded-full transition-colors duration-200 ${
                   isActive ? "text-white" : "text-white/65 hover:text-white"
                 }`}
@@ -154,7 +190,10 @@ export const Navbar = () => {
                   Navighează către secțiunile site-ului FIREARTRO
                 </SheetDescription>
                 <div className="flex items-center justify-between p-5 border-b border-white/10">
-                  <Logo onClick={() => setOpen(false)} />
+                  <Logo onClick={() => {
+                    setOpen(false);
+                    window.setTimeout(() => goHome("auto"), 180);
+                  }} />
                   <button
                     onClick={() => setOpen(false)}
                     className="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
@@ -169,13 +208,13 @@ export const Navbar = () => {
                   {NAV_LINKS.filter((link) => link.href !== "#acasa").map((l, i) => (
                     <motion.a
                       key={l.href}
-                      href={l.href}
+                      href={publicHref(l.href)}
                       onClick={(e) => {
                         e.preventDefault();
                         setOpen(false);
-                        setTimeout(() => scrollTo(l.href, "auto"), 220);
+                        setTimeout(() => goTo(l.href, "auto"), 220);
                       }}
-                      data-testid={`mobile-nav-link-${l.href.replace("#", "")}`}
+                      data-testid={`mobile-nav-link-${l.href.replace(/[#/]/g, "") || "home"}`}
                       initial={{ opacity: 0, x: 24 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.05 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
@@ -191,7 +230,7 @@ export const Navbar = () => {
                   <button
                     onClick={() => {
                       setOpen(false);
-                      setTimeout(() => scrollTo("#contact", "auto"), 220);
+                      setTimeout(() => goTo("#contact", "auto"), 220);
                     }}
                     data-testid="mobile-nav-cta"
                     className="btn-grad shine w-full inline-flex items-center justify-center gap-2 text-white font-semibold px-6 py-3.5 rounded-full"

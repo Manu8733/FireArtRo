@@ -106,6 +106,30 @@ export const PORTFOLIO = [
   { category: "City events", title: "Eveniment de oraș", image: "https://images.unsplash.com/photo-1648175705050-f091e8d03d1a" },
 ];
 
+export const CHAPTERS = [
+  {
+    no: "01",
+    kicker: "Conceptul",
+    title: "Totul începe cu o viziune",
+    text: "Ascultăm povestea evenimentului tău și transformăm emoția într-un concept vizual unic, gândit pentru momentul și locația ta.",
+    image: "https://images.unsplash.com/photo-1730053225079-cd26d10e214d",
+  },
+  {
+    no: "02",
+    kicker: "Spectacolul",
+    title: "Cerul prinde viață",
+    text: "Drone, artificii și efecte speciale se sincronizează pe muzică într-o coregrafie care taie respirația invitaților.",
+    image: "https://images.pexels.com/photos/3385614/pexels-photo-3385614.jpeg",
+  },
+  {
+    no: "03",
+    kicker: "Emoția",
+    title: "Un final pe care nu-l uită nimeni",
+    text: "Ultima scânteie se stinge, dar amintirea rămâne — un moment despre care invitații vor vorbi mult timp după eveniment.",
+    image: "https://images.pexels.com/photos/3397027/pexels-photo-3397027.jpeg",
+  },
+];
+
 export const WHY = [
   { icon: Wand2, title: "Design personalizat", desc: "Fiecare spectacol este creat de la zero, pentru povestea evenimentului tău." },
   { icon: ShieldCheck, title: "Siguranță & autorizații", desc: "Echipă autorizată, planificare tehnică riguroasă și respectarea tuturor normelor." },

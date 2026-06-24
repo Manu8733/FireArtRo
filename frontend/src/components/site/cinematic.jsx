@@ -9,7 +9,7 @@ export const ScaleIn = ({ children, delay = 0, from = 0.85, className }) => (
     className={className}
     initial={{ opacity: 0, scale: from }}
     whileInView={{ opacity: 1, scale: 1 }}
-    viewport={{ once: true, margin: "-70px" }}
+    viewport={{ once: false, margin: "-70px" }}
     transition={{ duration: 0.95, delay, ease: EASE }}
   >
     {children}
@@ -22,7 +22,7 @@ export const SlideIn = ({ children, delay = 0, x = -44, className }) => (
     className={className}
     initial={{ opacity: 0, x, filter: "blur(8px)" }}
     whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-    viewport={{ once: true, margin: "-70px" }}
+    viewport={{ once: false, margin: "-70px" }}
     transition={{ duration: 1, delay, ease: EASE }}
   >
     {children}
@@ -65,7 +65,7 @@ export const SectionHeader = ({ kicker, title, subtitle, center, className }) =>
       <motion.p
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
+        viewport={{ once: false, margin: "-60px" }}
         transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
         className="mt-5 text-white/60 text-base sm:text-lg font-light"
       >

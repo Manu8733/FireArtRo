@@ -5,6 +5,7 @@ import Intro from "@/components/site/Intro";
 import Stats from "@/components/site/Stats";
 import Services from "@/components/site/Services";
 import Showcase from "@/components/site/Showcase";
+import Chapters from "@/components/site/Chapters";
 import Technology from "@/components/site/Technology";
 import Process from "@/components/site/Process";
 import Packages from "@/components/site/Packages";
@@ -29,6 +30,7 @@ export default function Home() {
       <Stats />
       <Services />
       <Showcase />
+      <Chapters />
       <Technology />
       <Process />
       <Packages />

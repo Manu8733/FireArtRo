@@ -1,0 +1,152 @@
+{
+  "theme": "dark",
+  "archetype": "5 (Luxury) with Electric Accents",
+  "brand": {
+    "name": "FIREARTRO",
+    "tone": "Premium, Cinematic, Futuristic, Trustworthy, Spectacular",
+    "domain": "Event Production (Drone Shows & Fireworks)",
+    "language": "Romanian"
+  },
+  "typography": {
+    "primary_font": "Clash Display",
+    "secondary_font": "Outfit",
+    "hierarchy": {
+      "h1": "text-5xl sm:text-6xl lg:text-7xl font-black tracking-tighter leading-none text-white",
+      "h2": "text-4xl sm:text-5xl font-bold tracking-tight text-white",
+      "h3": "text-2xl sm:text-3xl font-semibold tracking-tight text-white",
+      "h4": "text-xl font-medium tracking-tight text-white",
+      "body": "text-base sm:text-lg font-light leading-relaxed text-[#A0A0B0]",
+      "overline": "text-xs sm:text-sm font-medium uppercase tracking-[0.2em] text-[#8338EC]"
+    }
+  },
+  "colors": {
+    "background": {
+      "base": "#030305",
+      "surface": "#0A0A12",
+      "card": "rgba(255, 255, 255, 0.03)"
+    },
+    "text": {
+      "primary": "#F8F9FA",
+      "secondary": "#A0A0B0",
+      "accent": "#8338EC"
+    },
+    "brand": {
+      "primary": "#8338EC",
+      "secondary": "#3A86FF",
+      "gradient": "linear-gradient(to right, #3A86FF, #8338EC)"
+    },
+    "border": {
+      "subtle": "rgba(255, 255, 255, 0.1)",
+      "highlight": "rgba(131, 56, 236, 0.5)"
+    }
+  },
+  "layout_spacing": {
+    "section_padding": "py-24 md:py-32",
+    "container": "max-w-7xl mx-auto px-6 md:px-12",
+    "grid_gap": "gap-8 md:gap-12"
+  },
+  "components": {
+    "hero": {
+      "overlay": "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-900/20 via-black/50 to-[#030305]/90",
+      "particles": "TSParticles configured for glowing sparks (slow moving, #8338EC and #3A86FF colors)"
+    },
+    "cards": {
+      "style": "Glassmorphism Crystal Variant",
+      "classes": "bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-8 hover:-translate-y-2 hover:shadow-[0_8px_32px_rgba(131,56,236,0.15)] hover:border-white/20 transition-all duration-300",
+      "interactive": true
+    },
+    "buttons": {
+      "primary": {
+        "classes": "bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-medium px-8 py-4 rounded-full hover:shadow-[0_0_24px_rgba(131,56,236,0.5)] transition-all duration-300"
+      },
+      "secondary": {
+        "classes": "bg-transparent border border-white/20 text-white font-medium px-8 py-4 rounded-full hover:bg-white/10 transition-all duration-300"
+      }
+    },
+    "navigation": {
+      "style": "Crystal Glass Sticky",
+      "classes": "fixed w-full z-50 backdrop-blur-xl bg-[#030305]/70 border-b border-white/10"
+    }
+  },
+  "sections_blueprint": [
+    {
+      "name": "Header",
+      "description": "Sticky nav with logo, main links, and primary CTA."
+    },
+    {
+      "name": "Hero",
+      "description": "Cinematic full-screen video/image. Particle effects over dark radial gradient. Large H1, subheadline, 2 CTAs, trust badges."
+    },
+    {
+      "name": "Animated Stats",
+      "description": "Count-up stats for credibility using Framer Motion."
+    },
+    {
+      "name": "Services",
+      "description": "4 Interactive glass cards detailing Drone, Fireworks, Hybrid, and Special FX. Drone Shows, Professional fireworks, Synchronized drone+fireworks, Cold sparks/special effects"
+    },
+    {
+      "name": "Portfolio Carousel",
+      "description": "Swiper carousel featuring past shows with category labels (Nun\u021bi, Corporate, Festivaluri, Lans\u0103ri)."
+    },
+    {
+      "name": "Why FIREARTRO",
+      "description": "Trust section with glowing icons and high-contrast typography."
+    },
+    {
+      "name": "Process Timeline",
+      "description": "Vertical glowing line connecting steps from Brief to Show (Brief -> Concept -> Planning -> Setup -> Show)."
+    },
+    {
+      "name": "Packages",
+      "description": "4 vertical pricing/offer cards. Popular package features Tracing Beam border."
+    },
+    {
+      "name": "Gallery",
+      "description": "Bento Grid image gallery with Lightbox support."
+    },
+    {
+      "name": "Testimonials & Partners",
+      "description": "Infinite marquee for partner logos, Glass cards for reviews."
+    },
+    {
+      "name": "FAQ",
+      "description": "Customized Shadcn accordion, dark theme."
+    },
+    {
+      "name": "Final CTA",
+      "description": "Massive typography, dark violet background glow, WhatsApp integration."
+    },
+    {
+      "name": "Footer",
+      "description": "Generous spacing (py-24), large logo, legal links."
+    }
+  ],
+  "motion_guidelines": {
+    "scroll": "Lenis smooth scrolling is mandatory for premium feel.",
+    "reveal": "Framer Motion staggered fade-up for section contents (initial opacity 0, y 20).",
+    "particles": "TSParticles in Hero and Final CTA to simulate sparks/drone lights."
+  },
+  "media": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1685622729096-678b76222b99",
+      "description": "Drone light show over a city at night"
+    },
+    "fireworks_service": {
+      "url": "https://images.pexels.com/photos/1503520/pexels-photo-1503520.jpeg",
+      "description": "Vibrant fireworks illuminating the night sky"
+    },
+    "drone_service": {
+      "url": "https://images.unsplash.com/photo-1774979301442-b5a5c4e774e8",
+      "description": "Cityscape with illuminated drone formations"
+    },
+    "particle_texture": {
+      "url": "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0",
+      "description": "Dark starry/particle background texture"
+    }
+  },
+  "testing": {
+    "data_testid_rule": "All interactive elements MUST have a data-testid attribute formatted as kebab-case-role."
+  },
+  "instructions_to_main_agent": "Use purely pure HTML/Tailwind for structural marketing layouts. Use Framer Motion for scroll reveals and hover effects. Use customized Shadcn for forms, dialogs, and accordions. Implement TSParticles for the 'sparks' effect in hero and CTA. Strict dark theme, avoid pure black, use deep violet-tinted blacks (#030305, #0A0A12). Ensure Lenis is configured for smooth scrolling."
+}

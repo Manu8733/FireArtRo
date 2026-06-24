@@ -37,8 +37,16 @@ aesthetic with blue/violet accents.
 - WhatsApp float + CTAs, partner marquee, gallery lightbox, FAQ accordion. ✅
 - **Iter 2 (cinematic rebuild)**: video-first hero collage (Mixkit loops + poster), Intro, premium Showcase slider (auto-advance/progress/swipe/arrows), Technology section, scroll-driven glowing timeline, consent + preferred-service on quote form, OG/schema/sitemap/robots. ✅
 - **Iter 3 (cinematic motion)**: dark-room veil, text-bloom headlines, global scale+blur scroll reveals, slide-in hero headline, letterboxed kickers, ambient floating icons, sticky-header Technology, hero parallax. ✅
-- **Iter 4 (scroll choreography)**: hero field of floating brand sparks (FloatingLogos) choreographed to scroll (drift + fade), matching the requested cinematic reference feel. ✅
-- Verified end-to-end by testing agent across iterations: backend + frontend 100%.
+- **Iter 4 (scroll choreography)**: hero field of floating brand sparks (FloatingLogos) choreographed to scroll.
+- **Iter 5 (10x premium cinematic redesign, 2026-06)**:
+  - Typography overhaul → **Sora (display) + Inter (body)**; fluid clamp scale (`display-xl/lg/md/sm`, `lead`) so phones never get oversized/cramped text; refined letter-spacing + restrained headline glow.
+  - New motion primitives: `hooks/useMediaQuery.js` (useIsMobile), enhanced `cinematic.jsx` (RevealText, Stagger, mobile-light + reduced-motion-aware ScaleIn/SlideIn/Parallax), lighter `Reveal.jsx`.
+  - Restructured storytelling flow: Hero → Brand Story → Stats → Services → Showcase → Chapters → **Why FIREARTRO (new)** → Process → Packages → Gallery → Testimonials → FAQ → Final CTA → Quote → Footer. Removed standalone Technology section from flow (file retained).
+  - **Mobile rebuild**: swipe carousels (Services/Packages/Gallery/Testimonials), category pills + dots on Showcase, vertical NON-pinned Chapters story + vertical glowing Process timeline (no scroll-jacking), particles/floating-logos/hero-video disabled on phones, sticky-nav scroll-spy active pill, premium drawer.
+  - Premium utilities: animated `aurora`, `glass-strong`, gradient hairline `border-gradient`, refined gradients/shadows; curated cinematic image set.
+  - SEO: enriched meta/keywords, OG locale ro_RO, robots max-image-preview; FAQ JSON-LD + schema graph + sitemap/robots retained.
+  - Verified by frontend testing agent: 100% pass across 360/390/430/768/1024/1440/1920 (zero horizontal scroll) + all interactions + quote submit (POST /api/quotes 200). ✅
+- **Infra fix**: recreated missing `backend/.env` (MONGO_URL/DB_NAME/CORS_ORIGINS) + `frontend/.env` (REACT_APP_BACKEND_URL) that were gitignored in the source repo and crashed the backend on boot.
 
 ## Backlog / Next
 - **P0**: Replace placeholder WhatsApp number, email, Instagram in `src/lib/constants.js`.

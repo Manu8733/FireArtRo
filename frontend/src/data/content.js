@@ -8,7 +8,44 @@ import {
   HeartHandshake,
   Gauge,
   Layers,
+  Settings2,
+  Radio,
+  MapPin,
+  MessagesSquare,
 } from "lucide-react";
+
+// Hero cinematic video collage (drone · fireworks · wedding) — hotlinkable Mixkit loops.
+export const HERO_POSTER =
+  "https://images.pexels.com/photos/27051702/pexels-photo-27051702.jpeg";
+export const HERO_VIDEOS = [
+  { src: "https://assets.mixkit.co/videos/46028/46028-720.mp4", label: "Artificii" },
+  { src: "https://assets.mixkit.co/videos/49846/49846-720.mp4", label: "Drone" },
+  { src: "https://assets.mixkit.co/videos/21718/21718-720.mp4", label: "Momente" },
+  { src: "https://assets.mixkit.co/videos/28375/28375-720.mp4", label: "Spectacol" },
+];
+
+export const INTRO_BULLETS = [
+  "Concept vizual creat special pentru evenimentul tău",
+  "Drone, artificii și efecte speciale sincronizate",
+  "Execuție sigură, autorizată și milimetrică",
+];
+
+export const TECH = [
+  { icon: Settings2, title: "Planificare tehnică", desc: "Analizăm locația, vântul, spațiul aerian și logistica pentru un show fără surprize." },
+  { icon: Radio, title: "Sincronizare vizuală", desc: "Coregrafie sincronizată pe muzică — drone, artificii și efecte la fix pe beat." },
+  { icon: ShieldCheck, title: "Siguranță și autorizații", desc: "Echipă autorizată, protocoale de siguranță și toate avizele necesare." },
+  { icon: Sparkles, title: "Drone + artificii", desc: "Combinăm tehnologia dronelor cu artificiile clasice pentru impact maxim." },
+  { icon: MapPin, title: "Efecte adaptate locației", desc: "Indoor sau outdoor, adaptăm efectele la spațiul și atmosfera evenimentului." },
+  { icon: MessagesSquare, title: "Consultanță pentru eveniment", desc: "Te ghidăm de la prima idee până la ultimul efect, pas cu pas." },
+];
+
+export const SERVICE_OPTIONS = [
+  "Spectacole cu drone",
+  "Artificii profesionale",
+  "Drone + artificii sincronizate",
+  "Cold sparks / efecte speciale",
+  "Nu sunt sigur(ă) încă",
+];
 
 export const IMG = {
   hero: "https://images.pexels.com/photos/27051702/pexels-photo-27051702.jpeg",

@@ -70,6 +70,40 @@ def test_create_quote_missing_required(client):
     assert r.status_code == 422
 
 
+def test_create_quote_with_consent_and_preferred_service(client):
+    """Iteration 2: verify new fields preferred_service and consent persist."""
+    payload = {
+        "name": "TEST_Consent User",
+        "phone": "0733111222",
+        "event_type": "Nuntă",
+        "preferred_service": "Spectacol drone",
+        "consent": True,
+    }
+    r = client.post(f"{API}/quotes", json=payload)
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data["preferred_service"] == "Spectacol drone"
+    assert data["consent"] is True
+    qid = data["id"]
+
+    r2 = client.get(f"{API}/quotes")
+    assert r2.status_code == 200
+    found = [q for q in r2.json() if q.get("id") == qid]
+    assert found
+    assert found[0]["preferred_service"] == "Spectacol drone"
+    assert found[0]["consent"] is True
+
+
+def test_create_quote_consent_defaults_false(client):
+    """If consent omitted, it should default to False."""
+    payload = {"name": "TEST_NoConsent", "phone": "0700000001", "event_type": "Corporate"}
+    r = client.post(f"{API}/quotes", json=payload)
+    assert r.status_code == 200
+    data = r.json()
+    assert data["consent"] is False
+    assert data["preferred_service"] == ""
+
+
 def test_get_quotes_sorted_desc(client):
     r = client.get(f"{API}/quotes")
     assert r.status_code == 200

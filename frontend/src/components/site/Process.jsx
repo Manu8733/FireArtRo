@@ -1,10 +1,21 @@
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 import { PROCESS } from "@/data/content";
 
+const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+
 export const Process = () => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 75%", "end 55%"],
+  });
+  const fill = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
   return (
-    <section className="relative py-24 md:py-32" data-testid="process-section">
+    <section className="relative py-24 md:py-32 section-grid-bg" data-testid="process-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <Reveal>
           <div className="max-w-2xl">
@@ -15,55 +26,71 @@ export const Process = () => {
               De la idee la spectacol
             </h2>
             <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
-              Un proces clar, transparent și fără stres — tu te bucuri de eveniment, noi ne
-              ocupăm de tot.
+              Un proces clar și fără stres — tu te bucuri de eveniment, noi ne ocupăm de tot.
             </p>
           </div>
         </Reveal>
 
-        <div className="mt-16 relative">
-          {/* vertical glowing line */}
-          <div className="absolute left-[27px] md:left-1/2 top-2 bottom-2 w-px bg-gradient-to-b from-[#3A86FF] via-[#8338EC] to-transparent md:-translate-x-1/2" />
-
-          <div className="space-y-10 md:space-y-0">
-            {PROCESS.map((p, i) => (
-              <Reveal key={p.step} delay={i * 0.08}>
-                <div
-                  className={`relative flex items-start gap-6 md:gap-0 md:grid md:grid-cols-2 md:items-center ${
-                    i % 2 === 1 ? "md:[direction:rtl]" : ""
-                  }`}
-                  data-testid={`process-step-${i}`}
-                >
-                  {/* node */}
-                  <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 z-10">
-                    <motion.div
-                      whileInView={{ scale: [0.6, 1.15, 1] }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6 }}
-                      className="h-14 w-14 rounded-full bg-[#0A0712] border border-[#8338EC]/50 flex items-center justify-center glow-ring"
-                    >
+        <div ref={ref} className="mt-16 relative">
+          {/* Desktop horizontal */}
+          <div className="hidden md:block relative">
+            <div className="absolute top-7 left-0 right-0 h-px bg-white/10" />
+            <motion.div
+              style={{ width: fill }}
+              className="absolute top-7 left-0 h-px bg-gradient-to-r from-[#3A86FF] to-[#8338EC] shadow-[0_0_12px_rgba(131,56,236,0.7)]"
+            />
+            <div className="relative grid grid-cols-5 gap-4">
+              {PROCESS.map((p, i) => (
+                <Reveal key={p.step} delay={i * 0.1}>
+                  <div data-testid={`process-step-${i}`} className="flex flex-col items-start">
+                    <div className="h-14 w-14 rounded-full bg-[#0A0712] border border-[#8338EC]/50 flex items-center justify-center glow-ring relative z-10">
                       <span className="font-display font-bold text-[#9D7BFF]">{p.step}</span>
-                    </motion.div>
+                    </div>
+                    <h3 className="mt-6 font-display font-semibold text-xl text-white">{p.title}</h3>
+                    <p className="mt-2 text-white/55 font-light leading-relaxed text-sm pr-4">{p.desc}</p>
                   </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
 
-                  {/* spacer for the side opposite the card on desktop */}
-                  <div className="hidden md:block" />
-
-                  <div
-                    className={`ml-20 md:ml-0 md:[direction:ltr] ${
-                      i % 2 === 1 ? "md:pr-16 md:text-right" : "md:pl-16"
-                    } py-2 md:py-12`}
-                  >
-                    <h3 className="font-display font-semibold text-2xl text-white">{p.title}</h3>
-                    <p className="mt-2 text-white/60 font-light leading-relaxed max-w-md md:inline-block">
-                      {p.desc}
-                    </p>
+          {/* Mobile vertical */}
+          <div className="md:hidden relative">
+            <div className="absolute left-7 top-2 bottom-2 w-px bg-white/10" />
+            <motion.div
+              style={{ height: fill }}
+              className="absolute left-7 top-2 w-px bg-gradient-to-b from-[#3A86FF] to-[#8338EC] shadow-[0_0_12px_rgba(131,56,236,0.7)]"
+            />
+            <div className="space-y-10">
+              {PROCESS.map((p, i) => (
+                <Reveal key={p.step} delay={i * 0.06}>
+                  <div data-testid={`process-step-m-${i}`} className="relative flex items-start gap-5">
+                    <div className="h-14 w-14 rounded-full bg-[#0A0712] border border-[#8338EC]/50 flex items-center justify-center glow-ring relative z-10 shrink-0">
+                      <span className="font-display font-bold text-[#9D7BFF]">{p.step}</span>
+                    </div>
+                    <div className="pt-1">
+                      <h3 className="font-display font-semibold text-xl text-white">{p.title}</h3>
+                      <p className="mt-2 text-white/55 font-light leading-relaxed">{p.desc}</p>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              ))}
+            </div>
           </div>
         </div>
+
+        <Reveal delay={0.15}>
+          <div className="mt-14">
+            <button
+              onClick={() => scrollTo("#contact")}
+              data-testid="process-cta"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-8 py-4 rounded-full hover:shadow-[0_0_28px_rgba(131,56,236,0.5)] transition-all duration-300"
+            >
+              Începe-ți proiectul
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

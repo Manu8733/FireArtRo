@@ -22,7 +22,8 @@ export const Packages = () => {
               Alege experiența potrivită
             </h2>
             <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
-              Preț personalizat în funcție de locație, durată și complexitate. Spune-ne ce îți
+              Prețul final depinde de locație, durată, complexitatea designului, tipul efectelor,
+              numărul de drone, cerințele de siguranță și logistica evenimentului. Spune-ne ce îți
               dorești, iar noi construim oferta.
             </p>
           </div>

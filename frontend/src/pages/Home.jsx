@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
+import Intro from "@/components/site/Intro";
 import Stats from "@/components/site/Stats";
 import Services from "@/components/site/Services";
-import Portfolio from "@/components/site/Portfolio";
-import WhyUs from "@/components/site/WhyUs";
+import Showcase from "@/components/site/Showcase";
+import Technology from "@/components/site/Technology";
 import Process from "@/components/site/Process";
 import Packages from "@/components/site/Packages";
 import Gallery from "@/components/site/Gallery";
@@ -24,10 +25,11 @@ export default function Home() {
     <main className="bg-[#050308] min-h-screen overflow-x-hidden">
       <Navbar />
       <Hero />
+      <Intro />
       <Stats />
       <Services />
-      <Portfolio />
-      <WhyUs />
+      <Showcase />
+      <Technology />
       <Process />
       <Packages />
       <Gallery />

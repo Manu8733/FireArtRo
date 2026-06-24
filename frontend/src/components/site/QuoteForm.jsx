@@ -12,8 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import Reveal from "@/components/site/Reveal";
-import { EVENT_TYPES, PACKAGES } from "@/data/content";
+import { EVENT_TYPES, PACKAGES, SERVICE_OPTIONS } from "@/data/content";
 import { whatsappLink, PHONE_DISPLAY, EMAIL } from "@/lib/constants";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -26,7 +27,9 @@ const empty = {
   event_date: "",
   location: "",
   package: "",
+  preferred_service: "",
   message: "",
+  consent: false,
 };
 
 export const QuoteForm = () => {
@@ -46,6 +49,10 @@ export const QuoteForm = () => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim() || !form.event_type) {
       toast.error("Completează numele, telefonul și tipul evenimentului.");
+      return;
+    }
+    if (!form.consent) {
+      toast.error("Te rugăm să accepți prelucrarea datelor pentru a continua.");
       return;
     }
     setLoading(true);
@@ -237,15 +244,35 @@ export const QuoteForm = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-white/70 text-sm">Locație</Label>
-                    <Input
-                      data-testid="quote-input-location"
-                      value={form.location}
-                      onChange={(e) => update("location")(e.target.value)}
-                      placeholder="Oraș / locație aproximativă"
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 rounded-xl focus-visible:ring-[#8338EC]"
-                    />
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <Label className="text-white/70 text-sm">Locație</Label>
+                      <Input
+                        data-testid="quote-input-location"
+                        value={form.location}
+                        onChange={(e) => update("location")(e.target.value)}
+                        placeholder="Oraș / locație aproximativă"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 rounded-xl focus-visible:ring-[#8338EC]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-white/70 text-sm">Serviciu preferat</Label>
+                      <Select value={form.preferred_service} onValueChange={update("preferred_service")}>
+                        <SelectTrigger
+                          data-testid="quote-select-service"
+                          className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-[#8338EC]"
+                        >
+                          <SelectValue placeholder="Opțional" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0A0712] border-white/10 text-white">
+                          {SERVICE_OPTIONS.map((s) => (
+                            <SelectItem key={s} value={s} className="focus:bg-[#8338EC]/30">
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -258,6 +285,23 @@ export const QuoteForm = () => {
                       rows={4}
                       className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-[#8338EC] resize-none"
                     />
+                  </div>
+
+                  <div className="flex items-start gap-3 pt-1">
+                    <Checkbox
+                      id="consent"
+                      data-testid="quote-consent"
+                      checked={form.consent}
+                      onCheckedChange={(v) => update("consent")(!!v)}
+                      className="mt-0.5 border-white/30 data-[state=checked]:bg-[#8338EC] data-[state=checked]:border-[#8338EC]"
+                    />
+                    <Label htmlFor="consent" className="text-white/55 text-sm font-light leading-relaxed cursor-pointer">
+                      Sunt de acord cu prelucrarea datelor mele pentru a primi o ofertă, conform{" "}
+                      <a href="/legal/confidentialitate" target="_blank" className="text-[#9D7BFF] underline">
+                        politicii de confidențialitate
+                      </a>
+                      .
+                    </Label>
                   </div>
 
                   <button

@@ -35,7 +35,9 @@ class QuoteCreate(BaseModel):
     event_date: Optional[str] = ""
     location: Optional[str] = ""
     package: Optional[str] = ""
+    preferred_service: Optional[str] = ""
     message: Optional[str] = ""
+    consent: Optional[bool] = False
 
 
 class Quote(BaseModel):
@@ -49,7 +51,9 @@ class Quote(BaseModel):
     event_date: str = ""
     location: str = ""
     package: str = ""
+    preferred_service: str = ""
     message: str = ""
+    consent: bool = False
     status: str = "new"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

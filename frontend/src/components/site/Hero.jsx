@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Plane, Zap, Clock } from "lucide-react";
 import HeroVideo from "@/components/site/HeroVideo";
 import Particles from "@/components/site/Particles";
+import FloatingLogos from "@/components/site/FloatingLogos";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
@@ -38,6 +39,7 @@ export const Hero = () => {
       data-testid="hero-section"
     >
       <HeroVideo />
+      <FloatingLogos />
       <Particles density={70} className="absolute inset-0 z-10 w-full h-full pointer-events-none" />
 
       {/* Floating aurora trails */}

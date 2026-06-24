@@ -32,10 +32,13 @@ aesthetic with blue/violet accents.
 - Romanian copy throughout; SEO meta + FAQ JSON-LD; responsive; reduced-motion friendly.
 
 ## Implemented (2026-06-24)
-- Full single-page site with all 13 sections + 3 legal pages. ✅
+- Full single-page site with all sections + 3 legal pages. ✅
 - Quote form persists to MongoDB with validation + success state + package prefill. ✅
 - WhatsApp float + CTAs, partner marquee, gallery lightbox, FAQ accordion. ✅
-- Verified end-to-end by testing agent: backend 5/5, frontend 100%.
+- **Iter 2 (cinematic rebuild)**: video-first hero collage (Mixkit loops + poster), Intro, premium Showcase slider (auto-advance/progress/swipe/arrows), Technology section, scroll-driven glowing timeline, consent + preferred-service on quote form, OG/schema/sitemap/robots. ✅
+- **Iter 3 (cinematic motion)**: dark-room veil, text-bloom headlines, global scale+blur scroll reveals, slide-in hero headline, letterboxed kickers, ambient floating icons, sticky-header Technology, hero parallax. ✅
+- **Iter 4 (scroll choreography)**: hero field of floating brand sparks (FloatingLogos) choreographed to scroll (drift + fade), matching the requested cinematic reference feel. ✅
+- Verified end-to-end by testing agent across iterations: backend + frontend 100%.
 
 ## Backlog / Next
 - **P0**: Replace placeholder WhatsApp number, email, Instagram in `src/lib/constants.js`.

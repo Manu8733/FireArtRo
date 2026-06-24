@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { NAV_LINKS } from "@/data/content";
@@ -10,29 +10,47 @@ const scrollTo = (href) => {
   if (el) el.scrollIntoView({ behavior: "smooth" });
 };
 
-const Logo = () => (
+const Logo = ({ onClick }) => (
   <a
     href="#acasa"
     onClick={(e) => {
       e.preventDefault();
-      scrollTo("#acasa");
+      onClick ? onClick() : scrollTo("#acasa");
     }}
     data-testid="nav-logo"
     className="flex items-center gap-3 shrink-0"
   >
-    <img src={LOGO_URL} alt="FIREARTRO" className="h-9 w-auto md:h-10 object-contain" />
+    <img src={LOGO_URL} alt="FIREARTRO" className="h-8 w-auto md:h-10 object-contain" />
   </a>
 );
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("#acasa");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scroll-spy: highlight the section currently in view.
+  useEffect(() => {
+    const ids = NAV_LINKS.map((l) => l.href.replace("#", ""));
+    const sections = ids.map((id) => document.getElementById(id)).filter(Boolean);
+    if (!sections.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(`#${entry.target.id}`);
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
+    );
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -42,39 +60,51 @@ export const Navbar = () => {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "backdrop-blur-xl bg-[#050308]/80 border-b border-white/10 py-3"
-          : "bg-transparent py-5"
+          ? "backdrop-blur-xl bg-[#050308]/75 border-b border-white/10 py-2.5"
+          : "bg-transparent py-4"
       }`}
       data-testid="main-navbar"
     >
-      <nav className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between gap-6">
+      <nav className="max-w-7xl mx-auto px-5 sm:px-6 md:px-12 flex items-center justify-between gap-6">
         <Logo />
 
-        <div className="hidden lg:flex items-center gap-8">
-          {NAV_LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollTo(l.href);
-              }}
-              data-testid={`nav-link-${l.href.replace("#", "")}`}
-              className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-200 relative group"
-            >
-              {l.label}
-              <span className="absolute -bottom-1.5 left-0 h-px w-0 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] group-hover:w-full transition-all duration-300" />
-            </a>
-          ))}
+        <div className="hidden lg:flex items-center gap-1">
+          {NAV_LINKS.map((l) => {
+            const isActive = active === l.href;
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo(l.href);
+                }}
+                data-testid={`nav-link-${l.href.replace("#", "")}`}
+                className={`relative text-sm font-medium px-3 py-2 rounded-full transition-colors duration-200 ${
+                  isActive ? "text-white" : "text-white/65 hover:text-white"
+                }`}
+              >
+                {l.label}
+                {isActive && (
+                  <motion.span
+                    layoutId="nav-active"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    className="absolute inset-0 -z-10 rounded-full bg-white/8 border border-white/10"
+                  />
+                )}
+              </a>
+            );
+          })}
         </div>
 
         <div className="hidden lg:block">
           <button
             onClick={() => scrollTo("#contact")}
             data-testid="nav-cta-button"
-            className="bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white text-sm font-semibold px-6 py-3 rounded-full hover:shadow-[0_0_24px_rgba(131,56,236,0.5)] transition-all duration-300"
+            className="group inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:shadow-[0_0_28px_rgba(131,56,236,0.55)] transition-all duration-300"
           >
             Solicită ofertă
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
 
@@ -84,61 +114,66 @@ export const Navbar = () => {
             <SheetTrigger asChild>
               <button
                 data-testid="mobile-menu-trigger"
-                className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="text-white p-2 rounded-xl glass hover:bg-white/10 transition-colors"
                 aria-label="Deschide meniul"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               </button>
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="bg-[#0A0712] border-white/10 w-[300px] p-0 [&>button]:hidden"
+              className="bg-[#0A0712]/95 backdrop-blur-xl border-white/10 w-[86vw] max-w-[340px] p-0 [&>button]:hidden"
             >
               <div className="flex flex-col h-full">
                 <SheetTitle className="sr-only">Meniu de navigare</SheetTitle>
                 <SheetDescription className="sr-only">
                   Navighează către secțiunile site-ului FIREARTRO
                 </SheetDescription>
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
-                  <Logo />
+                <div className="flex items-center justify-between p-5 border-b border-white/10">
+                  <Logo onClick={() => setOpen(false)} />
                   <button
                     onClick={() => setOpen(false)}
-                    className="text-white/70 hover:text-white"
+                    className="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
                     aria-label="Închide meniul"
                     data-testid="mobile-menu-close"
                   >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
-                <div className="flex flex-col p-6 gap-1">
+
+                <div className="flex flex-col px-5 py-6 gap-0.5 flex-1 overflow-y-auto">
                   {NAV_LINKS.map((l, i) => (
-                    <AnimatePresence key={l.href}>
-                      <motion.a
-                        href={l.href}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setOpen(false);
-                          setTimeout(() => scrollTo(l.href), 200);
-                        }}
-                        data-testid={`mobile-nav-link-${l.href.replace("#", "")}`}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="text-base font-medium text-white/80 hover:text-white py-3 border-b border-white/5"
-                      >
-                        {l.label}
-                      </motion.a>
-                    </AnimatePresence>
+                    <motion.a
+                      key={l.href}
+                      href={l.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setOpen(false);
+                        setTimeout(() => scrollTo(l.href), 220);
+                      }}
+                      data-testid={`mobile-nav-link-${l.href.replace("#", "")}`}
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex items-center justify-between text-[15px] font-medium text-white/80 hover:text-white py-3.5 border-b border-white/5 group"
+                    >
+                      {l.label}
+                      <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-[#9D7BFF] group-hover:translate-x-0.5 transition-all" />
+                    </motion.a>
                   ))}
+                </div>
+
+                <div className="p-5 border-t border-white/10">
                   <button
                     onClick={() => {
                       setOpen(false);
-                      setTimeout(() => scrollTo("#contact"), 200);
+                      setTimeout(() => scrollTo("#contact"), 220);
                     }}
                     data-testid="mobile-nav-cta"
-                    className="mt-6 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-6 py-3.5 rounded-full"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-6 py-3.5 rounded-full"
                   >
                     Solicită ofertă
+                    <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               </div>

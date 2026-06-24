@@ -1,40 +1,60 @@
+import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { Stagger, StaggerItem } from "@/components/site/cinematic";
 import { WHY } from "@/data/content";
+
+const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
 export const WhyUs = () => {
   return (
-    <section className="relative py-24 md:py-32 section-grid-bg" data-testid="why-section">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <Reveal>
-          <div className="max-w-2xl">
-            <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
-              De ce FIREARTRO
-            </span>
-            <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
-              Încredere, siguranță și efect wow
-            </h2>
-            <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
-              Nu vindem doar artificii — creăm experiențe complete, planificate la milimetru,
-              cu o echipă pe care te poți baza.
-            </p>
-          </div>
-        </Reveal>
-
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {WHY.map((w, i) => (
-            <Reveal key={w.title} delay={(i % 3) * 0.1}>
-              <div
-                className="group h-full glass rounded-2xl p-8 hover:-translate-y-1.5 hover:border-white/20 transition-all duration-300"
-                data-testid={`why-card-${i}`}
+    <section id="de-ce-noi" className="relative py-20 sm:py-28 md:py-32 overflow-hidden" data-testid="why-section">
+      <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[80vw] h-[40vw] rounded-full bg-[#8338EC]/8 blur-[150px]" />
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
+        <div className="grid lg:grid-cols-[0.9fr_1.4fr] gap-10 lg:gap-16">
+          {/* Intro */}
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <Reveal>
+              <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#9D7BFF]">
+                De ce FIREARTRO
+              </span>
+              <h2 className="mt-4 font-display font-bold text-white display-md">
+                Un partener care îți regizează momentul perfect
+              </h2>
+              <p className="mt-5 text-white/60 lead font-light">
+                Nu livrăm doar efecte. Construim o experiență completă — de la concept și
+                siguranță, până la emoția de pe fețele invitaților.
+              </p>
+              <button
+                onClick={() => scrollTo("#contact")}
+                className="mt-8 inline-flex items-center gap-2 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] text-white font-semibold px-6 py-3.5 rounded-full hover:shadow-[0_0_28px_rgba(131,56,236,0.5)] transition-all duration-300"
               >
-                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 border border-white/10 flex items-center justify-center group-hover:glow-ring transition-all duration-300">
-                  <w.icon className="h-7 w-7 text-[#9D7BFF]" />
-                </div>
-                <h3 className="mt-6 font-display font-semibold text-xl text-white">{w.title}</h3>
-                <p className="mt-3 text-white/60 font-light leading-relaxed">{w.desc}</p>
-              </div>
+                Hai să vorbim
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </Reveal>
-          ))}
+          </div>
+
+          {/* Reasons grid */}
+          <Stagger className="grid grid-cols-2 gap-3 sm:gap-5">
+            {WHY.map((w, i) => (
+              <StaggerItem key={w.title}>
+                <div
+                  className="group h-full glass rounded-2xl p-4 sm:p-6 hover:border-white/20 md:hover:-translate-y-1 transition-all duration-300"
+                  data-testid={`why-card-${i}`}
+                >
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 border border-white/10 flex items-center justify-center group-hover:glow-ring transition-all duration-300">
+                    <w.icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#9D7BFF]" />
+                  </div>
+                  <h3 className="mt-4 font-display font-semibold text-[15px] sm:text-lg text-white leading-snug">
+                    {w.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] sm:text-sm text-white/55 font-light leading-relaxed">
+                    {w.desc}
+                  </p>
+                </div>
+              </StaggerItem>
+            ))}
+          </Stagger>
         </div>
       </div>
     </section>

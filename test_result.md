@@ -102,58 +102,23 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the FIREARTRO landing page (Romanian drone-show/fireworks marketing site). Verify recently fixed animations and UI/UX including storytelling section, scroll reveal animations, mobile nav, gallery lightbox, quote form, and console errors."
+user_problem_statement: "Massive cinematic premium redesign of the FIREARTRO landing page (Romanian drone-show/fireworks site). New typography (Sora + Inter), restructured storytelling flow, mobile rebuild (swipe carousels, vertical timeline/story, lighter motion), refined animations and SEO. Verify functionality + responsive QA across viewports."
+
+backend:
+  - task: "Quote API (POST/GET /api/quotes)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "No backend code change in this redesign. Restored missing backend/.env (MONGO_URL, DB_NAME, CORS_ORIGINS) and frontend/.env (REACT_APP_BACKEND_URL) which were gitignored in the source repo and caused backend to crash on boot. /api/ health returns 200. Quote form still posts to /api/quotes."
 
 frontend:
-  - task: "Storytelling Section (Chapters) - Manual Navigation"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/components/site/Chapters.jsx"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "Desktop (1440x900) and Mobile (390x844): All elements visible including heading 'Povestea unui spectacol', chapter rail, and all 3 chapter dots. Manual chapter navigation by clicking dots works perfectly - clicking dot-2 changes counter to '03 / 03', clicking dot-0 changes to '01 / 03'. Counter updates correctly. Content is never blank/black during navigation."
-
-  - task: "Storytelling Section (Chapters) - Automatic Scroll Transitions"
-    implemented: true
-    working: "NA"
-    file: "/app/frontend/src/components/site/Chapters.jsx"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "testing"
-        comment: "Observation: When scrolling programmatically through the section, chapter transitions don't trigger automatically (counter stays at 01 / 03). This may be a limitation of automated testing as programmatic scrolling might not trigger framer-motion's scroll progress tracking the same way natural user scrolling does. Manual navigation works perfectly. Content remains visible (never blank/black) throughout scrolling. The sticky container shows some movement (270px) between scroll positions, but content is always visible. This is not marked as a failure since manual navigation works and no blank content appears."
-
-  - task: "Scroll Reveal Animations - Technology Section"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/components/site/Technology.jsx"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "Desktop and Mobile: All 4 tech cards (tech-card-0 to tech-card-3) are visible with full opacity (opacity=1). No blur or transparency issues. Cards remain visible and sharp after scrolling into view and do not re-blur when scrolling slightly. Reveal animations working correctly."
-
-  - task: "Scroll Reveal Animations - Gallery Section"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/components/site/Gallery.jsx"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "Desktop and Mobile: All 8 gallery items (gallery-item-0 to gallery-item-7) are visible with images properly loaded. Items remain visible and sharp after scrolling into view and do not re-blur when scrolling slightly. Reveal animations working correctly."
-
-  - task: "Mobile Navigation Drawer"
+  - task: "Navbar — scroll-spy active link + premium mobile drawer"
     implemented: true
     working: true
     file: "/app/frontend/src/components/site/Navbar.jsx"
@@ -161,11 +126,119 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Rebuilt with IntersectionObserver scroll-spy (active pill highlight), refined mobile Sheet drawer (single close button, animated links, sticky CTA). Verify desktop nav links scroll to sections, active highlight updates, mobile drawer opens/closes and links work."
       - working: true
         agent: "testing"
-        comment: "Mobile (390x844): Mobile menu trigger opens drawer correctly. Exactly 1 close button found (no duplicate X buttons). Clicking nav link (e.g., 'Galerie') closes drawer and scrolls to section. Clicking X close button closes drawer. All functionality working as expected."
+        comment: "✅ PASS - Desktop nav links scroll correctly to sections (tested nav-link-servicii). Mobile drawer opens/closes properly with exactly ONE close button [data-testid=mobile-menu-close]. Mobile nav links (e.g., mobile-nav-link-galerie) close drawer and scroll to correct section. Mobile nav CTA scrolls to #contact. Active highlight changes on scroll (IntersectionObserver working)."
 
-  - task: "Gallery Lightbox"
+  - task: "Hero — cinematic, fluid type, trust strip, mobile-light"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/site/Hero.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "New Sora display type, fluid clamp sizing, star/trust strip, particles+floating-logos disabled on mobile. Verify hero-primary-cta scrolls to #contact and hero-secondary-cta scrolls to #spectacole."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - hero-primary-cta scrolls correctly to #contact. hero-secondary-cta scrolls correctly to #spectacole. Hero section renders beautifully with Sora display font, trust strip with 5 stars '150+ spectacole regizate', and trust badges. Particles and floating logos correctly disabled on mobile."
+
+  - task: "Services — mobile swipe carousel"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/site/Services.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Cards become a horizontal snap carousel on mobile, 2-col grid on desktop. Verify service-card-0..3 render and service-cta scrolls to contact."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Services section renders correctly. Desktop shows 2-col grid, mobile shows horizontal snap carousel. All service cards (service-card-0..3) render with icons, descriptions, and CTAs. Service CTAs scroll to #contact."
+
+  - task: "Showcase — category pills, slider, dots, swipe"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/site/Showcase.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Auto-advancing slider with progress, category pills, desktop side list, mobile dots + arrows + swipe. Verify showcase-prev/next, category pills switch slide, showcase-cta works."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - showcase-prev and showcase-next buttons change slides correctly. Category pills switch featured slide. Progress bar animates. Mobile (390x844) shows dots [data-testid=showcase-dots] and slide advances. Desktop shows side list with showcase-tab-* elements. showcase-cta scrolls to #contact."
+
+  - task: "Chapters storytelling — desktop pinned / mobile vertical"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/site/Chapters.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Desktop keeps cinematic pinned crossfade (chapter-dot-*, chapter-media-*). Mobile renders a lightweight vertical story (no scroll-jack). Verify both; on mobile confirm 3 chapter cards render and no pinned/stuck scrolling."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Desktop (1440x900): Cinematic pinned crossfade with 3 chapters (chapter-media-0..2), scroll-driven animation, chapter dots navigation. Mobile (390x844): Clean vertical story with 3 stacked chapter cards, NO scroll-jacking, normal scrolling behavior. Section height appropriate for mobile (not extended/pinned)."
+
+  - task: "Why FIREARTRO (new section)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/site/WhyUs.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "New benefit-focused trust section (why-card-0..5). Replaces the old Technology grid in the page flow."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Why FIREARTRO section renders correctly with 6 benefit cards (why-card-0..5) in 2-col grid. Each card has icon, title, and description. Section integrates well into page flow."
+
+  - task: "Process — desktop pinned stepper / mobile vertical timeline"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/site/Process.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Desktop pinned scroll stepper (process-dot-*). Mobile vertical glowing timeline (process-step-0..4). Verify process-cta scrolls to contact."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Desktop (1440x900): Pinned scroll-driven stepper with 5 dots (process-dot-0..4), animated transitions between steps. Mobile (390x844): Vertical glowing timeline with 5 steps (process-step-0..4), NOT pinned, normal scrolling. process-cta scrolls to #contact. Both layouts work perfectly."
+
+  - task: "Packages — pricing factors, icons, prefill, mobile swipe"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/site/Packages.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "4 packages with icons + pricing-factor pills, mobile swipe. Verify package-cta-* dispatches prefill-package event, scrolls to #contact and prefills the 'Pachet dorit' select in the quote form."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - All 4 packages render with icons, pricing factors, features. package-cta-1 (Pachet Drone Show) correctly: 1) scrolls to #contact, 2) dispatches prefill-package event, 3) prefills 'Pachet dorit' select with 'Pachet Drone Show'. Mobile shows swipe carousel. Desktop shows 4-col grid."
+
+  - task: "Gallery — bento desktop / swipe mobile + lightbox"
     implemented: true
     working: true
     file: "/app/frontend/src/components/site/Gallery.jsx"
@@ -173,11 +246,14 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Bento grid on desktop, swipe carousel on mobile, category badges. Lightbox preserved (gallery-lightbox, DialogTitle sr-only). Verify gallery-item-0 opens lightbox and Escape closes it; no DialogTitle a11y warning."
       - working: true
         agent: "testing"
-        comment: "Desktop: Clicking gallery-item-0 opens lightbox (data-testid='gallery-lightbox') with image displayed. Pressing Escape closes lightbox. No console errors. DialogTitle is properly implemented (no accessibility warnings)."
+        comment: "✅ PASS - Desktop: Bento grid layout with 16 gallery items (gallery-item-0..15). Clicking visible gallery items opens lightbox [data-testid=gallery-lightbox] with image. Escape key closes lightbox. DialogTitle is sr-only (accessibility compliant). NO 'DialogContent requires a DialogTitle' console warnings. Mobile: Swipe carousel with category badges."
 
-  - task: "Quote Form Submission"
+  - task: "Quote Form submission (backend integration)"
     implemented: true
     working: true
     file: "/app/frontend/src/components/site/QuoteForm.jsx"
@@ -185,11 +261,29 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Logic unchanged; restyled + reassurance line added. Verify fill name/phone/event-type + consent submits successfully (quote-success state, success toast, POST /api/quotes 200)."
       - working: true
         agent: "testing"
-        comment: "Desktop: Form fields (name, phone, email) fill correctly. Event type select (shadcn Select component) works with get_by_role('option'). Consent checkbox can be checked. Form submits successfully and shows success state (data-testid='quote-success') with heading 'Mulțumim!'. Success toast notification appears: 'Cererea ta a fost trimisă! Te contactăm în curând.' Backend logs confirm POST /api/quotes returned 200 OK."
+        comment: "✅ PASS - Quote form submission works perfectly. Filled name='Maria Ionescu', phone='0723456789', event_type='Nuntă' (shadcn Select with role=option), checked consent. Form submits successfully. Success state [data-testid=quote-success] displays with heading 'Mulțumim!'. Success toast appears. Backend POST /api/quotes returns 200. Backend API health check: GET /api/ returns 200 with {\"message\":\"FIREARTRO API\"}."
 
-  - task: "Console Errors Check"
+  - task: "Responsive QA — no horizontal scroll across viewports"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/index.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Verify NO horizontal scroll (scrollWidth<=clientWidth) and no overlap/clipping at 360x800, 390x844, 430x932, 768x1024, 1024x768, 1440x900, 1920x1080. Check mobile menu, carousels, sticky sections."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Comprehensive responsive QA across ALL 7 viewports: 360x800 (0px overflow), 390x844 (0px overflow), 430x932 (0px overflow), 768x1024 (0px overflow), 1024x768 (0px overflow), 1440x900 (0px overflow), 1920x1080 (0px overflow). NO horizontal scroll detected on any viewport. Scrolled fully top-to-bottom on each viewport. No text clipping, broken grids, or overlapping elements observed. Mobile menu, carousels, and sticky sections all work correctly."
+
+  - task: "Console errors check"
     implemented: true
     working: true
     file: "N/A"
@@ -197,16 +291,18 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Confirm no console errors (ignore mixkit video ERR_ABORTED on fast navigation and posthog). Specifically no 'DialogContent requires a DialogTitle' warnings."
       - working: true
         agent: "testing"
-        comment: "No console errors found during testing on both desktop and mobile viewports. Specifically confirmed NO 'DialogContent requires a DialogTitle' errors when opening mobile nav drawer or gallery lightbox. All Dialog components properly implement DialogTitle (including sr-only for accessibility)."
+        comment: "✅ PASS - NO console errors found. 20 minor console warnings (Canvas2D willReadFrequently performance optimization, scroll offset container position) - all non-critical. NO 'DialogContent requires a DialogTitle' warnings. NO React/runtime errors. Ignored: posthog, mixkit video ERR_ABORTED, React DevTools notices as specified."
 
 metadata:
-  created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
-  run_ui: true
-  test_date: "2025-06-24"
+  created_by: "main_agent"
+  version: "2.0"
+  test_sequence: 2
+  run_ui: false
 
 test_plan:
   current_focus: []
@@ -215,5 +311,7 @@ test_plan:
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "main"
+    message: "Completed a large cinematic redesign of the FIREARTRO single-page site. Changed: typography (Sora display + Inter body) via index.html/index.css/tailwind.config; new motion primitives (cinematic.jsx, Reveal.jsx, useMediaQuery hook) that are mobile-light and reduced-motion aware; redesigned Navbar, Hero, HeroVideo, Intro, Stats, Services, Showcase, Chapters (mobile vertical fallback), new WhyUs section, Process (mobile vertical timeline fallback), Packages (pricing factors + prefill), Gallery (mobile swipe + lightbox), Testimonials, Faq, FinalCta, Footer; minor QuoteForm restyle (logic unchanged); content.js copy + curated cinematic images. Removed standalone Technology section from the page flow (file still exists). NOTE: restored missing backend/.env and frontend/.env (were gitignored) — backend healthy again. Please run full FRONTEND functional + RESPONSIVE QA per current_focus. Backend was not modified functionally."
   - agent: "testing"
-    message: "Comprehensive testing completed on FIREARTRO landing page. Tested all 6 requested areas on both desktop (1440x900) and mobile (390x844) viewports. All critical functionality is working correctly: manual chapter navigation, scroll reveal animations (tech cards and gallery items), mobile nav drawer, gallery lightbox, quote form submission with backend integration, and no console errors. One observation: automatic scroll-driven chapter transitions don't trigger during programmatic scrolling in automated tests, but this may be a testing limitation rather than a bug since manual navigation works perfectly and content is never blank. Ready for main agent to summarize and finish if no further issues."
+    message: "✅ COMPREHENSIVE QA COMPLETE - ALL TESTS PASS. Tested PRIORITY 1 (Responsive QA across 7 viewports: 360x800, 390x844, 430x932, 768x1024, 1024x768, 1440x900, 1920x1080 - ALL PASS with 0px horizontal overflow). PRIORITY 2 (Desktop functionality: navbar scroll-spy, hero CTAs, showcase slider/pills/progress, packages prefill, gallery lightbox, FAQ accordion, quote form submission with backend integration, process pinned stepper, chapters pinned crossfade - ALL PASS). PRIORITY 3 (Mobile functionality: mobile nav drawer with ONE close button, mobile nav links, showcase dots, process vertical timeline, chapters vertical story - ALL PASS). Console: NO errors, 20 minor warnings (Canvas2D, scroll offset - non-critical), NO DialogTitle warnings. Backend API healthy (200 OK). Site is production-ready. All tasks marked working=true, needs_retesting=false."

@@ -3,26 +3,35 @@
 @tailwind utilities;
 
 :root {
-    --background: 240 24% 2%;
+    --background: 250 30% 2%;
     --foreground: 0 0% 98%;
-    --card: 240 20% 6%;
+    --card: 250 24% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 22% 5%;
+    --popover: 250 26% 5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 265 82% 57%;
+    --primary: 265 82% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 10% 12%;
+    --secondary: 250 10% 12%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 10% 12%;
-    --muted-foreground: 240 6% 64%;
-    --accent: 217 100% 62%;
+    --muted: 250 10% 12%;
+    --muted-foreground: 250 6% 64%;
+    --accent: 217 100% 64%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 12% 16%;
-    --input: 240 12% 16%;
-    --ring: 265 82% 57%;
-    --radius: 0.85rem;
+    --border: 250 12% 15%;
+    --input: 250 12% 15%;
+    --ring: 265 82% 60%;
+    --radius: 1rem;
+
+    /* Brand tokens */
+    --ink: #050308;
+    --ink-2: #0a0712;
+    --blue: #3a86ff;
+    --blue-soft: #5aa9ff;
+    --violet: #8338ec;
+    --violet-soft: #9d7bff;
+    --magenta: #c77dff;
 }
 
 * {
@@ -31,123 +40,198 @@
 
 html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
     margin: 0;
-    font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background-color: #050308;
     color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
     /* clip (not hidden) so it doesn't create a scroll container that breaks position: sticky */
     overflow-x: clip;
 }
 
 .font-display {
-    font-family: "Clash Display", "Outfit", sans-serif;
+    font-family: "Sora", "Inter", sans-serif;
+    letter-spacing: -0.025em;
+    font-feature-settings: "ss01";
+}
+
+/* ---------- Fluid display type (mobile-safe, never oversized) ---------- */
+.display-xl {
+    font-size: clamp(2.35rem, 7.2vw, 5.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+}
+.display-lg {
+    font-size: clamp(2rem, 5.4vw, 3.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+}
+.display-md {
+    font-size: clamp(1.65rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+}
+.display-sm {
+    font-size: clamp(1.3rem, 3vw, 1.85rem);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+}
+.lead {
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.7;
 }
 
 /* Section scroll offset for sticky nav */
 section[id] {
-    scroll-margin-top: 90px;
+    scroll-margin-top: 96px;
 }
 
-/* ---------- Utilities ---------- */
+/* ---------- Gradients & text ---------- */
 .text-gradient {
-    background: linear-gradient(100deg, #5aa9ff 0%, #8338ec 60%, #c77dff 100%);
+    background: linear-gradient(104deg, #5aa9ff 0%, #8338ec 52%, #c77dff 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 }
 
-/* Cinematic text bloom — subtle glow on headlines (dark-room effect) */
-main h1,
-main h2 {
-    text-shadow: 0 0 28px rgba(131, 56, 236, 0.22), 0 0 60px rgba(58, 134, 255, 0.10);
-}
+/* Refined, restrained headline glow (no muddy global shadow) */
 .text-bloom {
-    text-shadow: 0 0 22px rgba(255, 255, 255, 0.28), 0 0 48px rgba(131, 56, 236, 0.35);
+    text-shadow: 0 0 24px rgba(157, 123, 255, 0.35), 0 0 64px rgba(58, 134, 255, 0.18);
 }
 .cine-kicker {
     text-transform: uppercase;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.3em;
+    font-feature-settings: "ss01";
 }
 
 .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-strong {
+    background: rgba(12, 9, 22, 0.72);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glow-ring {
-    box-shadow: 0 0 0 1px rgba(131, 56, 236, 0.3),
-        0 8px 40px rgba(131, 56, 236, 0.18);
+    box-shadow: 0 0 0 1px rgba(131, 56, 236, 0.28),
+        0 12px 48px rgba(131, 56, 236, 0.2);
+}
+.glow-soft {
+    box-shadow: 0 18px 60px -20px rgba(131, 56, 236, 0.55);
+}
+
+/* Gradient hairline border (premium card edge) */
+.border-gradient {
+    position: relative;
+}
+.border-gradient::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(140deg, rgba(90, 169, 255, 0.5), rgba(131, 56, 236, 0.15) 45%, transparent 70%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .section-grid-bg {
     background-image:
-        radial-gradient(circle at 50% 0%, rgba(131, 56, 236, 0.12), transparent 55%),
-        radial-gradient(circle at 80% 80%, rgba(58, 134, 255, 0.08), transparent 50%);
+        radial-gradient(circle at 50% 0%, rgba(131, 56, 236, 0.1), transparent 55%),
+        radial-gradient(circle at 85% 85%, rgba(58, 134, 255, 0.07), transparent 50%);
+}
+
+/* Animated aurora field (GPU-cheap, blurred radial blobs) */
+.aurora {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+.aurora::before,
+.aurora::after {
+    content: "";
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.5;
+    will-change: transform;
+}
+.aurora::before {
+    top: -20%;
+    left: -10%;
+    background: radial-gradient(circle, rgba(131, 56, 236, 0.4), transparent 65%);
+    animation: aurora-a 18s ease-in-out infinite;
+}
+.aurora::after {
+    bottom: -25%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(58, 134, 255, 0.32), transparent 65%);
+    animation: aurora-b 22s ease-in-out infinite;
 }
 
 .noise-overlay::before {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 1;
 }
+
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ---------- Keyframes ---------- */
 @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
 }
-.animate-marquee {
-    animation: marquee 30s linear infinite;
-}
+.animate-marquee { animation: marquee 36s linear infinite; }
 
 @keyframes float-slow {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-14px); }
 }
-.animate-float-slow {
-    animation: float-slow 7s ease-in-out infinite;
-}
+.animate-float-slow { animation: float-slow 7s ease-in-out infinite; }
 
 @keyframes glow-pulse {
-    0%, 100% { opacity: 0.5; }
+    0%, 100% { opacity: 0.45; }
     50% { opacity: 1; }
 }
-.animate-glow-pulse {
-    animation: glow-pulse 4s ease-in-out infinite;
-}
+.animate-glow-pulse { animation: glow-pulse 4s ease-in-out infinite; }
 
-@keyframes gradient-shift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-/* Ambient micro-floating — handheld / floating-in-space realism */
 @keyframes float-eff {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
 }
-.animate-float-eff {
-    animation: float-eff 6s ease-in-out infinite;
+.animate-float-eff { animation: float-eff 6s ease-in-out infinite; }
+
+@keyframes aurora-a {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(8%, 6%, 0) scale(1.12); }
 }
-@keyframes line-float {
-    0%, 100% { transform: translateY(0); opacity: 0.55; }
-    50% { transform: translateY(8px); opacity: 1; }
-}
-.animate-line-float {
-    animation: line-float 5s ease-in-out infinite;
+@keyframes aurora-b {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+    50% { transform: translate3d(-7%, -5%, 0) scale(0.95); }
 }
 
-/* Ken-Burns slow cinematic zoom/pan for storytelling media */
 @keyframes ken-burns {
     0% { transform: scale(1.04) translate3d(0, 0, 0); }
     100% { transform: scale(1.16) translate3d(-1.5%, -1.5%, 0); }
@@ -157,14 +241,20 @@ main h2 {
     will-change: transform;
 }
 
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .animate-marquee,
     .animate-float-slow,
     .animate-float-eff,
-    .animate-line-float,
     .animate-ken-burns,
-    .animate-glow-pulse { animation: none; }
+    .animate-glow-pulse,
+    .aurora::before,
+    .aurora::after { animation: none !important; }
 }
 
 /* Custom scrollbar */

@@ -16,11 +16,16 @@ import {
   Palette,
   Wrench,
   Rocket,
+  Crown,
+  Building2,
 } from "lucide-react";
 
-// Hero cinematic video collage (drone · fireworks · wedding) — hotlinkable Mixkit loops.
+/* ------------------------------------------------------------------ */
+/*  Cinematic media                                                    */
+/* ------------------------------------------------------------------ */
 export const HERO_POSTER =
-  "https://images.pexels.com/photos/27051702/pexels-photo-27051702.jpeg";
+  "https://images.unsplash.com/photo-1557393512-3c3f34c4ad70?crop=entropy&cs=srgb&fm=jpg&q=85&w=1920";
+
 export const HERO_VIDEOS = [
   { src: "https://assets.mixkit.co/videos/46028/46028-720.mp4", label: "Artificii" },
   { src: "https://assets.mixkit.co/videos/49846/49846-720.mp4", label: "Drone" },
@@ -28,44 +33,53 @@ export const HERO_VIDEOS = [
   { src: "https://assets.mixkit.co/videos/28375/28375-720.mp4", label: "Spectacol" },
 ];
 
+// Curated cinematic stills (drone light shows · fireworks · cold sparks)
+export const MEDIA = {
+  fireworksSky: "https://images.unsplash.com/photo-1557393512-3c3f34c4ad70?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
+  droneShow: "https://images.unsplash.com/photo-1704072979498-df7f24b04e05?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
+  droneShow2: "https://images.pexels.com/photos/35439843/pexels-photo-35439843.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+  droneShow3: "https://images.pexels.com/photos/10555659/pexels-photo-10555659.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+  coldSparks: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
+  coldSparks2: "https://images.unsplash.com/photo-1583245823946-0d3aac6562ad?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
+  coldSparks3: "https://images.pexels.com/photos/5858809/pexels-photo-5858809.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+  crowd: "https://images.unsplash.com/photo-1704073321423-e2db80cb304b?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600",
+  crowd2: "https://images.pexels.com/photos/34408550/pexels-photo-34408550.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+  crowd3: "https://images.pexels.com/photos/34408521/pexels-photo-34408521.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+  wedding: "https://images.pexels.com/photos/3397027/pexels-photo-3397027.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+  corporate: "https://images.unsplash.com/photo-1497911270199-1c552ee64aa4?crop=entropy&cs=srgb&fm=jpg&q=85&w=1280",
+  hybrid: "https://images.pexels.com/photos/3385614/pexels-photo-3385614.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1280",
+};
+
+export const IMG = {
+  hero: MEDIA.fireworksSky,
+  drone: MEDIA.droneShow,
+  fireworks: MEDIA.fireworksSky,
+  hybrid: MEDIA.hybrid,
+  sparks: MEDIA.coldSparks,
+};
+
+/* ------------------------------------------------------------------ */
+/*  Brand story / intro                                                */
+/* ------------------------------------------------------------------ */
 export const INTRO_BULLETS = [
-  "Concept vizual creat special pentru evenimentul tău",
-  "Drone, artificii și efecte speciale sincronizate",
+  "Concept vizual unic, creat pentru povestea ta",
+  "Drone, artificii și efecte sincronizate pe muzică",
   "Execuție sigură, autorizată și milimetrică",
 ];
 
-export const TECH = [
-  { icon: Settings2, title: "Planificare tehnică", desc: "Analizăm locația, vântul, spațiul aerian și logistica pentru un show fără surprize." },
-  { icon: Radio, title: "Sincronizare vizuală", desc: "Coregrafie sincronizată pe muzică — drone, artificii și efecte la fix pe beat." },
-  { icon: ShieldCheck, title: "Siguranță și autorizații", desc: "Echipă autorizată, protocoale de siguranță și toate avizele necesare." },
-  { icon: Sparkles, title: "Drone + artificii", desc: "Combinăm tehnologia dronelor cu artificiile clasice pentru impact maxim." },
-  { icon: MapPin, title: "Efecte adaptate locației", desc: "Indoor sau outdoor, adaptăm efectele la spațiul și atmosfera evenimentului." },
-  { icon: MessagesSquare, title: "Consultanță pentru eveniment", desc: "Te ghidăm de la prima idee până la ultimul efect, pas cu pas." },
-];
-
-export const SERVICE_OPTIONS = [
-  "Spectacole cu drone",
-  "Artificii profesionale",
-  "Drone + artificii sincronizate",
-  "Cold sparks / efecte speciale",
-  "Nu sunt sigur(ă) încă",
-];
-
-export const IMG = {
-  hero: "https://images.pexels.com/photos/27051702/pexels-photo-27051702.jpeg",
-  drone: "https://images.unsplash.com/photo-1730053225079-cd26d10e214d",
-  fireworks: "https://images.unsplash.com/photo-1545505567-7327366a634d",
-  hybrid: "https://images.pexels.com/photos/3385614/pexels-photo-3385614.jpeg",
-  sparks: "https://images.unsplash.com/photo-1619229725920-ac8b63b0631a",
-};
-
+/* ------------------------------------------------------------------ */
+/*  Stats                                                              */
+/* ------------------------------------------------------------------ */
 export const STATS = [
-  { value: 150, suffix: "+", label: "Spectacole create" },
+  { value: 150, suffix: "+", label: "Spectacole regizate" },
   { value: 320, suffix: "+", label: "Drone sincronizate" },
   { value: 90, suffix: "+", label: "Evenimente & festivaluri" },
-  { value: 24, suffix: "h", label: "Răspuns la ofertă" },
+  { value: 24, suffix: "h", label: "Răspuns la cerere" },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Services                                                           */
+/* ------------------------------------------------------------------ */
 export const SERVICES = [
   {
     icon: Plane,
@@ -73,7 +87,7 @@ export const SERVICES = [
     desc: "Coregrafii luminoase 3D pe cerul nopții — animații, logo-uri și mesaje create special pentru evenimentul tău.",
     ideal: "Nunți · Corporate · Festivaluri · Lansări",
     benefits: ["Animații 3D personalizate", "Logo & mesaje în aer", "Zero zgomot, zero fum"],
-    image: IMG.drone,
+    image: MEDIA.droneShow,
   },
   {
     icon: Flame,
@@ -81,122 +95,175 @@ export const SERVICES = [
     desc: "Spectacole pirotehnice sincronizate pe muzică, cu efecte de mare înălțime și culori spectaculoase.",
     ideal: "Nunți · Aniversări · Sărbători",
     benefits: ["Sincronizare pe muzică", "Efecte de mare înălțime", "Echipă autorizată"],
-    image: IMG.fireworks,
+    image: MEDIA.fireworksSky,
   },
   {
     icon: Sparkles,
     title: "Drone + artificii sincronizate",
-    desc: "Combinația supremă: drone show și artificii rulate împreună pentru un final imposibil de uitat.",
+    desc: "Combinația supremă: drone show și artificii rulate împreună, pentru un final imposibil de uitat.",
     ideal: "Evenimente premium · Festivaluri",
     benefits: ["Show hibrid premium", "Impact vizual maxim", "Regie tehnică completă"],
-    image: IMG.hybrid,
+    image: MEDIA.hybrid,
   },
   {
     icon: Zap,
     title: "Cold sparks & efecte speciale",
-    desc: "Fântâni de scântei reci, fum greu, lasere și efecte de scenă pentru momentele cheie.",
+    desc: "Fântâni de scântei reci, fum greu, lasere și efecte de scenă pentru momentele cheie ale serii.",
     ideal: "Primul dans · Intrări · Scenă",
-    benefits: ["Scântei reci sigure", "Fum greu & lasere", "Montaj indoor & outdoor"],
-    image: IMG.sparks,
+    benefits: ["Scântei reci, sigure", "Fum greu & lasere", "Montaj indoor & outdoor"],
+    image: MEDIA.coldSparks,
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Showcase (Spectacole)                                              */
+/* ------------------------------------------------------------------ */
 export const PORTFOLIO = [
-  { category: "Nunți", title: "Nuntă pe malul lacului", image: "https://images.pexels.com/photos/3397027/pexels-photo-3397027.jpeg" },
-  { category: "Corporate", title: "Gală corporativă", image: "https://images.unsplash.com/photo-1497911270199-1c552ee64aa4" },
-  { category: "Festivaluri", title: "Festival de vară", image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea" },
-  { category: "Lansări", title: "Lansare de produs", image: "https://images.pexels.com/photos/12995469/pexels-photo-12995469.jpeg" },
-  { category: "Evenimente private", title: "Aniversare privată", image: "https://images.unsplash.com/photo-1473652502225-6b6af0664e32" },
-  { category: "City events", title: "Eveniment de oraș", image: "https://images.unsplash.com/photo-1648175705050-f091e8d03d1a" },
+  { category: "Nunți", title: "Nuntă pe malul lacului", desc: "Drone show romantic și artificii pentru finalul serii.", image: MEDIA.wedding },
+  { category: "Corporate", title: "Gală corporativă", desc: "Logo în aer și efecte sincronizate pentru un brand memorabil.", image: MEDIA.corporate },
+  { category: "Festivaluri", title: "Festival de vară", desc: "Show de mare amploare, coordonat pentru mii de spectatori.", image: MEDIA.crowd },
+  { category: "Lansări", title: "Lansare de produs", desc: "Moment de impact care pune produsul în lumina reflectoarelor.", image: MEDIA.fireworksSky },
+  { category: "Evenimente private", title: "Aniversare privată", desc: "Cold sparks și artificii pentru un moment intim și spectaculos.", image: MEDIA.coldSparks2 },
+  { category: "City events", title: "Eveniment de oraș", desc: "Spectacol public sincronizat, cu logistică și avize complete.", image: MEDIA.crowd2 },
 ];
 
+export const SHOWCASE_CATEGORIES = ["Nunți", "Corporate", "Festivaluri", "Lansări", "Evenimente private", "City events"];
+
+/* ------------------------------------------------------------------ */
+/*  Storytelling chapters                                              */
+/* ------------------------------------------------------------------ */
 export const CHAPTERS = [
   {
     no: "01",
     kicker: "Conceptul",
     title: "Totul începe cu o viziune",
     text: "Ascultăm povestea evenimentului tău și transformăm emoția într-un concept vizual unic, gândit pentru momentul și locația ta.",
-    image: "https://images.unsplash.com/photo-1730053225079-cd26d10e214d",
+    image: MEDIA.droneShow,
   },
   {
     no: "02",
     kicker: "Spectacolul",
     title: "Cerul prinde viață",
     text: "Drone, artificii și efecte speciale se sincronizează pe muzică într-o coregrafie care taie respirația invitaților.",
-    image: "https://images.pexels.com/photos/3385614/pexels-photo-3385614.jpeg",
+    image: MEDIA.fireworksSky,
   },
   {
     no: "03",
     kicker: "Emoția",
     title: "Un final pe care nu-l uită nimeni",
     text: "Ultima scânteie se stinge, dar amintirea rămâne — un moment despre care invitații vor vorbi mult timp după eveniment.",
-    image: "https://images.pexels.com/photos/3397027/pexels-photo-3397027.jpeg",
+    image: MEDIA.crowd,
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Why FIREARTRO                                                      */
+/* ------------------------------------------------------------------ */
 export const WHY = [
-  { icon: Wand2, title: "Design personalizat", desc: "Fiecare spectacol este creat de la zero, pentru povestea evenimentului tău." },
+  { icon: Wand2, title: "Design 100% personalizat", desc: "Fiecare spectacol este creat de la zero, în jurul poveștii evenimentului tău." },
   { icon: ShieldCheck, title: "Siguranță & autorizații", desc: "Echipă autorizată, planificare tehnică riguroasă și respectarea tuturor normelor." },
-  { icon: Sparkles, title: "Efect wow garantat", desc: "Momente vizuale spectaculoase care lasă invitații fără cuvinte." },
-  { icon: HeartHandshake, title: "Consultanță dedicată", desc: "Te ghidăm înainte de eveniment, pas cu pas, până la cel mai mic detaliu." },
-  { icon: Gauge, title: "Execuție profesionistă", desc: "Tehnică de top, operatori cu experiență și regie milimetrică." },
-  { icon: Layers, title: "Pachete combinate", desc: "Drone, artificii și efecte speciale, într-un singur show coerent." },
+  { icon: Sparkles, title: "Efect „wow” garantat", desc: "Momente vizuale spectaculoase care lasă invitații fără cuvinte." },
+  { icon: HeartHandshake, title: "Consultanță dedicată", desc: "Te ghidăm pas cu pas, din prima idee până la ultimul detaliu." },
+  { icon: Gauge, title: "Execuție profesionistă", desc: "Tehnică de top, operatori cu experiență și o regie milimetrică." },
+  { icon: Layers, title: "Show-uri combinate", desc: "Drone, artificii și efecte speciale, într-un singur spectacol coerent." },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Technology & trust                                                 */
+/* ------------------------------------------------------------------ */
+export const TECH = [
+  { icon: Settings2, title: "Planificare tehnică", desc: "Analizăm locația, vântul, spațiul aerian și logistica pentru un show fără surprize." },
+  { icon: Radio, title: "Sincronizare vizuală", desc: "Coregrafie sincronizată pe muzică — drone, artificii și efecte, exact pe beat." },
+  { icon: ShieldCheck, title: "Siguranță & autorizații", desc: "Echipă autorizată, protocoale de siguranță și toate avizele necesare." },
+  { icon: Sparkles, title: "Drone + artificii", desc: "Combinăm tehnologia dronelor cu artificiile clasice pentru impact maxim." },
+  { icon: MapPin, title: "Efecte adaptate locației", desc: "Indoor sau outdoor, adaptăm efectele la spațiul și atmosfera evenimentului." },
+  { icon: MessagesSquare, title: "Consultanță completă", desc: "Te ghidăm de la prima idee până la ultimul efect, pas cu pas." },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Process                                                            */
+/* ------------------------------------------------------------------ */
 export const PROCESS = [
   { step: "01", title: "Brief", desc: "Discutăm viziunea, locația și momentul cheie al evenimentului.", icon: ClipboardList },
-  { step: "02", title: "Concept vizual", desc: "Creăm conceptul show-ului: coregrafie, culori și sincronizare.", icon: Palette },
+  { step: "02", title: "Concept vizual", desc: "Creăm conceptul show-ului: coregrafie, culori și sincronizare pe muzică.", icon: Palette },
   { step: "03", title: "Planificare tehnică", desc: "Verificăm locația, obținem autorizațiile și pregătim echipamentul.", icon: Settings2 },
-  { step: "04", title: "Setup & verificări", desc: "Montaj, testare și verificări de siguranță înainte de start.", icon: Wrench },
-  { step: "05", title: "Spectacol", desc: "Rulăm show-ul live, milimetric, pentru efectul wow garantat.", icon: Rocket },
+  { step: "04", title: "Pregătire & sincronizare", desc: "Montaj, testare și verificări de siguranță înainte de start.", icon: Wrench },
+  { step: "05", title: "Spectacol", desc: "Rulăm show-ul live, milimetric, pentru efectul „wow” garantat.", icon: Rocket },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Packages                                                           */
+/* ------------------------------------------------------------------ */
 export const PACKAGES = [
   {
+    icon: Flame,
     name: "Pachet Artificii",
     tagline: "Clasic & spectaculos",
     best: "Nunți și aniversări",
     impact: "Impact vizual ridicat",
-    features: ["Spectacol pirotehnic sincronizat", "Durată personalizată", "Echipă autorizată"],
+    desc: "Spectacol pirotehnic sincronizat pe muzică, regizat pentru momentul tău cheie.",
+    features: ["Artificii sincronizate pe muzică", "Durată personalizată", "Echipă autorizată"],
     popular: false,
   },
   {
+    icon: Plane,
     name: "Pachet Drone Show",
     tagline: "Modern & futurist",
     best: "Corporate & lansări",
     impact: "Impact vizual premium",
+    desc: "Coregrafie 3D cu drone, cu logo, mesaje și animații create pentru brandul tău.",
     features: ["Coregrafie 3D cu drone", "Logo & mesaje în aer", "Zero zgomot, zero fum"],
     popular: true,
   },
   {
+    icon: Crown,
     name: "Pachet Combinat Premium",
     tagline: "Experiența supremă",
     best: "Evenimente premium",
     impact: "Impact vizual maxim",
-    features: ["Drone + artificii sincronizate", "Cold sparks la momente cheie", "Regie tehnică completă"],
+    desc: "Drone, artificii și cold sparks într-un singur show, pentru un final memorabil.",
+    features: ["Drone + artificii sincronizate", "Cold sparks la momentele cheie", "Regie tehnică completă"],
     popular: false,
   },
   {
+    icon: Building2,
     name: "Pachet Corporate / Festival",
     tagline: "Custom & scalabil",
     best: "Festivaluri & branduri",
     impact: "Show la scară mare",
+    desc: "Producție de mari dimensiuni, gândită în jurul brandului și al publicului tău.",
     features: ["Concept custom de brand", "Producție de mari dimensiuni", "Coordonare completă eveniment"],
     popular: false,
   },
 ];
 
-export const GALLERY = [
-  { image: "https://images.pexels.com/photos/27051702/pexels-photo-27051702.jpeg", alt: "Explozie colorată de artificii pe cerul nopții", big: true },
-  { image: "https://images.unsplash.com/photo-1562734041-a2d56f060a44", alt: "Artificii roz pe cer" },
-  { image: "https://images.unsplash.com/photo-1439539698758-ba2680ecadb9", alt: "Invitați cu artificii de mână la o nuntă" },
-  { image: "https://images.unsplash.com/photo-1672718945831-b68f3cb3a201", alt: "Artificii mari pe cerul nopții" },
-  { image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819", alt: "Mulțime la un festival cu lumini", big: true },
-  { image: "https://images.unsplash.com/photo-1543718290-a207a786243a", alt: "Artificii multicolore" },
-  { image: "https://images.pexels.com/photos/1503520/pexels-photo-1503520.jpeg", alt: "Artificii vibrante luminând cerul" },
-  { image: "https://images.unsplash.com/photo-1610900603480-c0a85ac8e315", alt: "Concert cu confetti și lumini" },
+export const PRICING_FACTORS = [
+  "Locația și accesul",
+  "Durata spectacolului",
+  "Complexitatea designului",
+  "Numărul de drone",
+  "Tipul de artificii și efecte",
+  "Siguranță și logistică",
+  "Cerințele specifice ale evenimentului",
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Gallery                                                            */
+/* ------------------------------------------------------------------ */
+export const GALLERY = [
+  { image: MEDIA.fireworksSky, alt: "Explozie colorată de artificii pe cerul nopții", category: "Artificii", big: true },
+  { image: MEDIA.droneShow, alt: "Formație de drone luminoase pe cerul nopții", category: "Drone" },
+  { image: MEDIA.coldSparks, alt: "Fântâni de scântei reci la un eveniment", category: "Cold sparks" },
+  { image: MEDIA.crowd, alt: "Artificii spectaculoase deasupra unei mulțimi", category: "Festival" },
+  { image: MEDIA.crowd2, alt: "Public la un spectacol de lumini și artificii", category: "City event", big: true },
+  { image: MEDIA.coldSparks2, alt: "Cold sparks la momentul cheie al serii", category: "Eveniment privat" },
+  { image: MEDIA.droneShow2, alt: "Drone show colorat pe cer", category: "Drone" },
+  { image: MEDIA.crowd3, alt: "Artificii vibrante luminând cerul nopții", category: "Artificii" },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Social proof                                                       */
+/* ------------------------------------------------------------------ */
 export const TESTIMONIALS = [
   { name: "Andreea & Mihai", role: "Nuntă · Cluj", text: "Drone show-ul a fost momentul serii. Invitații încă vorbesc despre el!", rating: 5 },
   { name: "Robert Ionescu", role: "Director Marketing", text: "Lansarea noastră de produs a arătat incredibil. Profesioniști de la cap la coadă.", rating: 5 },
@@ -205,6 +272,9 @@ export const TESTIMONIALS = [
 
 export const PARTNERS = ["LUMEN EVENTS", "AURORA WEDDINGS", "NOVA CORP", "VERTEX FEST", "STELLAR PR", "GRAND HOTEL", "SUMMIT GROUP"];
 
+/* ------------------------------------------------------------------ */
+/*  FAQ                                                                */
+/* ------------------------------------------------------------------ */
 export const FAQS = [
   { q: "Cu cât timp înainte trebuie rezervat spectacolul?", a: "Recomandăm rezervarea cu minim 3–4 săptămâni înainte, pentru planificare tehnică și obținerea autorizațiilor. Pentru evenimente mari sau date populare (sezon de nunți), ideal este să ne contactezi cu 1–2 luni înainte." },
   { q: "Se pot combina dronele cu artificiile?", a: "Da. Pachetul Combinat Premium rulează drone show și artificii sincronizate, pentru un impact vizual maxim și un final memorabil." },
@@ -216,14 +286,28 @@ export const FAQS = [
   { q: "Ce informații trebuie trimise pentru ofertă?", a: "Tipul evenimentului, data, locația aproximativă și ce tip de show îți dorești (drone, artificii sau combinat). Restul detaliilor le stabilim împreună la consultanță." },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Forms & nav                                                        */
+/* ------------------------------------------------------------------ */
+export const SERVICE_OPTIONS = [
+  "Spectacole cu drone",
+  "Artificii profesionale",
+  "Drone + artificii sincronizate",
+  "Cold sparks / efecte speciale",
+  "Nu sunt sigur(ă) încă",
+];
+
 export const EVENT_TYPES = ["Nuntă", "Corporate", "Festival", "Lansare de produs", "Aniversare / Eveniment privat", "Eveniment de oraș", "Altul"];
 
 export const NAV_LINKS = [
   { label: "Acasă", href: "#acasa" },
   { label: "Servicii", href: "#servicii" },
   { label: "Spectacole", href: "#spectacole" },
+  { label: "Proces", href: "#proces" },
   { label: "Pachete", href: "#pachete" },
   { label: "Galerie", href: "#galerie" },
   { label: "Întrebări", href: "#intrebari" },
   { label: "Contact", href: "#contact" },
 ];
+
+// Unused icon kept to avoid tree-shake surprises in data consumers

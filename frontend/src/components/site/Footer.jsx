@@ -13,9 +13,9 @@ const LEGAL = [
 
 export const Footer = () => {
   return (
-    <footer className="relative border-t border-white/10 pt-20 pb-10" data-testid="site-footer">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid md:grid-cols-12 gap-12">
+    <footer className="relative border-t border-white/10 pt-16 sm:pt-20 pb-10" data-testid="site-footer">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-12">
+        <div className="grid md:grid-cols-12 gap-10 md:gap-12">
           <div className="md:col-span-5">
             <img src={LOGO_URL} alt="FIREARTRO" className="h-12 w-auto object-contain" />
             <p className="mt-6 text-white/55 font-light leading-relaxed max-w-sm">

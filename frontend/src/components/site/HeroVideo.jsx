@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { HERO_VIDEOS, HERO_POSTER } from "@/data/content";
 
-// Cinematic video collage — all clips autoplay natively; we crossfade opacity between them.
+// Cinematic video collage — clips autoplay natively; we crossfade opacity between them.
 const CLIPS = HERO_VIDEOS.slice(0, 3);
 
 export const HeroVideo = () => {
@@ -10,10 +10,10 @@ export const HeroVideo = () => {
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const small = window.matchMedia("(max-width: 640px)").matches;
-    if (reduce || small) return;
+    const small = window.matchMedia("(max-width: 768px)").matches;
+    if (reduce || small) return; // mobile & reduced-motion: poster only (perf)
     setEnabled(true);
-    const id = setInterval(() => setActive((a) => (a + 1) % CLIPS.length), 6000);
+    const id = setInterval(() => setActive((a) => (a + 1) % CLIPS.length), 6500);
     return () => clearInterval(id);
   }, []);
 
@@ -22,7 +22,8 @@ export const HeroVideo = () => {
       <img
         src={HERO_POSTER}
         alt="Spectacol de drone și artificii FIREARTRO"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover scale-105"
+        fetchPriority="high"
       />
 
       {enabled &&
@@ -30,22 +31,25 @@ export const HeroVideo = () => {
           <video
             key={clip.src}
             className="absolute inset-0 w-full h-full object-cover transition-opacity ease-in-out"
-            style={{ opacity: i === active ? 1 : 0, transitionDuration: "1500ms" }}
+            style={{ opacity: i === active ? 1 : 0, transitionDuration: "1600ms" }}
             src={clip.src}
             poster={HERO_POSTER}
             autoPlay
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
             aria-hidden="true"
           />
         ))}
 
-      <div className="absolute inset-0 bg-black/55" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_28%,_rgba(131,56,236,0.30),_transparent_58%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/70 via-[#050308]/45 to-[#050308]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#050308] via-[#050308]/20 to-transparent" />
+      {/* Cinematic overlays — depth, mood and strong text legibility */}
+      <div className="absolute inset-0 bg-black/45" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_22%,_rgba(131,56,236,0.32),_transparent_60%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/65 via-[#050308]/35 to-[#050308]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#050308] via-[#050308]/30 to-transparent" />
+      {/* subtle vignette */}
+      <div className="absolute inset-0 shadow-[inset_0_0_180px_60px_rgba(5,3,8,0.9)] pointer-events-none" />
     </div>
   );
 };

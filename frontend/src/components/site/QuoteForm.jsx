@@ -70,16 +70,16 @@ export const QuoteForm = () => {
   };
 
   return (
-    <section id="contact" className="relative py-24 md:py-32 section-grid-bg" data-testid="contact-section">
-      <div className="max-w-6xl mx-auto px-6 md:px-12">
+    <section id="contact" className="relative py-20 sm:py-28 md:py-32 section-grid-bg" data-testid="contact-section">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           {/* Left copy */}
           <Reveal>
             <div>
-              <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
+              <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#9D7BFF]">
                 Solicită ofertă
               </span>
-              <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
+              <h2 className="font-display font-bold text-white display-md mt-4">
                 Hai să creăm spectacolul tău
               </h2>
               <p className="mt-5 text-white/60 text-base sm:text-lg font-light">
@@ -320,6 +320,9 @@ export const QuoteForm = () => {
                       </>
                     )}
                   </button>
+                  <p className="text-center text-xs text-white/40">
+                    Răspuns în 24h · Fără obligații · Datele tale sunt în siguranță
+                  </p>
                 </form>
               )}
             </div>

@@ -32,7 +32,7 @@
   "seed_data_creation": "Created TEST_-prefixed quote records in MongoDB 'quotes' collection during E2E submission test. Total quotes in DB after run: 4. Safe to keep or clean later.",
   "retest_needed": false,
   "main_agent_can_self_test": true,
-  "context_for_next_testing_agent": "All critical flows verified end-to-end on https://web-storytelling.preview.emergentagent.com. Quote submission verified to persist in MongoDB via curl GET /api/quotes. Package CTA prefill flow works — window CustomEvent 'prefill-package' correctly sets the Pachet dorit select. Gallery lightbox uses Radix Dialog (logs a11y warning re: DialogTitle but is functional). Hero CTAs are 'hero-primary-cta'/'hero-secondary-cta'. Stats section exists with testid 'stats-section' but individual count-up numbers do not have per-stat testids (4 numbers do render and animate visually).",
+  "context_for_next_testing_agent": "All critical flows verified end-to-end on https://spectacle-cinema.preview.emergentagent.com. Quote submission verified to persist in MongoDB via curl GET /api/quotes. Package CTA prefill flow works — window CustomEvent 'prefill-package' correctly sets the Pachet dorit select. Gallery lightbox uses Radix Dialog (logs a11y warning re: DialogTitle but is functional). Hero CTAs are 'hero-primary-cta'/'hero-secondary-cta'. Stats section exists with testid 'stats-section' but individual count-up numbers do not have per-stat testids (4 numbers do render and animate visually).",
   "test_results_detail": {
     "backend_pytest": "5/5 passed (test_root, test_create_quote_and_persist, test_create_quote_minimal, test_create_quote_missing_required, test_get_quotes_sorted_desc)",
     "frontend_flows_verified": [

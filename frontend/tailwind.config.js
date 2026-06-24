@@ -8,8 +8,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Clash Display', 'Outfit', 'sans-serif'],
-        sans: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Sora', 'Inter', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      screens: {
+        xs: '420px',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -74,11 +77,16 @@ module.exports = {
           to: {
             height: '0'
           }
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out'
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fade-in 0.6s ease-out both'
       }
     }
   },

@@ -81,7 +81,7 @@ const MobileDock = () => {
       initial={{ opacity: 0, x: 18 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 24 }}
-      className="fixed right-4 bottom-24 z-40 md:hidden flex flex-col items-center gap-3"
+    className="mobile-social-dock fixed right-4 bottom-24 z-40 md:hidden flex flex-col items-center gap-3"
       data-testid="social-dock"
     >
       <AnimatePresence>
@@ -113,7 +113,7 @@ const MobileDock = () => {
         aria-label={open ? "Închide contactele" : "Deschide contactele"}
         aria-expanded={open}
         data-testid="social-dock-toggle"
-        className="h-12 w-12 rounded-full bg-gradient-to-br from-[#3A86FF] to-[#8338EC] text-white flex items-center justify-center shadow-[0_8px_30px_rgba(131,56,236,0.5)] focus-visible:ring-2 focus-visible:ring-white/70 outline-none"
+        className="h-12 w-12 rounded-full bg-gradient-to-br from-[#3A86FF] to-[#176BFF] text-white flex items-center justify-center shadow-[0_8px_30px_rgba(23, 107, 255,0.5)] focus-visible:ring-2 focus-visible:ring-white/70 outline-none"
       >
         <motion.span animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3, ease: EASE }}>
           <Plus className="h-6 w-6" />

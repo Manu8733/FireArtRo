@@ -3,14 +3,16 @@ import { Mail, Phone } from "lucide-react";
 import { YouTubeIcon, FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/site/BrandIcons";
 import { LOGO_URL, PHONE_DISPLAY, EMAIL, INSTAGRAM, FACEBOOK, YOUTUBE, whatsappLink } from "@/lib/constants";
 import { NAV_LINKS } from "@/data/content";
+import { BUSINESS_HOURS } from "@/data/businessContent";
+import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/site/CookieConsent";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 const publicHref = (href) => (href.startsWith("#") ? `/${href}` : href);
 
 const LEGAL = [
-  { label: "Politica de confidențialitate", to: "/legal/confidentialitate" },
-  { label: "Termeni și condiții", to: "/legal/termeni" },
-  { label: "Politica de cookie-uri", to: "/legal/cookies" },
+  { label: "Politica de confidențialitate", to: "/confidentialitate" },
+  { label: "Termeni și condiții", to: "/termeni-si-conditii" },
+  { label: "Politica de cookies", to: "/cookies" },
 ];
 
 export const Footer = () => {
@@ -31,8 +33,7 @@ export const Footer = () => {
           <div className="md:col-span-5">
             <img src={LOGO_URL} alt="FIREARTRO" width="720" height="311" loading="lazy" decoding="async" className="h-12 w-auto object-contain" />
             <p className="mt-6 text-white/55 font-light leading-relaxed max-w-sm">
-              Spectacole de drone, artificii și efecte speciale create pentru momente
-              imposibil de uitat. Premium, sigur și cinematic.
+              Producție vizuală pentru evenimente: concept, planificare și execuție într-un singur flux.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               {socialLinks.map((s) => (
@@ -89,12 +90,14 @@ export const Footer = () => {
             <ul className="mt-5 space-y-3 text-sm">
               {PHONE_DISPLAY && (
                 <li className="flex items-center gap-3 text-white/55">
-                  <Phone className="h-4 w-4 text-[#9D7BFF]" /> {PHONE_DISPLAY}
+                  <Phone className="h-4 w-4 text-[#5CB7FF]" /> {PHONE_DISPLAY}
                 </li>
               )}
               <li className="flex items-center gap-3 text-white/55">
-                <Mail className="h-4 w-4 text-[#9D7BFF]" /> {EMAIL}
+                <Mail className="h-4 w-4 text-[#5CB7FF]" /> {EMAIL}
               </li>
+              <li className="text-white/55">{BUSINESS_HOURS.label}</li>
+              <li className="text-white/42 leading-relaxed">{BUSINESS_HOURS.note}</li>
             </ul>
             <h2 className="font-display font-semibold text-white mt-8">Legal</h2>
             <ul className="mt-5 space-y-3">
@@ -109,6 +112,15 @@ export const Footer = () => {
                   </Link>
                 </li>
               ))}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent(OPEN_COOKIE_SETTINGS_EVENT))}
+                  className="text-white/55 hover:text-white text-sm transition-colors"
+                >
+                  Setări cookies
+                </button>
+              </li>
             </ul>
           </div>
         </div>

@@ -134,9 +134,9 @@ export const SHOWCASE_CATEGORIES = ["Nunți", "Corporate", "Festivaluri", "Lans�
 export const STORY = [
   { no: "01", kicker: "Momentul", title: "Noaptea așteaptă", text: "Luminile scad. Privirile se ridică.", image: MEDIA.crowd2, glow: "#3A86FF" },
   { no: "02", kicker: "Viziunea", title: "Ideea capătă formă", text: "Povestea evenimentului devine un concept vizual.", image: MEDIA.droneShow2, glow: "#5AA9FF" },
-  { no: "03", kicker: "Design & tehnologie", title: "Ritmul devine lumină", text: "Muzica, spațiul și sistemele urmează aceeași coregrafie.", image: MEDIA.hybrid, glow: "#8338EC" },
-  { no: "04", kicker: "Build-up", title: "Energia începe să urce", text: "Totul este verificat. Numărătoarea inversă începe.", image: MEDIA.coldSparks3, glow: "#C77DFF" },
-  { no: "05", kicker: "Spectacolul", title: "Cerul se deschide", text: "Lumină, ritm și profunzime într-un singur vârf vizual.", image: MEDIA.fireworksSky, glow: "#8338EC" },
+  { no: "03", kicker: "Design & tehnologie", title: "Ritmul devine lumină", text: "Muzica, spațiul și sistemele urmează aceeași coregrafie.", image: MEDIA.hybrid, glow: "#176BFF" },
+  { no: "04", kicker: "Build-up", title: "Energia începe să urce", text: "Totul este verificat. Numărătoarea inversă începe.", image: MEDIA.coldSparks3, glow: "#8F6BFF" },
+  { no: "05", kicker: "Spectacolul", title: "Cerul se deschide", text: "Lumină, ritm și profunzime într-un singur vârf vizual.", image: MEDIA.fireworksSky, glow: "#176BFF" },
   { no: "06", kicker: "Amintirea", title: "Lumina pleacă. Emoția rămâne.", text: "Reacția publicului devine partea care continuă povestea.", image: MEDIA.crowd, glow: "#5AA9FF" },
 ];
 
@@ -274,8 +274,8 @@ export const GALLERY = [
 
 export const GALLERY_VIDEOS = [
   {
-    title: "Show complet cu artificii",
-    desc: "Un cadru cinematic pentru finalul evenimentului, cu lumină, ritm și impact vizual.",
+    title: "Final pirotehnic",
+    desc: "Artificii regizate pentru punctul culminant al serii.",
     category: "Artificii",
     youtubeUrl: "https://www.youtube.com/watch?v=AyU0-6KQJXc",
     localSrc: "/media/fireart-hero.mp4",
@@ -283,8 +283,8 @@ export const GALLERY_VIDEOS = [
     poster: HERO_POSTER,
   },
   {
-    title: "Drone show în mișcare",
-    desc: "Coregrafie luminoasă pe cer, pregătită pentru nunți, corporate și lansări.",
+    title: "Coregrafie de drone",
+    desc: "Forme luminoase construite în ritmul evenimentului.",
     category: "Drone show",
     youtubeUrl: "https://www.youtube.com/watch?v=vfuBWWr7-EE",
     localSrc: "/media/fireart-drone.mp4",
@@ -292,8 +292,8 @@ export const GALLERY_VIDEOS = [
     poster: MEDIA.droneShow,
   },
   {
-    title: "Momente de atmosferă",
-    desc: "Detalii vizuale și efecte speciale care leagă spectacolul de povestea evenimentului.",
+    title: "Atmosfera spectacolului",
+    desc: "Detalii, reacții și efecte surprinse din mijlocul publicului.",
     category: "Behind the show",
     youtubeUrl: "https://www.youtube.com/watch?v=_qfvKDitA0Q",
     localSrc: "/media/fireart-moments.mp4",
@@ -352,9 +352,9 @@ export const NAV_LINKS = [
   { label: "Servicii", href: "#servicii" },
   { label: "Spectacole", href: "#spectacole" },
   { label: "Proces", href: "#proces" },
-  { label: "Pachete", href: "#pachete" },
+  { label: "Pachete", href: "/pachete" },
   { label: "Galerie", href: "/galerie" },
-  { label: "Întrebări", href: "#intrebari" },
+  { label: "Întrebări", href: "/intrebari-frecvente" },
   { label: "Contact", href: "#contact" },
 ];
 

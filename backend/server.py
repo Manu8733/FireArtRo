@@ -31,21 +31,42 @@ api_router = APIRouter(prefix="/api")
 
 # ---------- Models ----------
 class QuoteCreate(BaseModel):
-    name: str = Field(min_length=2, max_length=100)
+    first_name: str = Field(min_length=2, max_length=80)
+    last_name: str = Field(min_length=2, max_length=80)
     phone: str = Field(min_length=7, max_length=30)
-    email: Optional[str] = Field(default="", max_length=160)
+    email: str = Field(min_length=5, max_length=160)
+    locality: str = Field(min_length=2, max_length=120)
+    event_location: Optional[str] = Field(default="", max_length=180)
     event_type: str = Field(min_length=2, max_length=80)
-    event_date: Optional[str] = Field(default="", max_length=40)
-    location: Optional[str] = Field(default="", max_length=180)
-    package: Optional[str] = Field(default="", max_length=100)
-    preferred_service: Optional[str] = Field(default="", max_length=120)
+    event_date: str = Field(min_length=8, max_length=40)
+    services: List[str] = Field(min_length=1, max_length=12)
+    package_id: Optional[str] = Field(default="", max_length=100)
+    package_title: Optional[str] = Field(default="", max_length=120)
     message: Optional[str] = Field(default="", max_length=3000)
     consent: bool = False
+    company_website: Optional[str] = Field(default="", max_length=200)
 
-    @field_validator("name", "phone", "event_type", "location", "package", "preferred_service", "message")
+    @field_validator(
+        "first_name",
+        "last_name",
+        "phone",
+        "locality",
+        "event_location",
+        "event_type",
+        "package_id",
+        "package_title",
+        "message",
+        "company_website",
+    )
     @classmethod
     def normalize_text(cls, value):
         return " ".join((value or "").strip().split())
+
+    @field_validator("services")
+    @classmethod
+    def normalize_services(cls, values):
+        normalized = [" ".join(value.strip().split()) for value in values if value and value.strip()]
+        return list(dict.fromkeys(normalized))
 
     @field_validator("email")
     @classmethod
@@ -60,14 +81,17 @@ class Quote(BaseModel):
     model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
+    first_name: str
+    last_name: str
     phone: str
-    email: str = ""
+    email: str
+    locality: str
+    event_location: str = ""
     event_type: str
-    event_date: str = ""
-    location: str = ""
-    package: str = ""
-    preferred_service: str = ""
+    event_date: str
+    services: List[str] = Field(default_factory=list)
+    package_id: str = ""
+    package_title: str = ""
     message: str = ""
     consent: bool = False
     status: str = "new"
@@ -85,7 +109,11 @@ async def create_quote(input: QuoteCreate, request: Request):
     if not input.consent:
         raise HTTPException(status_code=422, detail="Consimțământul este obligatoriu.")
     enforce_rate_limit(request)
-    quote = Quote(**input.model_dump())
+    payload = input.model_dump(exclude={"company_website"})
+    quote = Quote(**payload)
+    if input.company_website:
+        quote.status = "accepted"
+        return quote
     doc = quote.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.quotes.insert_one(doc)

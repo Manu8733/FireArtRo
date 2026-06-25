@@ -8,7 +8,7 @@ import {
 } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PORTFOLIO } from "@/data/content";
-import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
 
 const EASE = [0.22, 1, 0.36, 1];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -18,6 +18,8 @@ export const Showcase = () => {
   const ref = useRef(null);
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const touch = useIsTouchDevice();
+  const compactMotion = mobile || touch;
   const [active, setActive] = useState(0);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
@@ -47,10 +49,10 @@ export const Showcase = () => {
       ref={ref}
       id="spectacole"
       className="relative bg-[#050308]"
-      style={{ height: `${PORTFOLIO.length * (mobile ? 92 : 82)}vh` }}
+      style={{ height: `${PORTFOLIO.length * (compactMotion ? 92 : 82)}svh` }}
       data-testid="showcase-section"
     >
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#050308]">
+      <div className="apple-viewport-height sticky top-0 h-[100svh] overflow-hidden bg-[#050308]">
         {PORTFOLIO.map((item, index) => (
           <motion.div
             key={item.image}
@@ -58,9 +60,9 @@ export const Showcase = () => {
             animate={{
               opacity: index === active ? 1 : 0,
               scale: index === active ? 1 : 1.06,
-              x: index === active ? 0 : (index < active ? -1 : 1) * (mobile ? 34 : 68),
+              x: index === active ? 0 : (index < active ? -1 : 1) * (compactMotion ? 24 : 68),
             }}
-            transition={{ duration: reduce ? 0 : mobile ? 0.56 : 0.78, ease: EASE }}
+            transition={{ duration: reduce ? 0 : compactMotion ? 0.48 : 0.78, ease: EASE }}
             style={{ pointerEvents: index === active ? "auto" : "none" }}
           >
               <img
@@ -91,15 +93,15 @@ export const Showcase = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={project.title}
-              initial={reduce ? false : { opacity: 0, y: mobile ? 30 : 58, filter: "blur(14px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={reduce ? undefined : { opacity: 0, y: mobile ? -22 : -38, filter: "blur(12px)" }}
-              transition={{ duration: reduce ? 0 : mobile ? 0.5 : 0.68, delay: 0.06, ease: EASE }}
+              initial={reduce ? false : { opacity: 0, y: compactMotion ? 24 : 58 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? undefined : { opacity: 0, y: compactMotion ? -18 : -38 }}
+              transition={{ duration: reduce ? 0 : compactMotion ? 0.46 : 0.68, delay: 0.06, ease: EASE }}
               className="max-w-3xl"
             >
               <div className="flex items-center gap-3">
-                <span className="cine-kicker text-[9px] font-semibold text-[#9D7BFF] md:text-[10px]">{project.category}</span>
-                <span className="h-px w-10 bg-gradient-to-r from-[#9D7BFF] to-transparent md:w-12" />
+                <span className="cine-kicker text-[9px] font-semibold text-[#5CB7FF] md:text-[10px]">{project.category}</span>
+                <span className="h-px w-10 bg-gradient-to-r from-[#5CB7FF] to-transparent md:w-12" />
                 <span className="font-mono text-[10px] text-white/45">
                   {String(active + 1).padStart(2, "0")} / {String(PORTFOLIO.length).padStart(2, "0")}
                 </span>
@@ -115,7 +117,7 @@ export const Showcase = () => {
                 className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/28 px-5 py-3 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/10 md:mt-8 md:px-6"
               >
                 Vreau un spectacol ca acesta
-                <ArrowRight className="h-4 w-4 text-[#9D7BFF]" />
+                <ArrowRight className="h-4 w-4 text-[#5CB7FF]" />
               </button>
             </motion.div>
           </AnimatePresence>
@@ -155,7 +157,7 @@ export const Showcase = () => {
               >
                 <span className={`block h-1 rounded-full transition-all duration-500 md:h-px ${
                   index === active
-                    ? "bg-gradient-to-r from-[#3A86FF] via-[#8338EC] to-[#C77DFF]"
+                    ? "bg-gradient-to-r from-[#3A86FF] via-[#176BFF] to-[#8F6BFF]"
                     : "bg-white/18 group-hover:bg-white/38"
                 }`} />
                 <span className={`mt-2 hidden truncate text-[10px] uppercase tracking-[0.16em] lg:block ${

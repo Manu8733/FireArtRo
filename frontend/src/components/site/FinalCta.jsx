@@ -11,14 +11,14 @@ export const FinalCta = () => {
   const mobile = useIsMobile();
   return (
     <section className="relative py-20 sm:py-28 md:py-36 overflow-hidden noise-overlay" data-testid="final-cta-section">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(131,56,236,0.25),_transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(23, 107, 255,0.25),_transparent_60%)]" />
       <div className="absolute inset-0 bg-aurora-pan opacity-70" />
       {!mobile && <Particles density={50} className="absolute inset-0 w-full h-full pointer-events-none" />}
       <div className="aurora opacity-60" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-5 sm:px-6 md:px-12 text-center">
         <Reveal>
-          <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#9D7BFF]">Ultimul pas</span>
+          <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#5CB7FF]">Ultimul pas</span>
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-5 font-display font-bold text-white display-lg">

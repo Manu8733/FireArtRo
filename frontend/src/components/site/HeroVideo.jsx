@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { HERO_POSTER, HERO_VIDEOS } from "@/data/content";
-import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useIsAppleWebKit, useIsMobile } from "@/hooks/useMediaQuery";
 
 export const HeroVideo = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const mobile = useIsMobile();
+  const appleWebKit = useIsAppleWebKit();
   const [enabled, setEnabled] = useState(true);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(0);
@@ -19,7 +20,7 @@ export const HeroVideo = () => {
   }, []);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || (appleWebKit && mobile)) return;
     const next = HERO_VIDEOS[(active + 1) % HERO_VIDEOS.length];
     const preload = document.createElement("video");
     preload.preload = "metadata";
@@ -29,7 +30,7 @@ export const HeroVideo = () => {
       preload.removeAttribute("src");
       preload.load();
     };
-  }, [active, enabled, mobile]);
+  }, [active, appleWebKit, enabled, mobile]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -91,7 +92,9 @@ export const HeroVideo = () => {
           playsInline
           preload={active === 0 ? "auto" : "metadata"}
           disablePictureInPicture
+          disableRemotePlayback
           controlsList="nodownload noplaybackrate nofullscreen"
+          onCanPlay={() => setReady(true)}
           onPlaying={() => setReady(true)}
           onTimeUpdate={(event) => {
             const video = event.currentTarget;
@@ -105,7 +108,7 @@ export const HeroVideo = () => {
       )}
 
       <div className="absolute inset-0 bg-black/30" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_56%_30%,_rgba(131,56,236,0.2),_transparent_62%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_56%_30%,_rgba(23, 107, 255,0.2),_transparent_62%)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/46 via-transparent to-[#050308]" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#050308]/94 via-[#050308]/24 to-transparent" />
       <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_130px_34px_rgba(5,3,8,0.72)]" />

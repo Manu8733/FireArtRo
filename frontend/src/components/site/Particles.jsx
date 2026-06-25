@@ -9,7 +9,7 @@ export const Particles = ({ density = 70, className }) => {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const colors = ["#3A86FF", "#8338EC", "#9D7BFF", "#5AA9FF", "#C77DFF"];
+    const colors = ["#3A86FF", "#176BFF", "#5CB7FF", "#5AA9FF", "#8F6BFF"];
     let width = 0;
     let height = 0;
     let particles = [];

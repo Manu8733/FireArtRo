@@ -118,9 +118,9 @@ export const Navbar = () => {
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: visible || open ? 0 : -104, opacity: 1 }}
       transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+      className={`site-navbar fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "backdrop-blur-xl bg-[#050308]/75 border-b border-white/10 py-2.5"
+          ? "site-navbar-scrolled backdrop-blur-xl bg-[#050308]/75 border-b border-white/10 py-2.5"
           : "bg-transparent py-4"
       }`}
       data-testid="main-navbar"
@@ -159,7 +159,7 @@ export const Navbar = () => {
 
         <div className="hidden lg:block">
           <button
-            onClick={() => scrollTo("#contact")}
+            onClick={() => goTo("#contact")}
             data-testid="nav-cta-button"
             className="btn-grad shine group inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-full"
           >
@@ -182,7 +182,7 @@ export const Navbar = () => {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="bg-[#0A0712]/95 backdrop-blur-xl border-white/10 w-[86vw] max-w-[340px] p-0 [&>button]:hidden"
+              className="mobile-nav-sheet bg-[#0A0712]/95 backdrop-blur-xl border-white/10 w-[86vw] max-w-[340px] p-0 [&>button]:hidden"
             >
               <div className="flex flex-col h-full">
                 <SheetTitle className="sr-only">Meniu de navigare</SheetTitle>
@@ -221,7 +221,7 @@ export const Navbar = () => {
                       className="flex items-center justify-between text-[15px] font-medium text-white/80 hover:text-white py-3.5 border-b border-white/5 group"
                     >
                       {l.label}
-                      <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-[#9D7BFF] group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-[#5CB7FF] group-hover:translate-x-0.5 transition-all" />
                     </motion.a>
                   ))}
                 </div>

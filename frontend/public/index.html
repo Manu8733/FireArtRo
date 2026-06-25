@@ -2,8 +2,29 @@
 <html lang="ro">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#050308" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script>
+            (() => {
+                const ua = navigator.userAgent || "";
+                const isiOS =
+                    /iPad|iPhone|iPod/.test(ua) ||
+                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+                const isSafari =
+                    /Safari/.test(ua) && !/Chrome|Chromium|Edg|OPR|SamsungBrowser/.test(ua);
+                const isMac = /Macintosh|MacIntel|MacPPC|Mac68K/.test(
+                    navigator.platform || ua
+                );
+                if (isiOS || isMac) {
+                    document.documentElement.dataset.applePlatform = "true";
+                }
+                if (isiOS || isSafari) {
+                    document.documentElement.dataset.appleWebkit = "true";
+                }
+            })();
+        </script>
         <meta
             name="description"
             content="FIREARTRO creează spectacole premium cu drone, artificii și efecte speciale pentru nunți, evenimente corporate, festivaluri și lansări."
@@ -98,6 +119,8 @@
                             "@type": "Country",
                             "name": "România"
                         },
+                        "openingHours": ["Mo-Fr 10:00-18:00"],
+                        "email": "contact@fireartro.ro",
                         "priceRange": "$$$",
                         "image": "https://www.fireartro.ro/media/fireart-hero-poster.webp",
                         "hasOfferCatalog": {

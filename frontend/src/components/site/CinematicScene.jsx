@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useIsAppleWebKit, useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
 
 const spring = { stiffness: 92, damping: 24, mass: 0.42 };
 
@@ -9,13 +9,16 @@ export const CinematicScene = ({
   id,
   index,
   label,
-  accent = "#8338EC",
+  accent = "#176BFF",
   motionType = "focus",
   className = "",
 }) => {
   const ref = useRef(null);
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const touch = useIsTouchDevice();
+  const appleWebKit = useIsAppleWebKit();
+  const constrainedMotion = mobile || touch || appleWebKit;
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const progress = useSpring(scrollYProgress, spring);
 
@@ -49,6 +52,15 @@ export const CinematicScene = ({
     lift: { y: liftY, scale: focusScale },
   };
 
+  const constrainedStyles = {
+    focus: { y: subtleY, scale: focusScale },
+    curtain: { y: subtleY },
+    aperture: { scale: focusScale },
+    depth: { y: liftY, scale: focusScale },
+    fold: { y: subtleY, scale: focusScale },
+    lift: { y: liftY },
+  };
+
   return (
     <div
       ref={ref}
@@ -61,7 +73,13 @@ export const CinematicScene = ({
       <span className="story-flow-node" aria-hidden="true" />
       <motion.div
         className="cinema-scene-frame"
-        style={reduce ? undefined : styles[motionType] || styles.focus}
+        style={
+          reduce
+            ? undefined
+            : constrainedMotion
+              ? constrainedStyles[motionType] || constrainedStyles.focus
+              : styles[motionType] || styles.focus
+        }
       >
         <span className="cinema-scene-edge cinema-scene-edge-top" aria-hidden="true" />
         <span className="cinema-scene-edge cinema-scene-edge-bottom" aria-hidden="true" />

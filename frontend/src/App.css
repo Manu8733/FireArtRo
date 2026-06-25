@@ -1,4 +1,5 @@
 .App {
     min-height: 100vh;
+    min-height: calc(var(--stable-vh, 1svh) * 100);
     background-color: #050308;
 }

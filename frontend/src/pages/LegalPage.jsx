@@ -1,125 +1,237 @@
-import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { LOGO_URL, EMAIL, PHONE_DISPLAY } from "@/lib/constants";
+import { Link } from "react-router-dom";
+import { ArrowRight, ExternalLink, Mail } from "lucide-react";
+import Navbar from "@/components/site/Navbar";
+import ScrollProgress from "@/components/site/ScrollProgress";
+import Footer from "@/components/site/Footer";
+import usePageMeta from "@/hooks/usePageMeta";
+import { EMAIL } from "@/lib/constants";
 
-const CONTENT = {
+const LEGAL_PAGES = {
   confidentialitate: {
+    path: "/confidentialitate",
+    eyebrow: "Protecția datelor",
     title: "Politica de confidențialitate",
-    intro:
-      "FIREARTRO respectă confidențialitatea datelor tale. Această politică descrie ce date colectăm și cum le folosim.",
+    description:
+      "Cum colectează, folosește și protejează FIREARTRO datele transmise prin site.",
+    updated: "24 iunie 2026",
     sections: [
       {
-        h: "Ce date colectăm",
-        p: "Atunci când completezi formularul de ofertă, colectăm numele, numărul de telefon, adresa de email (opțional) și detaliile evenimentului (tip, dată, locație, mesaj). Aceste date sunt folosite exclusiv pentru a-ți transmite o ofertă și a comunica despre eveniment.",
+        title: "Operatorul datelor",
+        body: [
+          `Datele transmise prin acest site sunt administrate de FIREARTRO. Pentru orice solicitare privind datele personale ne poți scrie la ${EMAIL}.`,
+        ],
       },
       {
-        h: "Cum folosim datele",
-        p: "Datele sunt utilizate pentru a răspunde solicitărilor tale, a pregăti oferte personalizate și a organiza spectacolele. Nu vindem și nu transmitem datele tale către terți în scopuri de marketing.",
+        title: "Datele pe care le colectăm",
+        body: [
+          "Prin formularul de ofertă putem colecta numele, prenumele, telefonul, emailul, localitatea, locația și data evenimentului, tipul evenimentului, serviciile selectate, pachetul preferat și mesajul transmis.",
+          "Colectăm numai informațiile necesare pentru a analiza solicitarea și a continua discuția comercială.",
+        ],
       },
       {
-        h: "Stocare și securitate",
-        p: "Datele sunt stocate în siguranță și păstrate doar atât timp cât este necesar pentru a-ți oferi serviciile solicitate sau conform obligațiilor legale.",
+        title: "Scopul și temeiul prelucrării",
+        body: [
+          "Folosim datele pentru a răspunde solicitărilor, a pregăti o ofertă, a planifica serviciile cerute și a păstra evidențele necesare colaborării.",
+          "Prelucrarea se bazează pe demersurile făcute la cererea ta înaintea încheierii unui contract, pe executarea contractului, pe obligații legale sau pe consimțământ, după caz.",
+        ],
       },
       {
-        h: "Drepturile tale",
-        p: "Ai dreptul de a solicita accesul, rectificarea sau ștergerea datelor tale personale. Pentru orice solicitare, ne poți contacta la " + EMAIL + ".",
+        title: "Păstrare și destinatari",
+        body: [
+          "Datele sunt păstrate numai cât este necesar pentru scopul comunicat și pentru obligațiile legale aplicabile. Nu vindem date personale.",
+          "Accesul poate fi acordat furnizorilor tehnici strict necesari operării site-ului și comunicării, în baza unor obligații de confidențialitate și securitate.",
+        ],
+      },
+      {
+        title: "Drepturile tale",
+        body: [
+          "Poți solicita accesul, rectificarea, ștergerea, restricționarea sau portabilitatea datelor și te poți opune anumitor prelucrări. Îți poți retrage consimțământul atunci când acesta este temeiul utilizat.",
+          "Ai și dreptul de a depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal.",
+        ],
       },
     ],
+    source: {
+      label: "Informații oficiale ANSPDCP despre GDPR",
+      href: "https://www.dataprotection.ro/?page=noua+_pagina_regulamentul_GDPR",
+    },
   },
   termeni: {
+    path: "/termeni-si-conditii",
+    eyebrow: "Condiții de utilizare",
     title: "Termeni și condiții",
-    intro:
-      "Prin utilizarea acestui site și solicitarea serviciilor FIREARTRO, ești de acord cu următorii termeni.",
+    description:
+      "Regulile generale pentru utilizarea site-ului și solicitarea serviciilor FIREARTRO.",
+    updated: "24 iunie 2026",
     sections: [
       {
-        h: "Serviciile noastre",
-        p: "FIREARTRO oferă spectacole de drone, artificii profesionale, show-uri combinate și efecte speciale. Fiecare ofertă este personalizată în funcție de locație, durată și complexitate.",
+        title: "Rolul site-ului",
+        body: [
+          "Site-ul prezintă serviciile FIREARTRO și permite trimiterea unei solicitări de ofertă. Informațiile au caracter general și pot fi actualizate pe măsură ce serviciile evoluează.",
+        ],
       },
       {
-        h: "Rezervări și oferte",
-        p: "Solicitarea unei oferte prin formular nu constituie o rezervare confirmată. Rezervarea devine fermă în urma confirmării reciproce și a îndeplinirii condițiilor agreate.",
+        title: "Oferte și rezervări",
+        body: [
+          "Trimiterea formularului nu reprezintă o rezervare și nu creează automat o obligație contractuală. Oferta finală este stabilită după verificarea locației, datei, cerințelor tehnice și condițiilor de siguranță.",
+          "O rezervare devine fermă numai după acceptarea condițiilor comerciale și tehnice comunicate de FIREARTRO.",
+        ],
       },
       {
-        h: "Siguranță și autorizații",
-        p: "Toate spectacolele sunt realizate cu respectarea normelor de siguranță și a autorizațiilor necesare. În condiții meteo nefavorabile, ne rezervăm dreptul de a replanifica sau adapta spectacolul.",
+        title: "Siguranță, avize și condiții meteo",
+        body: [
+          "Spectacolele se realizează numai dacă pot fi respectate normele de siguranță, restricțiile locației și autorizările aplicabile.",
+          "Vântul, precipitațiile, restricțiile de spațiu aerian sau alte situații independente pot impune adaptarea, amânarea ori anularea unei componente a spectacolului.",
+        ],
       },
       {
-        h: "Responsabilitate",
-        p: "FIREARTRO depune toate eforturile pentru execuția impecabilă a fiecărui show. Detaliile finale, durata și conținutul spectacolului se stabilesc de comun acord înainte de eveniment.",
+        title: "Proprietate intelectuală",
+        body: [
+          "Textele, identitatea vizuală, conceptele, fotografiile și materialele video publicate pe site sunt protejate. Reutilizarea lor comercială fără acord scris nu este permisă.",
+        ],
+      },
+      {
+        title: "Limitarea răspunderii",
+        body: [
+          "FIREARTRO urmărește menținerea informațiilor corecte și a site-ului disponibil, dar nu poate garanta funcționarea neîntreruptă sau lipsa completă a erorilor tehnice.",
+          "Condițiile specifice fiecărui proiect sunt cele prevăzute în oferta și documentele acceptate de părți.",
+        ],
       },
     ],
   },
   cookies: {
-    title: "Politica de cookie-uri",
-    intro:
-      "Acest site folosește un minim de cookie-uri pentru a asigura funcționarea corectă și a îmbunătăți experiența ta.",
+    path: "/cookies",
+    eyebrow: "Preferințe și stocare locală",
+    title: "Politica de cookies",
+    description:
+      "Ce tehnologii de stocare poate utiliza site-ul FIREARTRO și cum le poți controla.",
+    updated: "24 iunie 2026",
     sections: [
       {
-        h: "Ce sunt cookie-urile",
-        p: "Cookie-urile sunt fișiere mici stocate în browserul tău care ajută site-ul să funcționeze și să rețină anumite preferințe.",
+        title: "Ce stocăm în browser",
+        body: [
+          "Site-ul poate folosi cookie-uri și localStorage, adică mecanisme prin care browserul păstrează preferințe tehnice. FIREARTRO folosește aceste mecanisme numai pentru funcții explicate în această politică.",
+          "Alegerea făcută în bannerul de consimțământ este salvată local timp de maximum 180 de zile, după care site-ul solicită din nou preferințele.",
+        ],
       },
       {
-        h: "Cookie-uri pe care le folosim",
-        p: "Folosim cookie-uri esențiale pentru funcționarea site-ului și, eventual, cookie-uri de analiză pentru a înțelege cum este utilizat site-ul, fără a colecta date personale identificabile.",
+        title: "Cookie-uri strict necesare",
+        body: [
+          "Categoria strict necesară păstrează alegerea de consimțământ și susține funcțiile esențiale ale interfeței. Nu poate fi dezactivată din banner deoarece fără ea preferința ar trebui solicitată la fiecare vizită.",
+          "Aceste date nu sunt folosite pentru publicitate comportamentală și nu creează un profil comercial al vizitatorului.",
+        ],
       },
       {
-        h: "Controlul cookie-urilor",
-        p: "Poți gestiona sau șterge cookie-urile din setările browserului tău. Dezactivarea unor cookie-uri poate afecta funcționalitatea site-ului.",
+        title: "Analiză opțională",
+        body: [
+          "Categoria Analiză este dezactivată implicit. Ea poate fi folosită numai dacă FIREARTRO configurează ulterior un instrument de măsurare și numai după acceptul explicit al vizitatorului.",
+          "În starea actuală, acceptarea categoriei pregătește preferința, dar nu activează automat un furnizor de analiză neconfigurat.",
+        ],
+      },
+      {
+        title: "YouTube și conținut extern",
+        body: [
+          "Galeria afișează inițial doar posterul videoclipului. Playerul YouTube nu este încărcat la deschiderea paginii, ci numai după ce utilizatorul apasă pe un material video.",
+          "După pornirea playerului, YouTube poate prelucra date tehnice conform propriei politici. Folosim domeniul youtube-nocookie.com pentru o integrare cu expunere redusă înainte de interacțiune.",
+        ],
+      },
+      {
+        title: "Marketing și servicii viitoare",
+        body: [
+          "Categoria Conținut extern și marketing este dezactivată implicit. Orice pixel, instrument publicitar sau integrare nouă trebuie documentată aici și condiționată de consimțământ înainte de activare.",
+          "FIREARTRO nu activează automat publicitate personalizată doar pentru că vizitatorul deschide site-ul.",
+        ],
+      },
+      {
+        title: "Cum modifici sau retragi alegerea",
+        body: [
+          "Poți redeschide oricând panoul din linkul Setări cookies aflat în footer și poți alege Doar necesare sau alte preferințe.",
+          "Poți șterge și datele site-ului direct din setările browserului. La următoarea vizită, bannerul va fi afișat din nou.",
+        ],
+      },
+      {
+        title: "Lista actuală a stocării locale",
+        body: [
+          "fireartro-cookie-consent-v1: păstrează categoriile acceptate, data salvării și data expirării.",
+          "fireartro-managed-content-v1: este utilizată numai de pagina locală de administrare pentru previzualizarea drafturilor în browserul în care au fost editate; nu este un cookie de urmărire.",
+        ],
       },
     ],
   },
 };
 
-export default function LegalPage() {
-  const { slug } = useParams();
-  const data = CONTENT[slug] || CONTENT.confidentialitate;
+const LEGAL_NAV = [
+  { key: "confidentialitate", label: "Confidențialitate" },
+  { key: "termeni", label: "Termeni și condiții" },
+  { key: "cookies", label: "Cookies" },
+];
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = `${data.title} — FIREARTRO`;
-  }, [slug, data.title]);
+export default function LegalPage({ type = "confidentialitate" }) {
+  const data = LEGAL_PAGES[type] || LEGAL_PAGES.confidentialitate;
+
+  usePageMeta({
+    title: `${data.title} — FIREARTRO`,
+    description: data.description,
+    path: data.path,
+  });
 
   return (
-    <main className="bg-[#050308] min-h-screen">
-      <div className="border-b border-white/10">
-        <div className="max-w-3xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between">
-          <Link to="/" data-testid="legal-logo">
-            <img src={LOGO_URL} alt="FIREARTRO" className="h-9 w-auto object-contain" />
-          </Link>
-          <Link
-            to="/"
-            data-testid="legal-back"
-            className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" /> Înapoi acasă
-          </Link>
+    <main className="legal-page min-h-screen overflow-x-clip bg-[#050308] text-white">
+      <ScrollProgress />
+      <Navbar />
+
+      <header className="legal-hero">
+        <div className="legal-hero-inner">
+          <span>{data.eyebrow}</span>
+          <h1>{data.title}</h1>
+          <p>{data.description}</p>
+          <small>Actualizat la {data.updated}</small>
         </div>
-      </div>
+      </header>
 
-      <article className="max-w-3xl mx-auto px-6 md:px-12 py-16 md:py-24">
-        <h1 className="font-display font-bold text-white text-4xl sm:text-5xl tracking-tight">
-          {data.title}
-        </h1>
-        <p className="mt-5 text-white/60 font-light text-lg">{data.intro}</p>
+      <div className="legal-layout">
+        <aside className="legal-nav" aria-label="Documente legale">
+          <span>Documente</span>
+          {LEGAL_NAV.map((item) => (
+            <Link
+              key={item.key}
+              to={LEGAL_PAGES[item.key].path}
+              className={item.key === type ? "is-active" : undefined}
+            >
+              {item.label} <ArrowRight />
+            </Link>
+          ))}
+        </aside>
 
-        <div className="mt-12 space-y-10">
-          {data.sections.map((s, i) => (
-            <section key={i} data-testid={`legal-section-${i}`}>
-              <h2 className="font-display font-semibold text-2xl text-white">{s.h}</h2>
-              <p className="mt-3 text-white/60 font-light leading-relaxed">{s.p}</p>
+        <article className="legal-article">
+          {data.sections.map((section, index) => (
+            <section key={section.title} aria-labelledby={`legal-section-${index}`}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <h2 id={`legal-section-${index}`}>{section.title}</h2>
+                {section.body.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
             </section>
           ))}
-        </div>
 
-        <div className="mt-16 glass rounded-2xl p-6">
-          <p className="text-white/55 text-sm">
-            Pentru întrebări, ne poți contacta la{" "}
-            <a href={`mailto:${EMAIL}`} className="text-[#9D7BFF]">{EMAIL}</a> sau telefonic la{" "}
-            <span className="text-white">{PHONE_DISPLAY}</span>.
-          </p>
-        </div>
-      </article>
+          {data.source && (
+            <a className="legal-source" href={data.source.href} target="_blank" rel="noopener noreferrer">
+              {data.source.label} <ExternalLink />
+            </a>
+          )}
+
+          <div className="legal-contact">
+            <Mail />
+            <div>
+              <span>Ai o solicitare legată de acest document?</span>
+              <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <Footer />
     </main>
   );
 }

@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useInView, useReducedMotion } from "framer-motion";
-import { useIsMobile, getScrollDir } from "@/hooks/useMediaQuery";
+import { useIsAppleWebKit, useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
 
 export const EASE = [0.16, 1, 0.3, 1];
 
@@ -14,6 +14,7 @@ const useReveal = (amount = 0.2) => {
 export const ScaleIn = ({ children, delay = 0, from = 0.94, className }) => {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const touch = useIsTouchDevice();
   const [ref, inView] = useReveal(0.2);
   if (reduce) return <div ref={ref} className={className}>{children}</div>;
   const scaleFrom = mobile ? 0.98 : from;
@@ -39,16 +40,15 @@ export const SlideIn = ({ children, delay = 0, x = -36, className }) => {
   if (reduce) return <div ref={ref} className={className}>{children}</div>;
   const xFrom = mobile ? 0 : x;
   const yFrom = mobile ? 12 : 0;
-  const b = mobile ? 0 : 8;
   return (
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, x: xFrom, y: yFrom, filter: `blur(${b}px)` }}
+      initial={{ opacity: 0, x: xFrom, y: yFrom }}
       animate={
         inView
-          ? { opacity: 1, x: 0, y: 0, filter: "blur(0px)" }
-          : { opacity: 0, x: xFrom, y: yFrom, filter: `blur(${b}px)` }
+          ? { opacity: 1, x: 0, y: 0 }
+          : { opacity: 0, x: xFrom, y: yFrom }
       }
       transition={{ duration: mobile ? 0.5 : 0.85, delay: inView ? (mobile ? 0 : delay) : 0, ease: EASE }}
     >
@@ -74,8 +74,8 @@ export const Stagger = ({ children, className, amount = 0.18, gap = 0.08 }) => {
 };
 
 export const fadeUpVariant = {
-  hidden: { opacity: 0, y: 26, scale: 0.96, filter: "blur(8px)" },
-  show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: { duration: 0.7, ease: EASE } },
+  hidden: { opacity: 0, y: 26, scale: 0.985 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7, ease: EASE } },
 };
 
 export const StaggerItem = ({ children, className }) => {
@@ -161,9 +161,10 @@ export const TiltCard = ({ children, className, max = 9, glare = false }) => {
 export const MagneticButton = ({ children, className, strength = 0.28, ...rest }) => {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const touch = useIsTouchDevice();
   const ref = useRef(null);
 
-  if (reduce || mobile)
+  if (reduce || mobile || touch)
     return (
       <button className={className} {...rest}>
         {children}
@@ -194,9 +195,11 @@ export const Parallax = ({ children, range = 60, className }) => {
   const ref = useRef(null);
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const touch = useIsTouchDevice();
+  const appleWebKit = useIsAppleWebKit();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [-range / 2, range / 2]);
-  if (reduce || mobile) return <div className={className}>{children}</div>;
+  if (reduce || mobile || touch || appleWebKit) return <div className={className}>{children}</div>;
   return (
     <motion.div ref={ref} style={{ y }} className={className}>
       {children}
@@ -205,21 +208,20 @@ export const Parallax = ({ children, range = 60, className }) => {
 };
 
 /* ---------------- Reversible cinematic section header ---------------- */
-const headerVariants = (dy, b, down) => ({
-  initial: { opacity: 0, y: dy, filter: `blur(${b}px)` },
-  in: { opacity: 1, y: 0, filter: "blur(0px)" },
-  out: { opacity: 0, y: down ? -dy : dy, filter: `blur(${b}px)` },
+const headerVariants = (dy) => ({
+  initial: { opacity: 0, y: dy },
+  in: { opacity: 1, y: 0 },
 });
 
 const HeaderLine = ({ inView, reduce, mobile, delay = 0, dy = 22, className, children }) => {
   if (reduce) return <div className={className}>{children}</div>;
-  const v = headerVariants(mobile ? Math.min(dy, 14) : dy, mobile ? 0 : 8, getScrollDir() === "down");
+  const v = headerVariants(mobile ? Math.min(dy, 14) : dy);
   return (
     <motion.div
       className={className}
       initial={v.initial}
-      animate={inView ? v.in : v.out}
-      transition={{ duration: mobile ? 0.5 : 0.7, delay: inView ? (mobile ? 0 : delay) : 0, ease: EASE }}
+      animate={inView ? v.in : undefined}
+      transition={{ duration: mobile ? 0.5 : 0.7, delay: mobile ? 0 : delay, ease: EASE }}
     >
       {children}
     </motion.div>
@@ -236,8 +238,8 @@ export const SectionHeader = ({ kicker, title, subtitle, center, className, ligh
     <div ref={ref} className={`${center ? "text-center mx-auto" : ""} max-w-2xl ${className || ""}`}>
       {kicker && (
         <HeaderLine inView={inView} reduce={reduce} mobile={mobile} dy={16}>
-          <span className={`inline-flex items-center gap-2 cine-kicker text-[10px] sm:text-[11px] font-semibold ${light ? "text-white/70" : "text-[#9D7BFF]"}`}>
-            <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#3A86FF] to-[#8338EC]" />
+          <span className={`inline-flex items-center gap-2 cine-kicker text-[10px] sm:text-[11px] font-semibold ${light ? "text-white/70" : "text-[#5CB7FF]"}`}>
+            <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#3A86FF] to-[#176BFF]" />
             {kicker}
           </span>
         </HeaderLine>

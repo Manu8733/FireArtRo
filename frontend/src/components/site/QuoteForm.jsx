@@ -1,36 +1,34 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, MessageCircle, Phone, Mail, Sparkles } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CheckCircle2, Clock3, Loader2, Mail, MessageCircle, Phone, Sparkles } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
-import { EVENT_TYPES, PACKAGES, SERVICE_OPTIONS } from "@/data/content";
+import {
+  BUSINESS_HOURS,
+  CONTACT_EVENT_TYPES,
+  PACKAGE_ITEMS,
+  SERVICE_INTEREST_OPTIONS,
+} from "@/data/businessContent";
 import { whatsappLink, PHONE_DISPLAY, EMAIL } from "@/lib/constants";
 
 const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/$/, "");
 const API = `${BACKEND_URL}/api`;
 
 const empty = {
-  name: "",
+  first_name: "",
+  last_name: "",
   phone: "",
   email: "",
-  event_type: "",
+  locality: "",
+  event_location: "",
   event_date: "",
-  location: "",
-  package: "",
-  preferred_service: "",
+  event_type: "",
+  services: [],
+  package_id: "",
+  package_title: "",
   message: "",
   consent: false,
+  company_website: "",
 };
 
 export const QuoteForm = () => {
@@ -39,321 +37,210 @@ export const QuoteForm = () => {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    const handler = (e) => setForm((f) => ({ ...f, package: e.detail }));
+    const handler = (event) => {
+      const item = event.detail;
+      setForm((current) => ({
+        ...current,
+        package_id: item.id || "",
+        package_title: item.title || String(item),
+        services: item.category
+          ? [...new Set([...current.services, item.category])]
+          : current.services,
+      }));
+    };
     window.addEventListener("prefill-package", handler);
     return () => window.removeEventListener("prefill-package", handler);
   }, []);
 
-  const update = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
+  const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  const toggleService = (service) =>
+    setForm((current) => ({
+      ...current,
+      services: current.services.includes(service)
+        ? current.services.filter((item) => item !== service)
+        : [...current.services, service],
+    }));
 
-  const submit = async (e) => {
-    e.preventDefault();
-    if (!form.name.trim() || !form.phone.trim() || !form.event_type) {
-      toast.error("Completează numele, telefonul și tipul evenimentului.");
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!form.first_name.trim() || !form.last_name.trim() || !form.phone.trim() || !form.email.trim()) {
+      toast.error("Completează numele, prenumele, telefonul și emailul.");
+      return;
+    }
+    if (!form.locality.trim() || !form.event_type || !form.event_date) {
+      toast.error("Completează localitatea, data și tipul evenimentului.");
+      return;
+    }
+    if (!form.services.length) {
+      toast.error("Alege cel puțin un serviciu de interes.");
       return;
     }
     if (!form.consent) {
-      toast.error("Te rugăm să accepți prelucrarea datelor pentru a continua.");
+      toast.error("Acceptă prelucrarea datelor pentru a continua.");
       return;
     }
+
     setLoading(true);
     try {
-      await axios.post(`${API}/quotes`, form);
+      await axios.post(`${API}/quotes`, form, {
+        headers: { "Content-Type": "application/json" },
+        timeout: 12000,
+      });
       setDone(true);
-      toast.success("Cererea ta a fost trimisă! Te contactăm în curând.");
       setForm(empty);
-    } catch (err) {
-      console.error(err);
-      toast.error("A apărut o eroare. Încearcă din nou sau scrie-ne pe WhatsApp.");
+      toast.success("Cererea a fost trimisă. Revenim cu următorii pași.");
+    } catch (error) {
+      console.error(error);
+      const message = error.response?.status === 429
+        ? "Ai trimis mai multe solicitări într-un interval scurt. Încearcă mai târziu."
+        : "Cererea nu a putut fi trimisă. Folosește WhatsApp sau email.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section id="contact" className="relative py-20 sm:py-28 md:py-32 section-grid-bg" data-testid="contact-section">
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-12">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* Left copy */}
+    <section id="contact" className="contact-modern" data-testid="contact-section" aria-labelledby="contact-title">
+      <div className="contact-modern-inner">
+        <div className="contact-modern-layout">
           <Reveal>
-            <div>
-              <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#9D7BFF]">
-                Solicită ofertă
-              </span>
-              <h2 className="font-display font-bold text-white display-md mt-4">
-                Hai să creăm spectacolul tău
-              </h2>
-              <p className="mt-4 text-white/60 lead font-light">
-                Spune-ne câteva detalii despre eveniment și revenim rapid cu o ofertă
-                personalizată.
+            <div className="contact-modern-intro">
+              <span className="contact-modern-kicker">Solicită ofertă</span>
+              <h2 id="contact-title">Trimite contextul. Primești o direcție clară.</h2>
+              <p>
+                Nu ai nevoie de un brief perfect. Data, locația și tipul de spectacol sunt suficiente pentru prima evaluare.
               </p>
 
-              <div className="mt-6">
-                <div className="label-xs uppercase tracking-[0.18em] text-[#5AA9FF]">
-                  Include în brief
+              <ol className="contact-brief-list">
+                {[
+                  ["01", "Context", "Eveniment, dată și locație"],
+                  ["02", "Selecție", "Serviciile și pachetul care te interesează"],
+                  ["03", "Răspuns", "Întrebări tehnice și o direcție de ofertă"],
+                ].map(([number, title, text]) => (
+                  <li key={number}>
+                    <span>{number}</span>
+                    <div><strong>{title}</strong><small>{text}</small></div>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="contact-hours">
+                <Clock3 />
+                <div>
+                  <strong>{BUSINESS_HOURS.label}</strong>
+                  <span>{BUSINESS_HOURS.note}</span>
                 </div>
-                <ul className="mt-3 grid grid-cols-2 gap-2.5">
-                  {["Tipul evenimentului", "Data și locația", "Tipul de show dorit", "Buget aproximativ"].map((t) => (
-                    <li key={t} className="flex items-center gap-2 text-[13px] text-white/70 glass rounded-xl px-3 py-2.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-[#8338EC] shrink-0" />
-                      {t}
-                    </li>
-                  ))}
-                </ul>
               </div>
 
-              <div className="mt-10 space-y-4">
+              <div className="contact-channel-list">
                 {PHONE_DISPLAY && (
-                  <a
-                    href={`tel:${PHONE_DISPLAY.replace(/\s/g, "")}`}
-                    data-testid="contact-phone"
-                    className="flex items-center gap-4 glass rounded-2xl p-4 hover:border-white/20 transition-colors"
-                  >
-                    <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 flex items-center justify-center">
-                      <Phone className="h-5 w-5 text-[#9D7BFF]" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-white/45">Telefon</div>
-                      <div className="text-white font-medium">{PHONE_DISPLAY}</div>
-                    </div>
-                  </a>
+                  <a href={`tel:${PHONE_DISPLAY.replace(/\s/g, "")}`}><Phone /><span><small>Telefon</small><strong>{PHONE_DISPLAY}</strong></span></a>
                 )}
-                <a
-                  href={`mailto:${EMAIL}`}
-                  data-testid="contact-email"
-                  className="flex items-center gap-4 glass rounded-2xl p-4 hover:border-white/20 transition-colors"
-                >
-                  <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 flex items-center justify-center">
-                    <Mail className="h-5 w-5 text-[#9D7BFF]" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-white/45">Email</div>
-                    <div className="text-white font-medium">{EMAIL}</div>
-                  </div>
-                </a>
+                <a href={`mailto:${EMAIL}`}><Mail /><span><small>Email</small><strong>{EMAIL}</strong></span></a>
                 {whatsappLink() && (
-                  <a
-                    href={whatsappLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="contact-whatsapp"
-                    className="flex items-center gap-4 glass rounded-2xl p-4 hover:border-white/20 transition-colors"
-                  >
-                    <div className="h-11 w-11 rounded-xl bg-[#25D366]/15 flex items-center justify-center">
-                      <MessageCircle className="h-5 w-5 text-[#25D366]" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-white/45">WhatsApp</div>
-                      <div className="text-white font-medium">Scrie-ne acum</div>
-                    </div>
+                  <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle /><span><small>WhatsApp</small><strong>Scrie-ne direct</strong></span>
                   </a>
                 )}
               </div>
             </div>
           </Reveal>
 
-          {/* Right form */}
-          <Reveal delay={0.1}>
-            <div className="glass rounded-3xl p-7 md:p-9 glow-ring" data-testid="quote-form-card">
+          <Reveal delay={0.08}>
+            <div className="contact-form-panel" data-testid="quote-form-card">
+              <div className="contact-form-heading"><span>Brief eveniment</span><strong>2 minute</strong></div>
               {done ? (
-                <div className="text-center py-12" data-testid="quote-success">
-                  <div className="h-16 w-16 mx-auto rounded-full bg-gradient-to-br from-[#3A86FF] to-[#8338EC] flex items-center justify-center">
-                    <CheckCircle2 className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="mt-6 font-display font-semibold text-2xl text-white">
-                    Mulțumim!
-                  </h3>
-                  <p className="mt-3 text-white/60 font-light">
-                    Cererea ta a fost trimisă cu succes. Te contactăm în cel mai scurt timp cu o
-                    ofertă personalizată.
-                  </p>
-                  <button
-                    onClick={() => setDone(false)}
-                    data-testid="quote-new-request"
-                    className="mt-7 glass text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
-                  >
-                    Trimite altă cerere
-                  </button>
+                <div className="contact-success" data-testid="quote-success">
+                  <div><CheckCircle2 /></div>
+                  <h3>Cerere trimisă</h3>
+                  <p>Analizăm detaliile și revenim cu întrebările relevante pentru configurație.</p>
+                  <button type="button" onClick={() => setDone(false)}>Trimite altă cerere</button>
                 </div>
               ) : (
-                <form onSubmit={submit} className="space-y-5" data-testid="quote-form">
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-name" className="text-white/70 text-sm">Nume *</Label>
-                      <Input
-                        id="quote-name"
-                        data-testid="quote-input-name"
-                        value={form.name}
-                        onChange={(e) => update("name")(e.target.value)}
-                        placeholder="Numele tău"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 rounded-xl focus-visible:ring-[#8338EC]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-phone" className="text-white/70 text-sm">Telefon *</Label>
-                      <Input
-                        id="quote-phone"
-                        data-testid="quote-input-phone"
-                        value={form.phone}
-                        onChange={(e) => update("phone")(e.target.value)}
-                        placeholder="07xx xxx xxx"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 rounded-xl focus-visible:ring-[#8338EC]"
-                      />
-                    </div>
+                <form onSubmit={submit} className="contact-form-grid" data-testid="quote-form" noValidate>
+                  <div className="contact-field">
+                    <label htmlFor="quote-first-name">Nume *</label>
+                    <input id="quote-first-name" value={form.first_name} onChange={(e) => update("first_name", e.target.value)} autoComplete="family-name" />
                   </div>
-
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-email" className="text-white/70 text-sm">Email</Label>
-                      <Input
-                        id="quote-email"
-                        data-testid="quote-input-email"
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => update("email")(e.target.value)}
-                        placeholder="email@exemplu.ro"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 rounded-xl focus-visible:ring-[#8338EC]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-date" className="text-white/70 text-sm">Data evenimentului</Label>
-                      <Input
-                        id="quote-date"
-                        data-testid="quote-input-date"
-                        type="date"
-                        value={form.event_date}
-                        onChange={(e) => update("event_date")(e.target.value)}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 rounded-xl focus-visible:ring-[#8338EC] [color-scheme:dark]"
-                      />
-                    </div>
+                  <div className="contact-field">
+                    <label htmlFor="quote-last-name">Prenume *</label>
+                    <input id="quote-last-name" value={form.last_name} onChange={(e) => update("last_name", e.target.value)} autoComplete="given-name" />
                   </div>
-
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-event-type" className="text-white/70 text-sm">Tip eveniment *</Label>
-                      <Select value={form.event_type} onValueChange={update("event_type")}>
-                        <SelectTrigger
-                          id="quote-event-type"
-                          aria-label="Tip eveniment"
-                          data-testid="quote-select-event"
-                          className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-[#8338EC]"
-                        >
-                          <SelectValue placeholder="Alege..." />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#0A0712] border-white/10 text-white">
-                          {EVENT_TYPES.map((t) => (
-                            <SelectItem key={t} value={t} className="focus:bg-[#8338EC]/30">
-                              {t}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-package" className="text-white/70 text-sm">Pachet dorit</Label>
-                      <Select value={form.package} onValueChange={update("package")}>
-                        <SelectTrigger
-                          id="quote-package"
-                          aria-label="Pachet dorit"
-                          data-testid="quote-select-package"
-                          className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-[#8338EC]"
-                        >
-                          <SelectValue placeholder="Opțional" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#0A0712] border-white/10 text-white">
-                          {PACKAGES.map((p) => (
-                            <SelectItem key={p.name} value={p.name} className="focus:bg-[#8338EC]/30">
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="contact-field">
+                    <label htmlFor="quote-phone">Telefon *</label>
+                    <input id="quote-phone" type="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} autoComplete="tel" placeholder="07xx xxx xxx" />
                   </div>
-
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-location" className="text-white/70 text-sm">Locație</Label>
-                      <Input
-                        id="quote-location"
-                        data-testid="quote-input-location"
-                        value={form.location}
-                        onChange={(e) => update("location")(e.target.value)}
-                        placeholder="Oraș / locație aproximativă"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 h-12 rounded-xl focus-visible:ring-[#8338EC]"
-                      />
+                  <div className="contact-field">
+                    <label htmlFor="quote-email">Email *</label>
+                    <input id="quote-email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} autoComplete="email" />
+                  </div>
+                  <div className="contact-field">
+                    <label htmlFor="quote-locality">Localitatea *</label>
+                    <input id="quote-locality" value={form.locality} onChange={(e) => update("locality", e.target.value)} autoComplete="address-level2" />
+                  </div>
+                  <div className="contact-field">
+                    <label htmlFor="quote-event-location">Locația evenimentului</label>
+                    <input id="quote-event-location" value={form.event_location} onChange={(e) => update("event_location", e.target.value)} placeholder="Sală, adresă sau reper" />
+                  </div>
+                  <div className="contact-field">
+                    <label htmlFor="quote-date">Data evenimentului *</label>
+                    <input id="quote-date" type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
+                  </div>
+                  <div className="contact-field">
+                    <label htmlFor="quote-event-type">Tip eveniment *</label>
+                    <select id="quote-event-type" value={form.event_type} onChange={(e) => update("event_type", e.target.value)}>
+                      <option value="">Alege tipul</option>
+                      {CONTACT_EVENT_TYPES.map((item) => <option key={item} value={item}>{item}</option>)}
+                    </select>
+                  </div>
+                  <div className="contact-field contact-field-wide">
+                    <label htmlFor="quote-package">Pachet selectat</label>
+                    <select
+                      id="quote-package"
+                      value={form.package_id}
+                      onChange={(e) => {
+                        const item = PACKAGE_ITEMS.find((entry) => entry.id === e.target.value);
+                        update("package_id", e.target.value);
+                        update("package_title", item?.title || "");
+                      }}
+                    >
+                      <option value="">Fără pachet selectat</option>
+                      {PACKAGE_ITEMS.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
+                    </select>
+                  </div>
+                  <fieldset className="contact-services contact-field-wide">
+                    <legend>Servicii de interes *</legend>
+                    <p>Poți selecta mai multe opțiuni.</p>
+                    <div>
+                      {SERVICE_INTEREST_OPTIONS.map((service) => (
+                        <label key={service}>
+                          <input
+                            type="checkbox"
+                            checked={form.services.includes(service)}
+                            onChange={() => toggleService(service)}
+                          />
+                          <span>{service}</span>
+                        </label>
+                      ))}
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="quote-service" className="text-white/70 text-sm">Serviciu preferat</Label>
-                      <Select value={form.preferred_service} onValueChange={update("preferred_service")}>
-                        <SelectTrigger
-                          id="quote-service"
-                          aria-label="Serviciu preferat"
-                          data-testid="quote-select-service"
-                          className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-[#8338EC]"
-                        >
-                          <SelectValue placeholder="Opțional" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#0A0712] border-white/10 text-white">
-                          {SERVICE_OPTIONS.map((s) => (
-                            <SelectItem key={s} value={s} className="focus:bg-[#8338EC]/30">
-                              {s}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  </fieldset>
+                  <div className="contact-field contact-field-wide">
+                    <label htmlFor="quote-message">Mesaj</label>
+                    <textarea id="quote-message" value={form.message} onChange={(e) => update("message", e.target.value)} rows={4} placeholder="Detalii despre moment, public, muzică sau accesul în locație" />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="quote-message" className="text-white/70 text-sm">Mesaj</Label>
-                    <Textarea
-                      id="quote-message"
-                      data-testid="quote-input-message"
-                      value={form.message}
-                      onChange={(e) => update("message")(e.target.value)}
-                      placeholder="Spune-ne mai multe despre evenimentul tău..."
-                      rows={4}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-[#8338EC] resize-none"
-                    />
+                  <div className="contact-honeypot" aria-hidden="true">
+                    <label htmlFor="company-website">Website companie</label>
+                    <input id="company-website" tabIndex="-1" autoComplete="off" value={form.company_website} onChange={(e) => update("company_website", e.target.value)} />
                   </div>
-
-                  <div className="flex items-start gap-3 pt-1">
-                    <Checkbox
-                      id="consent"
-                      data-testid="quote-consent"
-                      checked={form.consent}
-                      onCheckedChange={(v) => update("consent")(!!v)}
-                      className="mt-0.5 border-white/30 data-[state=checked]:bg-[#8338EC] data-[state=checked]:border-[#8338EC]"
-                    />
-                    <Label htmlFor="consent" className="text-white/55 text-sm font-light leading-relaxed cursor-pointer">
-                      Sunt de acord cu prelucrarea datelor mele pentru a primi o ofertă, conform{" "}
-                      <a href="/legal/confidentialitate" className="text-[#9D7BFF] underline">
-                        politicii de confidențialitate
-                      </a>
-                      .
-                    </Label>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    data-testid="quote-submit"
-                    className="btn-grad shine w-full inline-flex items-center justify-center gap-2 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 disabled:opacity-60"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" /> Se trimite...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4" /> Trimite cererea
-                      </>
-                    )}
+                  <label className="contact-consent">
+                    <input type="checkbox" checked={form.consent} onChange={(e) => update("consent", e.target.checked)} />
+                    <span>Sunt de acord cu prelucrarea datelor conform <a href="/confidentialitate">politicii de confidențialitate</a>.</span>
+                  </label>
+                  <button type="submit" disabled={loading} className="contact-submit">
+                    {loading ? <><Loader2 className="animate-spin" /> Se trimite...</> : <><Sparkles /> Trimite cererea</>}
                   </button>
-                  <p className="text-center text-xs text-white/40">
-                    Analizăm detaliile evenimentului înainte de direcția de ofertă.
-                  </p>
+                  <p className="contact-form-note">Datele sunt folosite exclusiv pentru această solicitare.</p>
                 </form>
               )}
             </div>

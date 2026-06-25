@@ -24,10 +24,10 @@ export const Technology = () => {
                   className="group relative h-full glass rounded-2xl p-7 hover:-translate-y-1.5 hover:border-white/20 transition-all duration-300"
                   data-testid={`tech-card-${i}`}
                 >
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#8338EC]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#176BFF]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <Floating delay={i * 0.4}>
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#8338EC]/20 border border-white/10 flex items-center justify-center group-hover:glow-ring transition-all duration-300">
-                      <t.icon className="h-6 w-6 text-[#9D7BFF]" />
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#3A86FF]/20 to-[#176BFF]/20 border border-white/10 flex items-center justify-center group-hover:glow-ring transition-all duration-300">
+                      <t.icon className="h-6 w-6 text-[#5CB7FF]" />
                     </div>
                   </Floating>
                   <h3 className="mt-5 font-display font-semibold text-lg text-white">{t.title}</h3>

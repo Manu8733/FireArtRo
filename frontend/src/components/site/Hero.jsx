@@ -5,7 +5,8 @@ import HeroVideo from "@/components/site/HeroVideo";
 import Particles from "@/components/site/Particles";
 import FloatingLogos from "@/components/site/FloatingLogos";
 import { MagneticButton } from "@/components/site/cinematic";
-import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useIsAppleWebKit, useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { TRUST_BADGES } from "@/data/businessContent";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
@@ -20,6 +21,9 @@ export const Hero = () => {
   const ref = useRef(null);
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
+  const touch = useIsTouchDevice();
+  const appleWebKit = useIsAppleWebKit();
+  const constrainedMotion = mobile || touch || appleWebKit;
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const trailY1 = useTransform(scrollYProgress, [0, 1], [0, -140]);
@@ -45,9 +49,9 @@ export const Hero = () => {
       data-testid="hero-section"
     >
       <motion.div
-        className="sticky top-0 h-[100svh] flex items-center overflow-hidden cinema-hero-frame"
+        className="apple-viewport-height sticky top-0 h-[100svh] flex items-center overflow-hidden cinema-hero-frame"
         style={
-          reduce || mobile
+          reduce || constrainedMotion
             ? undefined
             : {
                 scale: frameScale,
@@ -61,37 +65,33 @@ export const Hero = () => {
       <div className="absolute inset-0 z-0">
         <HeroVideo />
       </div>
-      {!mobile && <FloatingLogos />}
-      {!mobile && (
+      {!constrainedMotion && <FloatingLogos />}
+      {!constrainedMotion && (
         <Particles density={60} className="absolute inset-0 z-10 w-full h-full pointer-events-none" />
       )}
 
       {/* Floating + parallax aurora trails */}
       <motion.div
-        style={reduce ? undefined : { y: trailY1 }}
-        className="absolute -top-1/4 -right-1/4 z-[5] h-[60vw] w-[60vw] rounded-full bg-[#8338EC]/10 blur-[70px] md:blur-[120px] animate-float-eff"
+        style={reduce || constrainedMotion ? undefined : { y: trailY1 }}
+        className="hero-aurora hero-aurora-top absolute -top-1/4 -right-1/4 z-[5] h-[60vw] w-[60vw] rounded-full animate-float-eff"
       />
       <motion.div
-        style={reduce ? undefined : { y: trailY2 }}
-        className="absolute bottom-0 -left-1/4 z-[5] h-[50vw] w-[50vw] rounded-full bg-[#3A86FF]/10 blur-[70px] md:blur-[120px] animate-float-eff"
+        style={reduce || constrainedMotion ? undefined : { y: trailY2 }}
+        className="hero-aurora hero-aurora-bottom absolute bottom-0 -left-1/4 z-[5] h-[50vw] w-[50vw] rounded-full animate-float-eff"
       />
 
       <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full pt-28 pb-20 md:pt-32 md:pb-24">
         <motion.div variants={container} initial="hidden" animate="show" className="max-w-4xl">
-          <h1 className="max-w-3xl font-display text-[clamp(2.05rem,4.4vw,4rem)] font-extrabold leading-[1.02] tracking-[-0.04em] text-white">
-            <span className="block">
-              Spectacole cu drone
-            </span>
-            <span className="block">
-              <span className="text-gradient text-bloom">și artificii.</span>
-            </span>
+          <h1 className="max-w-[15ch] font-display text-[clamp(1.8rem,4.5vw,4rem)] font-extrabold leading-[1.06] tracking-[-0.04em] text-white">
+            Spectacole de drone și artificii pentru
+            <span className="text-gradient text-bloom"> momente imposibil de uitat</span>
           </h1>
 
           <motion.p
             variants={fadeItem}
             className="mt-5 text-sm sm:text-base text-white/70 font-light leading-relaxed max-w-xl"
           >
-            Un singur scenariu de lumină pentru momentul care trebuie să rămână.
+            FIREARTRO transformă evenimentele în experiențe vizuale cinematice, cu drone show-uri, artificii și efecte speciale sincronizate.
           </motion.p>
 
           <motion.div variants={fadeItem} className="mt-8 flex flex-col xs:flex-row gap-3 sm:gap-4">
@@ -114,6 +114,12 @@ export const Hero = () => {
               Vezi spectacolele
             </MagneticButton>
           </motion.div>
+
+          <motion.ul variants={fadeItem} className="hero-trust-badges" aria-label="Avantaje FIREARTRO">
+            {TRUST_BADGES.map((badge) => (
+              <li key={badge}>{badge}</li>
+            ))}
+          </motion.ul>
         </motion.div>
       </div>
 

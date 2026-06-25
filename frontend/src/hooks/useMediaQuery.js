@@ -26,6 +26,23 @@ export const useIsMobile = () => useMediaQuery("(max-width: 767px)");
 
 export const useIsTablet = () => useMediaQuery("(min-width: 768px) and (max-width: 1023px)");
 
+// iPads and touch-first laptops need the lighter motion path even at desktop widths.
+export const useIsTouchDevice = () => useMediaQuery("(hover: none), (pointer: coarse)");
+
+export const useIsAppleWebKit = () => {
+  const get = () =>
+    typeof document !== "undefined" &&
+    (document.documentElement.dataset.appleWebkit === "true" ||
+      document.documentElement.dataset.applePlatform === "true");
+  const [matches, setMatches] = useState(get);
+
+  useEffect(() => {
+    setMatches(get());
+  }, []);
+
+  return matches;
+};
+
 /* ----------------------------------------------------------------------
    Global scroll-direction tracker (for direction-aware exit animations).
    Module-level singleton listener — cheap, shared across all reveals.

@@ -15,7 +15,7 @@ export const Portfolio = () => {
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div className="max-w-2xl">
-              <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#8338EC]">
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#176BFF]">
                 Spectacole realizate
               </span>
               <h2 className="font-display font-bold text-white text-4xl sm:text-5xl mt-4 tracking-tight">
@@ -49,7 +49,7 @@ export const Portfolio = () => {
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#050308] via-[#050308]/30 to-transparent" />
-                      <div className="absolute inset-0 bg-[#8338EC]/0 group-hover:bg-[#8338EC]/10 transition-colors duration-500" />
+                      <div className="absolute inset-0 bg-[#176BFF]/0 group-hover:bg-[#176BFF]/10 transition-colors duration-500" />
 
                       <div className="absolute top-5 left-5">
                         <span className="glass text-xs font-semibold uppercase tracking-wider text-white px-3 py-1.5 rounded-full">
@@ -59,7 +59,7 @@ export const Portfolio = () => {
 
                       <div className="absolute bottom-0 left-0 right-0 p-7">
                         <h3 className="font-display font-semibold text-2xl text-white">{p.title}</h3>
-                        <div className="mt-2 h-px w-12 bg-gradient-to-r from-[#3A86FF] to-[#8338EC] group-hover:w-24 transition-all duration-500" />
+                        <div className="mt-2 h-px w-12 bg-gradient-to-r from-[#3A86FF] to-[#176BFF] group-hover:w-24 transition-all duration-500" />
                       </div>
                     </div>
                   </CarouselItem>
@@ -68,11 +68,11 @@ export const Portfolio = () => {
               <div className="flex items-center justify-end gap-3 mt-8">
                 <CarouselPrevious
                   data-testid="portfolio-prev"
-                  className="static translate-y-0 h-11 w-11 bg-white/5 border-white/15 text-white hover:bg-[#8338EC] hover:border-[#8338EC]"
+                  className="static translate-y-0 h-11 w-11 bg-white/5 border-white/15 text-white hover:bg-[#176BFF] hover:border-[#176BFF]"
                 />
                 <CarouselNext
                   data-testid="portfolio-next"
-                  className="static translate-y-0 h-11 w-11 bg-white/5 border-white/15 text-white hover:bg-[#8338EC] hover:border-[#8338EC]"
+                  className="static translate-y-0 h-11 w-11 bg-white/5 border-white/15 text-white hover:bg-[#176BFF] hover:border-[#176BFF]"
                 />
               </div>
             </Carousel>

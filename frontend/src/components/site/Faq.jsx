@@ -18,11 +18,11 @@ export const Faq = () => {
 
   return (
     <section className="relative py-20 sm:py-24 md:py-28" data-testid="faq-section">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-6 md:px-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
         <Reveal>
           <div className="lg:sticky lg:top-28">
-            <span className="cine-kicker text-[10px] font-semibold text-[#9D7BFF]">Obiecții, clarificate</span>
+            <span className="cine-kicker text-[10px] font-semibold text-[#5CB7FF]">Obiecții, clarificate</span>
             <h2 className="mt-5 max-w-md font-display text-[clamp(1.6rem,3vw,2.8rem)] font-bold leading-[1.08] text-white">
               Ce trebuie să știi înainte să ridicăm privirile spre cer.
             </h2>
@@ -52,7 +52,7 @@ export const Faq = () => {
               >
                 <AccordionTrigger className="py-5 text-left font-display text-sm font-medium text-white hover:no-underline sm:py-6 sm:text-base">
                   <span className="flex items-start gap-4">
-                    <span className="mt-0.5 font-mono text-[9px] text-[#9D7BFF]">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="mt-0.5 font-mono text-[9px] text-[#5CB7FF]">{String(index + 1).padStart(2, "0")}</span>
                     <span>{item.q}</span>
                   </span>
                 </AccordionTrigger>

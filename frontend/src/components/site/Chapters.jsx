@@ -33,13 +33,13 @@ const Constellation = () => (
         key={i}
         x1={`${DOTS[a][0]}%`} y1={`${DOTS[a][1]}%`}
         x2={`${DOTS[b][0]}%`} y2={`${DOTS[b][1]}%`}
-        stroke="rgba(131,56,236,0.18)" strokeWidth="1"
+        stroke="rgba(23, 107, 255,0.18)" strokeWidth="1"
       />
     ))}
     {DOTS.map(([x, y], i) => (
       <circle
         key={i} cx={`${x}%`} cy={`${y}%`} r={i % 4 === 0 ? 2.4 : 1.4}
-        fill={i % 3 === 0 ? "#5AA9FF" : "#9D7BFF"}
+        fill={i % 3 === 0 ? "#5AA9FF" : "#5CB7FF"}
         className="animate-twinkle"
         style={{ animationDelay: `${(i % 6) * 0.5}s` }}
       />
@@ -60,7 +60,7 @@ const RailSeg = ({ progress, index, total, active, onClick, no }) => {
     >
       <span className={`font-mono text-[10px] tabular-nums transition-colors ${active ? "text-white" : "text-white/30 group-hover:text-white/60"}`}>{no}</span>
       <span className={`relative rounded-full overflow-hidden bg-white/12 transition-[height] duration-500 w-1 ${active ? "h-9" : "h-5"}`}>
-        <motion.span className="absolute inset-x-0 top-0 rounded-full bg-gradient-to-b from-[#3A86FF] to-[#8338EC]" style={{ height: fill }} />
+        <motion.span className="absolute inset-x-0 top-0 rounded-full bg-gradient-to-b from-[#3A86FF] to-[#176BFF]" style={{ height: fill }} />
       </span>
     </button>
   );
@@ -102,10 +102,10 @@ const DesktopStory = () => {
       ref={ref}
       id="povestea"
       className="relative bg-[#050308]"
-      style={{ height: `${STORY.length * 74}vh` }}
+      style={{ height: `${STORY.length * 74}svh` }}
       data-testid="chapters-section"
     >
-      <div className="sticky top-0 h-screen overflow-hidden flex items-center">
+      <div className="apple-viewport-height sticky top-0 h-[100svh] overflow-hidden flex items-center">
         {/* Scene-tinted layered background */}
         <motion.div
           className="absolute inset-0"
@@ -118,8 +118,8 @@ const DesktopStory = () => {
 
         {/* Floating light trails */}
         <div className="absolute left-[8%] top-1/4 h-40 w-px bg-gradient-to-b from-transparent via-[#5AA9FF]/40 to-transparent animate-trail" />
-        <div className="absolute right-[14%] top-1/3 h-56 w-px bg-gradient-to-b from-transparent via-[#9D7BFF]/40 to-transparent animate-trail" style={{ animationDelay: "1.5s" }} />
-        <div className="absolute left-1/3 bottom-1/4 h-32 w-px bg-gradient-to-b from-transparent via-[#C77DFF]/40 to-transparent animate-trail" style={{ animationDelay: "0.8s" }} />
+        <div className="absolute right-[14%] top-1/3 h-56 w-px bg-gradient-to-b from-transparent via-[#5CB7FF]/40 to-transparent animate-trail" style={{ animationDelay: "1.5s" }} />
+        <div className="absolute left-1/3 bottom-1/4 h-32 w-px bg-gradient-to-b from-transparent via-[#8F6BFF]/40 to-transparent animate-trail" style={{ animationDelay: "0.8s" }} />
 
         {/* Progress rail */}
         <div className="absolute right-5 lg:right-8 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col gap-2.5">
@@ -131,17 +131,17 @@ const DesktopStory = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-7 lg:gap-16 items-center pt-16 pb-14 md:py-0">
           {/* Left — text */}
           <div className="relative order-2 md:order-1">
-            <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#9D7BFF]">Călătoria FIREARTRO</span>
+            <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#5CB7FF]">Călătoria FIREARTRO</span>
             <AnimatePresence mode="wait">
               <motion.div
                 key={sc.no}
-                initial={{ opacity: 0, y: 34, filter: "blur(12px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -28, filter: "blur(12px)" }}
+                initial={{ opacity: 0, y: 34 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -28 }}
                 transition={{ duration: 0.55, ease: EASE }}
               >
                 <div className="font-display font-bold text-white/12 leading-none text-[2.6rem] sm:text-[3.6rem] xl:text-[4.8rem] mt-2">{sc.no}</div>
-                <div className="cine-kicker text-[#9D7BFF] label-xs mt-3">{sc.kicker}</div>
+                <div className="cine-kicker text-[#5CB7FF] label-xs mt-3">{sc.kicker}</div>
                 <h3 className="font-display font-semibold text-white display-md mt-3 max-w-md">{sc.title}</h3>
                 <p className="mt-3.5 text-white/60 lead font-light max-w-sm">{sc.text}</p>
               </motion.div>
@@ -158,7 +158,7 @@ const DesktopStory = () => {
               animate={{ rotateX: tilt.x, rotateY: tilt.y }}
               transition={{ type: "spring", stiffness: 120, damping: 18 }}
             >
-              <div className="absolute -inset-6 rounded-[2rem] blur-3xl opacity-60" style={{ background: `radial-gradient(circle, ${sc.glow}55, transparent 70%)` }} />
+              <div className="chapter-media-glow absolute -inset-6 rounded-[2rem] opacity-60" style={{ background: `radial-gradient(circle, ${sc.glow}55, transparent 70%)` }} />
               {STORY.map((s, i) => (
                 <motion.div
                   key={s.no}
@@ -179,7 +179,7 @@ const DesktopStory = () => {
                   <div
                     className={`absolute inset-0 pointer-events-none ${
                       i === 4
-                        ? "bg-[radial-gradient(circle_at_56%_42%,rgba(199,125,255,0.26),transparent_42%)]"
+                        ? "bg-[radial-gradient(circle_at_56%_42%,rgba(143, 107, 255,0.26),transparent_42%)]"
                         : i === 5
                           ? "bg-gradient-to-t from-[#050308]/70 via-transparent to-transparent"
                           : "bg-transparent"
@@ -204,7 +204,7 @@ const DesktopStory = () => {
             <span
               key={story.no}
               className={`h-1 flex-1 rounded-full transition-colors duration-500 ${
-                index === active ? "bg-gradient-to-r from-[#3A86FF] to-[#8338EC]" : "bg-white/16"
+                index === active ? "bg-gradient-to-r from-[#3A86FF] to-[#176BFF]" : "bg-white/16"
               }`}
             />
           ))}

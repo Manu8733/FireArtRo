@@ -1,8 +1,7 @@
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 import { TECH } from "@/data/content";
-
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+import { goToContact } from "@/lib/contactNavigation";
 
 export const WhyUs = () => (
   <section id="de-ce-noi" className="relative overflow-hidden py-20 sm:py-24 md:py-28" data-testid="why-section">
@@ -16,7 +15,7 @@ export const WhyUs = () => (
           <p className="mt-5 max-w-lg text-sm leading-relaxed text-white/58 sm:text-base">
             Fiecare decizie vizuală este legată de locație, logistică, sincronizare și condițiile reale ale evenimentului.
           </p>
-          <button type="button" onClick={() => scrollTo("#contact")} className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-white">
+          <button type="button" onClick={() => goToContact()} className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-white">
             Discută locația evenimentului
             <ArrowRight className="h-4 w-4 text-[#5CB7FF]" />
           </button>

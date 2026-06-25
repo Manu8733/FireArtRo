@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import { useIsAppleWebKit, useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
 
 const spring = { stiffness: 92, damping: 24, mass: 0.42 };
 
@@ -17,8 +17,7 @@ export const CinematicScene = ({
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
   const touch = useIsTouchDevice();
-  const appleWebKit = useIsAppleWebKit();
-  const constrainedMotion = mobile || touch || appleWebKit;
+  const constrainedMotion = mobile || touch;
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const progress = useSpring(scrollYProgress, spring);
 

@@ -1,4 +1,4 @@
-"""Contract tests for the FIREARTRO quote endpoint."""
+"""Contract tests for the FireArtRo quote endpoint."""
 import os
 import requests
 import pytest

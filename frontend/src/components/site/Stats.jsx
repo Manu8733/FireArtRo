@@ -8,9 +8,9 @@ export const Stats = () => (
       <SectionHeader
         kicker="Capacitate reală"
         title="Un format potrivit pentru fiecare scară."
-        subtitle="Cifrele apar o singură dată, acolo unde ajută la evaluarea capacității FIREARTRO."
+        subtitle="Cifrele apar o singură dată, acolo unde ajută la evaluarea capacității FireArtRo."
       />
-      <h2 id="stats-proof-title" className="sr-only">Capacitate și experiență FIREARTRO</h2>
+      <h2 id="stats-proof-title" className="sr-only">Capacitate și experiență FireArtRo</h2>
       <div className="stats-proof-grid">
         {STATS_ITEMS.map((item, index) => (
           <Reveal key={item.id} delay={index * 0.05}>

@@ -15,7 +15,7 @@ export const Testimonials = () => {
           title="Recenzii publicate responsabil."
           subtitle="Nu inventăm nume, ratinguri sau rezultate. Spațiile de mai jos sunt pregătite pentru feedback aprobat."
         />
-        <h2 id="testimonial-title" className="sr-only">Testimoniale FIREARTRO</h2>
+        <h2 id="testimonial-title" className="sr-only">Testimoniale FireArtRo</h2>
         <div className="testimonial-system-grid">
           {testimonials.map((item, index) => (
             <Reveal key={item.id} delay={index * 0.06}>

@@ -7,6 +7,7 @@ import FloatingLogos from "@/components/site/FloatingLogos";
 import { MagneticButton } from "@/components/site/cinematic";
 import { useIsAppleWebKit, useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
 import { TRUST_BADGES } from "@/data/businessContent";
+import { goToContact } from "@/lib/contactNavigation";
 
 const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
@@ -23,7 +24,7 @@ export const Hero = () => {
   const mobile = useIsMobile();
   const touch = useIsTouchDevice();
   const appleWebKit = useIsAppleWebKit();
-  const constrainedMotion = mobile || touch || appleWebKit;
+  const constrainedMotion = mobile || touch;
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const trailY1 = useTransform(scrollYProgress, [0, 1], [0, -140]);
@@ -45,7 +46,7 @@ export const Hero = () => {
     <section
       ref={ref}
       id="acasa"
-      className="relative h-[116svh] md:h-[122svh]"
+      className="relative h-[108svh] md:h-[112svh]"
       data-testid="hero-section"
     >
       <motion.div
@@ -62,12 +63,12 @@ export const Hero = () => {
         }
       >
       {/* Background depth layer (cinematic zoom-in on scroll) */}
-      <div className="absolute inset-0 z-0">
+      <div className="hero-media-shell absolute inset-0 z-0">
         <HeroVideo />
       </div>
       {!constrainedMotion && <FloatingLogos />}
       {!constrainedMotion && (
-        <Particles density={60} className="absolute inset-0 z-10 w-full h-full pointer-events-none" />
+        <Particles density={appleWebKit ? 38 : 60} className="absolute inset-0 z-10 w-full h-full pointer-events-none" />
       )}
 
       {/* Floating + parallax aurora trails */}
@@ -80,9 +81,9 @@ export const Hero = () => {
         className="hero-aurora hero-aurora-bottom absolute bottom-0 -left-1/4 z-[5] h-[50vw] w-[50vw] rounded-full animate-float-eff"
       />
 
-      <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full pt-28 pb-20 md:pt-32 md:pb-24">
-        <motion.div variants={container} initial="hidden" animate="show" className="max-w-4xl">
-          <h1 className="max-w-[15ch] font-display text-[clamp(1.8rem,4.5vw,4rem)] font-extrabold leading-[1.06] tracking-[-0.04em] text-white">
+      <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full pt-28 pb-20 md:pt-28 md:pb-20">
+        <motion.div variants={container} initial="hidden" animate="show" className="max-w-3xl">
+          <h1 className="max-w-[14ch] font-display text-[clamp(1.75rem,3.7vw,3.45rem)] font-extrabold leading-[1.07] tracking-[-0.04em] text-white">
             Spectacole de drone și artificii pentru
             <span className="text-gradient text-bloom"> momente imposibil de uitat</span>
           </h1>
@@ -91,12 +92,12 @@ export const Hero = () => {
             variants={fadeItem}
             className="mt-5 text-sm sm:text-base text-white/70 font-light leading-relaxed max-w-xl"
           >
-            FIREARTRO transformă evenimentele în experiențe vizuale cinematice, cu drone show-uri, artificii și efecte speciale sincronizate.
+            FireArtRo transformă evenimentele în experiențe vizuale cinematice, cu drone show-uri, artificii și efecte speciale sincronizate.
           </motion.p>
 
           <motion.div variants={fadeItem} className="mt-8 flex flex-col xs:flex-row gap-3 sm:gap-4">
             <MagneticButton
-              onClick={() => scrollTo("#contact")}
+              onClick={() => goToContact()}
               data-testid="hero-primary-cta"
               className="btn-grad shine group inline-flex items-center justify-center gap-2 text-white font-semibold px-7 py-3.5 sm:px-8 sm:py-4 rounded-full"
             >
@@ -115,7 +116,7 @@ export const Hero = () => {
             </MagneticButton>
           </motion.div>
 
-          <motion.ul variants={fadeItem} className="hero-trust-badges" aria-label="Avantaje FIREARTRO">
+          <motion.ul variants={fadeItem} className="hero-trust-badges" aria-label="Avantaje FireArtRo">
             {TRUST_BADGES.map((badge) => (
               <li key={badge}>{badge}</li>
             ))}

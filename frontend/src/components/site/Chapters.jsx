@@ -131,7 +131,7 @@ const DesktopStory = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-7 lg:gap-16 items-center pt-16 pb-14 md:py-0">
           {/* Left — text */}
           <div className="relative order-2 md:order-1">
-            <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#5CB7FF]">Călătoria FIREARTRO</span>
+            <span className="cine-kicker text-[11px] sm:text-xs font-semibold text-[#5CB7FF]">Călătoria FireArtRo</span>
             <AnimatePresence mode="wait">
               <motion.div
                 key={sc.no}

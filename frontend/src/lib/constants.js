@@ -14,6 +14,6 @@ export const LOGO_URL = "/media/fireart-logo.webp";
 export const whatsappLink = (msg) =>
   WHATSAPP_NUMBER
     ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-        msg || "Bună! Aș dori o ofertă pentru un spectacol FIREARTRO."
+        msg || "Bună! Aș dori o ofertă pentru un spectacol FireArtRo."
       )}`
     : "";

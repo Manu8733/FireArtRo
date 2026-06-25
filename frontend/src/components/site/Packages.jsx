@@ -4,8 +4,7 @@ import Reveal from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/cinematic";
 import { PACKAGE_CATEGORIES, PACKAGE_ITEMS } from "@/data/businessContent";
 import useManagedContent from "@/hooks/useManagedContent";
-
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+import { goToContact } from "@/lib/contactNavigation";
 
 const categoryIcons = {
   "Artificii de zi": Sun,
@@ -17,8 +16,11 @@ const categoryIcons = {
 };
 
 const selectPackage = (item) => {
-  window.dispatchEvent(new CustomEvent("prefill-package", { detail: item }));
-  scrollTo("#contact");
+  goToContact({
+    package_id: item.id,
+    package_title: item.title,
+    services: [item.category],
+  });
 };
 
 export const Packages = ({ full = false }) => {
@@ -40,7 +42,7 @@ export const Packages = ({ full = false }) => {
           title="Pachete clare, configurate pentru context."
           subtitle="Alege o categorie. Durata, tehnologia și logistica se adaptează după locație și obiectiv."
         />
-        <h2 id="packages-title" className="sr-only">Pachete FIREARTRO</h2>
+        <h2 id="packages-title" className="sr-only">Pachete FireArtRo</h2>
 
         <div className="package-filter-row" aria-label="Categorii pachete">
           {PACKAGE_CATEGORIES.map((item) => (

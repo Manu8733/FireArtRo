@@ -36,15 +36,33 @@ const PromoMedia = ({ item, active }) => {
 export const Gallery = () => {
   const slides = useManagedContent("promoSlides", PROMO_SLIDES);
   const trackRef = useRef(null);
+  const pointerRef = useRef(null);
   const [active, setActive] = useState(0);
+
+  const updateActive = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const cards = [...track.children];
+    const center = track.scrollLeft + track.clientWidth / 2;
+    const nearest = cards.reduce(
+      (best, card, index) => {
+        const cardCenter = card.offsetLeft + card.clientWidth / 2;
+        const distance = Math.abs(cardCenter - center);
+        return distance < best.distance ? { index, distance } : best;
+      },
+      { index: 0, distance: Number.POSITIVE_INFINITY },
+    );
+    setActive(nearest.index);
+  };
 
   const goTo = (index) => {
     const next = (index + slides.length) % slides.length;
+    const card = trackRef.current?.children[next];
+    if (!card) return;
     setActive(next);
-    trackRef.current?.children[next]?.scrollIntoView({
+    trackRef.current.scrollTo({
+      left: card.offsetLeft - (trackRef.current.clientWidth - card.clientWidth) / 2,
       behavior: "smooth",
-      block: "nearest",
-      inline: "center",
     });
   };
 
@@ -53,11 +71,11 @@ export const Gallery = () => {
       <div className="promo-showcase-header">
         <Reveal>
           <span>Selecție vizuală</span>
-          <h2 id="promo-showcase-title">Imagini, filme și direcții de spectacol.</h2>
+          <h2 id="promo-showcase-title">Cadre reale. Spectacol în mișcare.</h2>
         </Reveal>
         <Reveal delay={0.08}>
           <div className="promo-showcase-tools">
-            <p>O selecție scurtă din producțiile FIREARTRO. Galeria completă reunește toate formatele într-un singur loc.</p>
+            <p>Trage, derulează sau folosește săgețile. Galeria completă reunește fotografiile și filmele FireArtRo.</p>
             <div>
               <button type="button" onClick={() => goTo(active - 1)} aria-label="Slide anterior">
                 <ArrowLeft />
@@ -73,10 +91,26 @@ export const Gallery = () => {
       <div
         ref={trackRef}
         className="promo-showcase-track"
-        onScroll={(event) => {
-          const track = event.currentTarget;
-          const width = track.firstElementChild?.getBoundingClientRect().width || 1;
-          setActive(Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / width))));
+        onScroll={updateActive}
+        onPointerDown={(event) => {
+          pointerRef.current = {
+            x: event.clientX,
+            scrollLeft: event.currentTarget.scrollLeft,
+          };
+          event.currentTarget.setPointerCapture?.(event.pointerId);
+        }}
+        onPointerMove={(event) => {
+          if (!pointerRef.current) return;
+          event.currentTarget.scrollLeft =
+            pointerRef.current.scrollLeft - (event.clientX - pointerRef.current.x);
+        }}
+        onPointerUp={(event) => {
+          pointerRef.current = null;
+          event.currentTarget.releasePointerCapture?.(event.pointerId);
+          updateActive();
+        }}
+        onPointerCancel={() => {
+          pointerRef.current = null;
         }}
       >
         {slides.map((item, index) => (

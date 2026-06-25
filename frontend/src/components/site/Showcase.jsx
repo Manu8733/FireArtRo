@@ -9,10 +9,10 @@ import {
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PORTFOLIO } from "@/data/content";
 import { useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { goToContact } from "@/lib/contactNavigation";
 
 const EASE = [0.22, 1, 0.36, 1];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
 export const Showcase = () => {
   const ref = useRef(null);
@@ -112,7 +112,7 @@ export const Showcase = () => {
               <p className="mt-4 max-w-xl text-sm font-light leading-relaxed text-white/72 md:mt-6 md:text-lg">{project.desc}</p>
               <button
                 type="button"
-                onClick={() => scrollTo("#contact")}
+                onClick={() => goToContact()}
                 data-testid="showcase-cta"
                 className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/28 px-5 py-3 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/10 md:mt-8 md:px-6"
               >

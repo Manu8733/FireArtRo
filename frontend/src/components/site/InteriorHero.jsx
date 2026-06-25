@@ -12,7 +12,6 @@ export default function InteriorHero({
   primaryLabel,
   secondaryHref,
   secondaryLabel,
-  index,
 }) {
   const reduce = useReducedMotion();
   const item = reduce
@@ -52,17 +51,6 @@ export default function InteriorHero({
               )}
             </div>
           )}
-        </motion.div>
-        <motion.div
-          className="interior-hero-index"
-          initial={reduce ? undefined : { opacity: 0, scale: 0.92 }}
-          animate={reduce ? undefined : { opacity: 1, scale: 1 }}
-          transition={{ duration: 0.9, delay: 0.18, ease: EASE }}
-          aria-hidden="true"
-        >
-          <span>FIREARTRO</span>
-          <strong>{index}</strong>
-          <i />
         </motion.div>
       </div>
     </section>

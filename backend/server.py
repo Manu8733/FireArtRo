@@ -23,7 +23,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI(title="FIREARTRO API")
+app = FastAPI(title="FireArtRo API")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -101,7 +101,7 @@ class Quote(BaseModel):
 # ---------- Routes ----------
 @api_router.get("/")
 async def root():
-    return {"message": "FIREARTRO API"}
+    return {"message": "FireArtRo API"}
 
 
 @api_router.post("/quotes", response_model=Quote)

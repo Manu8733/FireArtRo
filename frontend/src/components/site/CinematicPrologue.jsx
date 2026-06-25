@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { HERO_POSTER, MEDIA } from "@/data/content";
-import { useIsAppleWebKit, useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { useIsTouchDevice } from "@/hooks/useMediaQuery";
 
 const EASE = [0.22, 1, 0.36, 1];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -18,7 +18,7 @@ const SCENES = [
     motion: "rise",
   },
   {
-    kicker: "Semnătura FIREARTRO",
+    kicker: "Semnătura FireArtRo",
     title: "Ideea devine ritm, formă și intensitate.",
     text: "Construim un fir vizual potrivit locului și momentului.",
     image: MEDIA.droneShow2,
@@ -56,8 +56,7 @@ export const CinematicPrologue = () => {
   const ref = useRef(null);
   const reduce = useReducedMotion();
   const touch = useIsTouchDevice();
-  const appleWebKit = useIsAppleWebKit();
-  const constrainedMotion = touch || appleWebKit;
+  const constrainedMotion = touch;
   const [active, setActive] = useState(0);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 

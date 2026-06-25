@@ -30,7 +30,7 @@ export const Faq = () => {
               Detaliile tehnice se schimbă de la o locație la alta. Aici găsești răspunsurile care te ajută să începi brief-ul corect.
             </p>
             <a
-              href={directContactHref || "#contact"}
+              href={directContactHref || "/contact"}
               {...(directContactHref ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-white"
             >

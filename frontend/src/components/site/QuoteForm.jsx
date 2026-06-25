@@ -10,6 +10,7 @@ import {
   SERVICE_INTEREST_OPTIONS,
 } from "@/data/businessContent";
 import { whatsappLink, PHONE_DISPLAY, EMAIL } from "@/lib/constants";
+import { readContactPrefill } from "@/lib/contactNavigation";
 
 const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/$/, "");
 const API = `${BACKEND_URL}/api`;
@@ -37,6 +38,15 @@ export const QuoteForm = () => {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    const prefill = readContactPrefill();
+    if (Object.keys(prefill).length) {
+      setForm((current) => ({
+        ...current,
+        ...prefill,
+        services: [...new Set([...(current.services || []), ...(prefill.services || [])])],
+      }));
+    }
+
     const handler = (event) => {
       const item = event.detail;
       setForm((current) => ({
@@ -209,10 +219,16 @@ export const QuoteForm = () => {
                       {PACKAGE_ITEMS.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
                     </select>
                   </div>
-                  <fieldset className="contact-services contact-field-wide">
-                    <legend>Servicii de interes *</legend>
-                    <p>Poți selecta mai multe opțiuni.</p>
-                    <div>
+                  <details className="contact-services contact-field-wide" open={form.services.length > 0}>
+                    <summary>
+                      <span>Servicii de interes *</span>
+                      <small>
+                        {form.services.length
+                          ? `${form.services.length} ${form.services.length === 1 ? "opțiune selectată" : "opțiuni selectate"}`
+                          : "Alege una sau mai multe"}
+                      </small>
+                    </summary>
+                    <div className="contact-services-options">
                       {SERVICE_INTEREST_OPTIONS.map((service) => (
                         <label key={service}>
                           <input
@@ -224,7 +240,7 @@ export const QuoteForm = () => {
                         </label>
                       ))}
                     </div>
-                  </fieldset>
+                  </details>
                   <div className="contact-field contact-field-wide">
                     <label htmlFor="quote-message">Mesaj</label>
                     <textarea id="quote-message" value={form.message} onChange={(e) => update("message", e.target.value)} rows={4} placeholder="Detalii despre moment, public, muzică sau accesul în locație" />

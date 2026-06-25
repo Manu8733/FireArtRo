@@ -4,13 +4,12 @@ import Reveal from "@/components/site/Reveal";
 import { MagneticButton } from "@/components/site/cinematic";
 import { whatsappLink } from "@/lib/constants";
 import { useIsMobile } from "@/hooks/useMediaQuery";
-
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+import { goToContact } from "@/lib/contactNavigation";
 
 export const FinalCta = () => {
   const mobile = useIsMobile();
   return (
-    <section className="relative py-20 sm:py-28 md:py-36 overflow-hidden noise-overlay" data-testid="final-cta-section">
+    <section className="final-cta-cinema relative overflow-hidden" data-testid="final-cta-section">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(23, 107, 255,0.25),_transparent_60%)]" />
       <div className="absolute inset-0 bg-aurora-pan opacity-70" />
       {!mobile && <Particles density={50} className="absolute inset-0 w-full h-full pointer-events-none" />}
@@ -34,7 +33,7 @@ export const FinalCta = () => {
         <Reveal delay={0.15}>
           <div className="mt-10 flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center">
             <MagneticButton
-              onClick={() => scrollTo("#contact")}
+              onClick={() => goToContact()}
               data-testid="final-cta-primary"
               className="btn-grad shine group inline-flex items-center justify-center gap-2 text-white font-semibold px-8 py-4 rounded-full"
             >

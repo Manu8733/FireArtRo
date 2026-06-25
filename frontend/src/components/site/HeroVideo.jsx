@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { HERO_POSTER, HERO_VIDEOS } from "@/data/content";
-import { useIsAppleWebKit, useIsMobile } from "@/hooks/useMediaQuery";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 export const HeroVideo = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const mobile = useIsMobile();
-  const appleWebKit = useIsAppleWebKit();
   const [enabled, setEnabled] = useState(true);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(0);
@@ -20,7 +19,7 @@ export const HeroVideo = () => {
   }, []);
 
   useEffect(() => {
-    if (!enabled || (appleWebKit && mobile)) return;
+    if (!enabled) return;
     const next = HERO_VIDEOS[(active + 1) % HERO_VIDEOS.length];
     const preload = document.createElement("video");
     preload.preload = "metadata";
@@ -30,7 +29,7 @@ export const HeroVideo = () => {
       preload.removeAttribute("src");
       preload.load();
     };
-  }, [active, appleWebKit, enabled, mobile]);
+  }, [active, enabled, mobile]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -69,13 +68,13 @@ export const HeroVideo = () => {
   };
 
   return (
-    <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden">
+    <div ref={containerRef} className="hero-video-stage absolute inset-0 z-0 overflow-hidden">
       <img
         src={HERO_POSTER}
-        alt="Spectacol de drone și artificii FIREARTRO"
+        alt="Spectacol de drone și artificii FireArtRo"
         width="800"
         height="1600"
-        className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
+        className="hero-media-surface absolute inset-0 h-full w-full object-cover"
         fetchPriority="high"
         decoding="async"
       />
@@ -84,11 +83,12 @@ export const HeroVideo = () => {
         <video
           key={source}
           ref={videoRef}
-          className="hero-media-video absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
+          className="hero-media-surface hero-media-video absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
           style={{ opacity: ready ? 1 : 0 }}
           poster={HERO_POSTER}
           autoPlay
           muted
+          loop={HERO_VIDEOS.length === 1}
           playsInline
           preload={active === 0 ? "auto" : "metadata"}
           disablePictureInPicture

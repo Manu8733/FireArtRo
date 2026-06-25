@@ -3,9 +3,9 @@ import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, u
 import { ArrowRight, Check } from "lucide-react";
 import { SERVICES } from "@/data/content";
 import { useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { goToContact } from "@/lib/contactNavigation";
 
 const EASE = [0.16, 1, 0.3, 1];
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
 const DETAILS = [
   { impact: "Silencios & precis", environment: "Outdoor", role: "Poveste, logo, mesaje" },
@@ -127,7 +127,7 @@ export const Services = () => {
             <div><dt>Rol în eveniment</dt><dd>{detail.role}</dd></div>
             <div><dt>Potrivit pentru</dt><dd>{service.ideal}</dd></div>
           </dl>
-          <button type="button" onClick={() => scrollTo("#contact")}>
+          <button type="button" onClick={() => goToContact({ services: [service.title] })}>
             Configurează direcția <ArrowRight />
           </button>
         </motion.aside>

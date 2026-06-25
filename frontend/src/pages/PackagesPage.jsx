@@ -2,21 +2,20 @@ import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import InteriorHero from "@/components/site/InteriorHero";
 import Packages from "@/components/site/Packages";
-import QuoteForm from "@/components/site/QuoteForm";
 import Footer from "@/components/site/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
 import { PACKAGE_ITEMS, SITE_DETAILS } from "@/data/businessContent";
 
 export default function PackagesPage() {
   usePageMeta({
-    title: "Pachete spectacole cu drone și artificii — FIREARTRO",
+    title: "Pachete spectacole cu drone și artificii — FireArtRo",
     description:
-      "Compară pachetele FIREARTRO pentru artificii profesionale, drone show, spectacole combinate și efecte speciale. Solicită o configurație adaptată evenimentului.",
+      "Compară pachetele FireArtRo pentru artificii profesionale, drone show, spectacole combinate și efecte speciale. Solicită o configurație adaptată evenimentului.",
     path: "/pachete",
     schema: {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      name: "Pachete FIREARTRO",
+      name: "Pachete FireArtRo",
       url: `${SITE_DETAILS.siteUrl}/pachete`,
       itemListElement: PACKAGE_ITEMS.map((item, index) => ({
         "@type": "ListItem",
@@ -36,20 +35,18 @@ export default function PackagesPage() {
       <ScrollProgress />
       <Navbar />
       <InteriorHero
-        eyebrow="Pachete FIREARTRO"
+        eyebrow="Pachete FireArtRo"
         title="Un punct de plecare clar."
         accent="Un spectacol construit pentru tine."
         description="Alegi direcția vizuală, iar noi adaptăm durata, tehnologia, logistica și intensitatea la locația și momentul evenimentului."
-        primaryHref="#contact"
+        primaryHref="/contact"
         primaryLabel="Solicită configurația"
         secondaryHref="#optiuni"
         secondaryLabel="Compară opțiunile"
-        index="01"
       />
       <div id="optiuni" className="interior-section-anchor">
         <Packages full />
       </div>
-      <QuoteForm />
       <Footer />
     </main>
   );

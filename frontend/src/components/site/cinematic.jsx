@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useInView, useReducedMotion } from "framer-motion";
-import { useIsAppleWebKit, useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
 
 export const EASE = [0.16, 1, 0.3, 1];
 
@@ -196,10 +196,9 @@ export const Parallax = ({ children, range = 60, className }) => {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
   const touch = useIsTouchDevice();
-  const appleWebKit = useIsAppleWebKit();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [-range / 2, range / 2]);
-  if (reduce || mobile || touch || appleWebKit) return <div className={className}>{children}</div>;
+  if (reduce || mobile || touch) return <div className={className}>{children}</div>;
   return (
     <motion.div ref={ref} style={{ y }} className={className}>
       {children}

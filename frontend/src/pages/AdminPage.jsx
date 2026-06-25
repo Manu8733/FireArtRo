@@ -29,8 +29,8 @@ export default function AdminPage() {
   const [status, setStatus] = useState("");
 
   usePageMeta({
-    title: "Administrare conținut local | FIREARTRO",
-    description: "Editor local pentru conținutul FIREARTRO.",
+    title: "Administrare conținut local | FireArtRo",
+    description: "Editor local pentru conținutul FireArtRo.",
     path: "/admin",
     noindex: true,
   });
@@ -98,7 +98,7 @@ export default function AdminPage() {
       <Navbar />
       <section className="admin-content" aria-labelledby="admin-title">
         <header>
-          <span>Editor local FIREARTRO</span>
+          <span>Editor local FireArtRo</span>
           <h1 id="admin-title">Conținut ușor de actualizat.</h1>
           <p>
             Modificările se salvează doar în browserul curent. Pentru publicare globală, exportă JSON-ul și actualizează

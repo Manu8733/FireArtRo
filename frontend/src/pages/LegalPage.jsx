@@ -12,13 +12,13 @@ const LEGAL_PAGES = {
     eyebrow: "Protecția datelor",
     title: "Politica de confidențialitate",
     description:
-      "Cum colectează, folosește și protejează FIREARTRO datele transmise prin site.",
+      "Cum colectează, folosește și protejează FireArtRo datele transmise prin site.",
     updated: "24 iunie 2026",
     sections: [
       {
         title: "Operatorul datelor",
         body: [
-          `Datele transmise prin acest site sunt administrate de FIREARTRO. Pentru orice solicitare privind datele personale ne poți scrie la ${EMAIL}.`,
+          `Datele transmise prin acest site sunt administrate de FireArtRo. Pentru orice solicitare privind datele personale ne poți scrie la ${EMAIL}.`,
         ],
       },
       {
@@ -60,20 +60,20 @@ const LEGAL_PAGES = {
     eyebrow: "Condiții de utilizare",
     title: "Termeni și condiții",
     description:
-      "Regulile generale pentru utilizarea site-ului și solicitarea serviciilor FIREARTRO.",
+      "Regulile generale pentru utilizarea site-ului și solicitarea serviciilor FireArtRo.",
     updated: "24 iunie 2026",
     sections: [
       {
         title: "Rolul site-ului",
         body: [
-          "Site-ul prezintă serviciile FIREARTRO și permite trimiterea unei solicitări de ofertă. Informațiile au caracter general și pot fi actualizate pe măsură ce serviciile evoluează.",
+          "Site-ul prezintă serviciile FireArtRo și permite trimiterea unei solicitări de ofertă. Informațiile au caracter general și pot fi actualizate pe măsură ce serviciile evoluează.",
         ],
       },
       {
         title: "Oferte și rezervări",
         body: [
           "Trimiterea formularului nu reprezintă o rezervare și nu creează automat o obligație contractuală. Oferta finală este stabilită după verificarea locației, datei, cerințelor tehnice și condițiilor de siguranță.",
-          "O rezervare devine fermă numai după acceptarea condițiilor comerciale și tehnice comunicate de FIREARTRO.",
+          "O rezervare devine fermă numai după acceptarea condițiilor comerciale și tehnice comunicate de FireArtRo.",
         ],
       },
       {
@@ -92,7 +92,7 @@ const LEGAL_PAGES = {
       {
         title: "Limitarea răspunderii",
         body: [
-          "FIREARTRO urmărește menținerea informațiilor corecte și a site-ului disponibil, dar nu poate garanta funcționarea neîntreruptă sau lipsa completă a erorilor tehnice.",
+          "FireArtRo urmărește menținerea informațiilor corecte și a site-ului disponibil, dar nu poate garanta funcționarea neîntreruptă sau lipsa completă a erorilor tehnice.",
           "Condițiile specifice fiecărui proiect sunt cele prevăzute în oferta și documentele acceptate de părți.",
         ],
       },
@@ -103,13 +103,13 @@ const LEGAL_PAGES = {
     eyebrow: "Preferințe și stocare locală",
     title: "Politica de cookies",
     description:
-      "Ce tehnologii de stocare poate utiliza site-ul FIREARTRO și cum le poți controla.",
+      "Ce tehnologii de stocare poate utiliza site-ul FireArtRo și cum le poți controla.",
     updated: "24 iunie 2026",
     sections: [
       {
         title: "Ce stocăm în browser",
         body: [
-          "Site-ul poate folosi cookie-uri și localStorage, adică mecanisme prin care browserul păstrează preferințe tehnice. FIREARTRO folosește aceste mecanisme numai pentru funcții explicate în această politică.",
+          "Site-ul poate folosi cookie-uri și localStorage, adică mecanisme prin care browserul păstrează preferințe tehnice. FireArtRo folosește aceste mecanisme numai pentru funcții explicate în această politică.",
           "Alegerea făcută în bannerul de consimțământ este salvată local timp de maximum 180 de zile, după care site-ul solicită din nou preferințele.",
         ],
       },
@@ -123,7 +123,7 @@ const LEGAL_PAGES = {
       {
         title: "Analiză opțională",
         body: [
-          "Categoria Analiză este dezactivată implicit. Ea poate fi folosită numai dacă FIREARTRO configurează ulterior un instrument de măsurare și numai după acceptul explicit al vizitatorului.",
+          "Categoria Analiză este dezactivată implicit. Ea poate fi folosită numai dacă FireArtRo configurează ulterior un instrument de măsurare și numai după acceptul explicit al vizitatorului.",
           "În starea actuală, acceptarea categoriei pregătește preferința, dar nu activează automat un furnizor de analiză neconfigurat.",
         ],
       },
@@ -138,7 +138,7 @@ const LEGAL_PAGES = {
         title: "Marketing și servicii viitoare",
         body: [
           "Categoria Conținut extern și marketing este dezactivată implicit. Orice pixel, instrument publicitar sau integrare nouă trebuie documentată aici și condiționată de consimțământ înainte de activare.",
-          "FIREARTRO nu activează automat publicitate personalizată doar pentru că vizitatorul deschide site-ul.",
+          "FireArtRo nu activează automat publicitate personalizată doar pentru că vizitatorul deschide site-ul.",
         ],
       },
       {
@@ -169,7 +169,7 @@ export default function LegalPage({ type = "confidentialitate" }) {
   const data = LEGAL_PAGES[type] || LEGAL_PAGES.confidentialitate;
 
   usePageMeta({
-    title: `${data.title} — FIREARTRO`,
+    title: `${data.title} — FireArtRo`,
     description: data.description,
     path: data.path,
   });

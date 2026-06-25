@@ -2,9 +2,9 @@ import { useRef } from "react";
 import { motion, useInView, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { PROCESS } from "@/data/content";
+import { goToContact } from "@/lib/contactNavigation";
 
 const EASE = [0.16, 1, 0.3, 1];
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 const BURST_RAYS = Array.from({ length: 16 }, (_, index) => index);
 const BURST_DOTS = Array.from({ length: 12 }, (_, index) => index);
 
@@ -32,7 +32,7 @@ const ProcessFinale = ({ reduce }) => {
       <span>Etapa 05 completă</span>
       <h3>Spectacolul este gata să înceapă.</h3>
       <p>Toate deciziile ajung într-un singur moment coordonat.</p>
-      <button type="button" onClick={() => scrollTo("#contact")}>
+      <button type="button" onClick={() => goToContact()}>
         Pornește proiectul <ArrowRight />
       </button>
     </motion.div>

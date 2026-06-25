@@ -168,7 +168,7 @@ export const CHAPTERS = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Why FIREARTRO                                                      */
+/*  Why FireArtRo                                                      */
 /* ------------------------------------------------------------------ */
 export const WHY = [
   { icon: Wand2, title: "Design 100% personalizat", desc: "Fiecare spectacol este creat de la zero, în jurul poveștii evenimentului tău." },
@@ -349,13 +349,13 @@ export const EVENT_TYPES = ["Nuntă", "Corporate", "Festival", "Lansare de produ
 
 export const NAV_LINKS = [
   { label: "Acasă", href: "#acasa" },
-  { label: "Servicii", href: "#servicii" },
+  { label: "Direcții", href: "#pachete" },
   { label: "Spectacole", href: "#spectacole" },
   { label: "Proces", href: "#proces" },
   { label: "Pachete", href: "/pachete" },
   { label: "Galerie", href: "/galerie" },
   { label: "Întrebări", href: "/intrebari-frecvente" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 // Unused icon kept to avoid tree-shake surprises in data consumers

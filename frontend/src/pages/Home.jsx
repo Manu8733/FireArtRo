@@ -1,17 +1,14 @@
 import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
 import CinematicPrologue from "@/components/site/CinematicPrologue";
-import Chapters from "@/components/site/Chapters";
 import Stats from "@/components/site/Stats";
-import Services from "@/components/site/Services";
 import Showcase from "@/components/site/Showcase";
 import WhyUs from "@/components/site/WhyUs";
 import Process from "@/components/site/Process";
-import Packages from "@/components/site/Packages";
+import OfferJourney from "@/components/site/OfferJourney";
 import Gallery from "@/components/site/Gallery";
 import Testimonials from "@/components/site/Testimonials";
 import Partners from "@/components/site/Partners";
-import QuoteForm from "@/components/site/QuoteForm";
 import FinalCta from "@/components/site/FinalCta";
 import Footer from "@/components/site/Footer";
 import SocialDock from "@/components/site/SocialDock";
@@ -22,9 +19,9 @@ import { BUSINESS_HOURS, SITE_DETAILS } from "@/data/businessContent";
 
 export default function Home() {
   usePageMeta({
-    title: "Spectacole cu drone și artificii pentru evenimente | FIREARTRO",
+    title: "Spectacole cu drone și artificii pentru evenimente | FireArtRo",
     description:
-      "FIREARTRO creează drone show-uri, artificii de zi și de noapte, cold sparks și spectacole sincronizate pentru nunți, corporate și festivaluri în România.",
+      "FireArtRo creează drone show-uri, artificii de zi și de noapte, cold sparks și spectacole sincronizate pentru nunți, corporate și festivaluri în România.",
     path: "/",
     schema: {
       "@context": "https://schema.org",
@@ -56,14 +53,8 @@ export default function Home() {
 
       <CinematicPrologue />
 
-      <Chapters />
-
       <CinematicScene index={2} label="Dovezi" accent="#8F6BFF" motionType="focus">
         <Stats />
-      </CinematicScene>
-
-      <CinematicScene id="servicii" index={3} label="Servicii" accent="#176BFF" motionType="curtain">
-        <Services />
       </CinematicScene>
 
       <Showcase />
@@ -74,9 +65,7 @@ export default function Home() {
 
       <Process />
 
-      <CinematicScene id="pachete" index={5} label="Pachete" accent="#176BFF" motionType="depth">
-        <Packages />
-      </CinematicScene>
+      <OfferJourney />
 
       <CinematicScene id="galerie" index={6} label="Galerie" accent="#5AA9FF" motionType="fold">
         <Gallery />
@@ -88,9 +77,10 @@ export default function Home() {
 
       <Partners />
 
-      <QuoteForm />
-      <FinalCta />
-      <Footer />
+      <div className="site-ending">
+        <FinalCta />
+        <Footer />
+      </div>
       <SocialDock />
     </main>
   );

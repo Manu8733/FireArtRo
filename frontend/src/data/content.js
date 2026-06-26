@@ -26,10 +26,24 @@ export const HERO_POSTER =
   "/media/fireart-hero-poster.webp";
 
 export const HERO_VIDEOS = [
-  { src: "/media/fireart-hero.mp4", mobileSrc: "/media/fireart-hero-mobile.mp4", label: "Artificii" },
-  { src: "/media/fireart-drone.mp4", mobileSrc: "/media/fireart-drone-mobile.mp4", label: "Drone" },
-  { src: "/media/fireart-moments.mp4", mobileSrc: "/media/fireart-moments-mobile.mp4", label: "Momente" },
-  { src: "/media/fireart-spectacle.mp4", mobileSrc: "/media/fireart-spectacle-mobile.mp4", label: "Spectacol" },
+  {
+    src: "/media/hero-loop-aerial.mp4",
+    mobileSrc: "/media/hero-loop-aerial-mobile.mp4",
+    label: "Cadru aerian cu oras luminat si artificii la distanta",
+    position: "50% 44%",
+  },
+  {
+    src: "/media/hero-loop-fireworks.mp4",
+    mobileSrc: "/media/hero-loop-fireworks-mobile.mp4",
+    label: "Artificii realiste pentru eveniment de seara",
+    position: "52% 50%",
+  },
+  {
+    src: "/media/hero-loop-show.mp4",
+    mobileSrc: "/media/hero-loop-show-mobile.mp4",
+    label: "Show luminos cu drone si artificii sincronizate",
+    position: "50% 46%",
+  },
 ];
 
 // Curated cinematic stills (drone light shows · fireworks · cold sparks)
@@ -205,6 +219,49 @@ export const PROCESS = [
 /* ------------------------------------------------------------------ */
 /*  Packages                                                           */
 /* ------------------------------------------------------------------ */
+export const PROCESS_ENHANCED = [
+  {
+    step: "01",
+    title: "Brief eveniment",
+    desc: "Stabilim tipul evenimentului, locația, publicul și momentul cheie pentru drone show, artificii sau efecte speciale.",
+    result: "Direcție clară pentru ofertă",
+    keywords: ["locație", "public", "moment"],
+    icon: ClipboardList,
+  },
+  {
+    step: "02",
+    title: "Concept vizual",
+    desc: "Transformăm ideea într-o coregrafie luminoasă: forme, culori, ritm, muzică și intensitatea potrivită atmosferei.",
+    result: "Scenariu vizual propus",
+    keywords: ["coregrafie", "muzică", "culori"],
+    icon: Palette,
+  },
+  {
+    step: "03",
+    title: "Planificare tehnică",
+    desc: "Verificăm spațiul, vizibilitatea, accesul, vântul, siguranța și condițiile reale pentru execuția spectacolului.",
+    result: "Plan tehnic verificat",
+    keywords: ["spațiu", "siguranță", "logistică"],
+    icon: Settings2,
+  },
+  {
+    step: "04",
+    title: "Autorizări și sincronizare",
+    desc: "Pregătim avizele, echipa, echipamentul și sincronizarea dintre drone, artificii, cold sparks și muzică.",
+    result: "Show pregătit de execuție",
+    keywords: ["avize", "echipă", "teste"],
+    icon: Wrench,
+  },
+  {
+    step: "05",
+    title: "Execuție live",
+    desc: "Rulăm spectacolul coordonat în timp real, cu atenție la siguranță, ritm și impactul vizual al momentului final.",
+    result: "Moment memorabil pentru public",
+    keywords: ["live", "impact", "final"],
+    icon: Rocket,
+  },
+];
+
 export const PACKAGES = [
   {
     icon: Flame,
@@ -349,7 +406,7 @@ export const EVENT_TYPES = ["Nuntă", "Corporate", "Festival", "Lansare de produ
 
 export const NAV_LINKS = [
   { label: "Acasă", href: "#acasa" },
-  { label: "Direcții", href: "#pachete" },
+  { label: "Despre noi", href: "#intro" },
   { label: "Spectacole", href: "#spectacole" },
   { label: "Proces", href: "#proces" },
   { label: "Pachete", href: "/pachete" },

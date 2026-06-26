@@ -1,16 +1,23 @@
-import { useRef } from "react";
-import { motion, useInView, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useRef, useState } from "react";
+import {
+  motion,
+  useInView,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { PROCESS } from "@/data/content";
+import { PROCESS_ENHANCED } from "@/data/content";
 import { goToContact } from "@/lib/contactNavigation";
 
 const EASE = [0.16, 1, 0.3, 1];
-const BURST_RAYS = Array.from({ length: 16 }, (_, index) => index);
-const BURST_DOTS = Array.from({ length: 12 }, (_, index) => index);
+const PROCESS_ITEMS = PROCESS_ENHANCED;
 
 const ProcessFinale = ({ reduce }) => {
   const ref = useRef(null);
-  const visible = useInView(ref, { once: true, amount: 0.58 });
+  const visible = useInView(ref, { once: true, amount: 0.5 });
 
   return (
     <motion.div
@@ -20,18 +27,14 @@ const ProcessFinale = ({ reduce }) => {
       animate={visible || reduce ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: 0.7, ease: EASE }}
     >
-      <div className={`process-firework ${visible ? "is-active" : ""}`} aria-hidden="true">
-        <span className="process-firework-core" />
-        {BURST_RAYS.map((ray) => (
-          <i key={`ray-${ray}`} className="process-firework-ray" style={{ "--ray": ray }} />
-        ))}
-        {BURST_DOTS.map((dot) => (
-          <b key={`dot-${dot}`} className="process-firework-dot" style={{ "--dot": dot }} />
-        ))}
+      <div className={`process-signal ${visible ? "is-active" : ""}`} aria-hidden="true">
+        <span />
+        <i />
+        <b />
       </div>
       <span>Etapa 05 completă</span>
       <h3>Spectacolul este gata să înceapă.</h3>
-      <p>Toate deciziile ajung într-un singur moment coordonat.</p>
+      <p>Brief, concept, plan tehnic și execuție live ajung într-un singur moment coordonat.</p>
       <button type="button" onClick={() => goToContact()}>
         Pornește proiectul <ArrowRight />
       </button>
@@ -42,12 +45,18 @@ const ProcessFinale = ({ reduce }) => {
 export const Process = () => {
   const ref = useRef(null);
   const reduce = useReducedMotion();
+  const [activeStep, setActiveStep] = useState(0);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start 64%", "end 54%"],
+    offset: ["start 68%", "end 44%"],
   });
   const progress = useSpring(scrollYProgress, { stiffness: 95, damping: 28, mass: 0.34 });
   const scaleY = useTransform(progress, [0, 1], [0, 1]);
+
+  useMotionValueEvent(progress, "change", (value) => {
+    const next = Math.min(PROCESS_ITEMS.length - 1, Math.max(0, Math.floor(value * PROCESS_ITEMS.length)));
+    setActiveStep(next);
+  });
 
   return (
     <section
@@ -59,8 +68,13 @@ export const Process = () => {
     >
       <header className="process-story-header">
         <span>Cum lucrăm</span>
-        <h2 id="process-title">Cinci pași. Un singur fir logic.</h2>
-        <p>Fiecare etapă pregătește următoarea, până când conceptul devine spectacol.</p>
+        <h2 id="process-title">Proces clar pentru drone show-uri, artificii și efecte speciale.</h2>
+        <p>De la brief la execuție live, fiecare pas are un rezultat concret și reduce riscul din seara evenimentului.</p>
+        <div className="process-scroll-cue" aria-hidden="true">
+          <span>Derulează procesul</span>
+          <i />
+          <strong>{String(activeStep + 1).padStart(2, "0")} / {String(PROCESS_ITEMS.length).padStart(2, "0")}</strong>
+        </div>
       </header>
 
       <div className="process-story-timeline">
@@ -68,13 +82,14 @@ export const Process = () => {
           <motion.span style={reduce ? { scaleY: 1 } : { scaleY }} />
         </div>
 
-        {PROCESS.map((item, index) => {
+        {PROCESS_ITEMS.map((item, index) => {
           const Icon = item.icon;
           const side = index % 2 === 0 ? "left" : "right";
+          const isActive = index <= activeStep;
           return (
             <motion.article
               key={item.step}
-              className={`process-story-step process-story-step-${side}`}
+              className={`process-story-step process-story-step-${side} ${isActive ? "is-active" : ""}`}
               data-testid={`process-step-${index}`}
               initial={reduce ? false : { opacity: 0, x: side === "left" ? -32 : 32, y: 18 }}
               whileInView={reduce ? undefined : { opacity: 1, x: 0, y: 0 }}
@@ -88,6 +103,10 @@ export const Process = () => {
                 <span>{item.step}</span>
                 <h3>{item.title}</h3>
                 <p>{item.desc}</p>
+                <div className="process-story-tags" aria-label={`Repere pentru ${item.title}`}>
+                  {item.keywords.map((keyword) => <small key={keyword}>{keyword}</small>)}
+                </div>
+                <strong>{item.result}</strong>
               </div>
             </motion.article>
           );

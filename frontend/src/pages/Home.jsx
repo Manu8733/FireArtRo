@@ -5,8 +5,6 @@ import Stats from "@/components/site/Stats";
 import Showcase from "@/components/site/Showcase";
 import WhyUs from "@/components/site/WhyUs";
 import Process from "@/components/site/Process";
-import OfferJourney from "@/components/site/OfferJourney";
-import Gallery from "@/components/site/Gallery";
 import Testimonials from "@/components/site/Testimonials";
 import Partners from "@/components/site/Partners";
 import FinalCta from "@/components/site/FinalCta";
@@ -33,7 +31,8 @@ export default function Home() {
           email: SITE_DETAILS.email,
           areaServed: { "@type": "Country", name: SITE_DETAILS.areaServed },
           openingHours: BUSINESS_HOURS.schema,
-          description: "Producție de spectacole cu drone, artificii profesionale și efecte speciale pentru evenimente.",
+          description:
+            "Producție de spectacole cu drone, artificii profesionale și efecte speciale pentru evenimente.",
         },
         {
           "@type": "Service",
@@ -51,13 +50,12 @@ export default function Home() {
       <Navbar />
       <Hero />
 
-      <CinematicPrologue />
+      <span id="intro" className="interior-section-anchor" aria-hidden="true" />
+      <Showcase />
 
       <CinematicScene index={2} label="Dovezi" accent="#8F6BFF" motionType="focus">
         <Stats />
       </CinematicScene>
-
-      <Showcase />
 
       <CinematicScene index={4} label="Siguranță" accent="#3A86FF" motionType="aperture">
         <WhyUs />
@@ -65,11 +63,7 @@ export default function Home() {
 
       <Process />
 
-      <OfferJourney />
-
-      <CinematicScene id="galerie" index={6} label="Galerie" accent="#5AA9FF" motionType="fold">
-        <Gallery />
-      </CinematicScene>
+      <CinematicPrologue />
 
       <CinematicScene index={7} label="Încredere" accent="#8F6BFF" motionType="lift">
         <Testimonials />

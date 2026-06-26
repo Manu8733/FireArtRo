@@ -2,14 +2,11 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import HeroVideo from "@/components/site/HeroVideo";
-import Particles from "@/components/site/Particles";
-import FloatingLogos from "@/components/site/FloatingLogos";
 import { MagneticButton } from "@/components/site/cinematic";
-import { useIsAppleWebKit, useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { useIsMobile, useIsTouchDevice } from "@/hooks/useMediaQuery";
 import { TRUST_BADGES } from "@/data/businessContent";
 import { goToContact } from "@/lib/contactNavigation";
-
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+import { scrollToHash } from "@/lib/scrollNavigation";
 
 const EASE = [0.22, 1, 0.36, 1];
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } } };
@@ -23,7 +20,6 @@ export const Hero = () => {
   const reduce = useReducedMotion();
   const mobile = useIsMobile();
   const touch = useIsTouchDevice();
-  const appleWebKit = useIsAppleWebKit();
   const constrainedMotion = mobile || touch;
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
@@ -66,10 +62,6 @@ export const Hero = () => {
       <div className="hero-media-shell absolute inset-0 z-0">
         <HeroVideo />
       </div>
-      {!constrainedMotion && <FloatingLogos />}
-      {!constrainedMotion && (
-        <Particles density={appleWebKit ? 38 : 60} className="absolute inset-0 z-10 w-full h-full pointer-events-none" />
-      )}
 
       {/* Floating + parallax aurora trails */}
       <motion.div
@@ -105,7 +97,7 @@ export const Hero = () => {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </MagneticButton>
             <MagneticButton
-              onClick={() => scrollTo("#spectacole")}
+              onClick={() => scrollToHash("#spectacole")}
               data-testid="hero-secondary-cta"
               className="shine inline-flex items-center justify-center gap-2 glass text-white font-semibold px-7 py-3.5 sm:px-8 sm:py-4 rounded-full hover:bg-white/10"
             >
@@ -125,7 +117,7 @@ export const Hero = () => {
       </div>
 
       <motion.button
-        onClick={() => scrollTo("#intro")}
+        onClick={() => scrollToHash("#intro")}
         style={reduce ? undefined : { opacity }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

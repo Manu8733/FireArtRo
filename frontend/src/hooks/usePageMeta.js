@@ -54,7 +54,6 @@ export default function usePageMeta({
       document.head.appendChild(script);
     }
 
-    window.scrollTo({ top: 0, behavior: "auto" });
     return () => document.getElementById(schemaId)?.remove();
   }, [description, image, noindex, path, schema, title]);
 }

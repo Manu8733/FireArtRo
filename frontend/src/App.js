@@ -1,9 +1,10 @@
 import { lazy, Suspense, useEffect } from "react";
 import "@/App.css";
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Home from "@/pages/Home";
 import CookieConsent from "@/components/site/CookieConsent";
+import { scrollToHash, scrollToTop, syncScrollOffset } from "@/lib/scrollNavigation";
 
 const GalleryPage = lazy(() => import("@/pages/GalleryPage"));
 const PackagesPage = lazy(() => import("@/pages/PackagesPage"));
@@ -11,6 +12,24 @@ const FaqPage = lazy(() => import("@/pages/FaqPage"));
 const ContactPage = lazy(() => import("@/pages/ContactPage"));
 const LegalPage = lazy(() => import("@/pages/LegalPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
+
+function RouteScrollManager() {
+  const location = useLocation();
+
+  useEffect(() => {
+    syncScrollOffset();
+    const timer = window.setTimeout(() => {
+      if (location.hash) {
+        scrollToHash(location.hash, "auto");
+      } else {
+        scrollToTop("auto");
+      }
+    }, 90);
+    return () => window.clearTimeout(timer);
+  }, [location.pathname, location.hash]);
+
+  return null;
+}
 
 function App() {
   useEffect(() => {
@@ -37,6 +56,7 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
+        <RouteScrollManager />
         <Suspense fallback={<div className="route-loading" aria-label="Se încarcă pagina" />}>
           <Routes>
             <Route path="/" element={<Home />} />

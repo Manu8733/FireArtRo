@@ -3,10 +3,10 @@ import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScro
 import { ArrowRight } from "lucide-react";
 import { HERO_POSTER, MEDIA } from "@/data/content";
 import { useIsTouchDevice } from "@/hooks/useMediaQuery";
+import { scrollToHash } from "@/lib/scrollNavigation";
 
 const EASE = [0.22, 1, 0.36, 1];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-const scrollTo = (href) => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
 
 const SCENES = [
   {
@@ -160,7 +160,7 @@ export const CinematicPrologue = () => {
               {scene.action && (
                 <button
                   type="button"
-                  onClick={() => scrollTo("#povestea")}
+                  onClick={() => scrollToHash("#povestea")}
                   className="mt-7 inline-flex items-center gap-2 rounded-full border border-white/14 bg-black/24 px-5 py-3 text-sm font-semibold text-white backdrop-blur-md"
                 >
                   Continuă povestea

@@ -1,5 +1,7 @@
 import { ArrowDown, ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
+import { navigateToHref } from "@/lib/scrollNavigation";
 
 const EASE = [0.16, 1, 0.3, 1];
 
@@ -14,6 +16,12 @@ export default function InteriorHero({
   secondaryLabel,
 }) {
   const reduce = useReducedMotion();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const handleNavigate = (event, href) => {
+    event.preventDefault();
+    navigateToHref({ href, navigate, pathname: location.pathname });
+  };
   const item = reduce
     ? {}
     : {
@@ -40,12 +48,12 @@ export default function InteriorHero({
           {(primaryHref || secondaryHref) && (
             <div className="interior-hero-actions">
               {primaryHref && (
-                <a className="btn-grad" href={primaryHref}>
+                <a className="btn-grad" href={primaryHref} onClick={(event) => handleNavigate(event, primaryHref)}>
                   {primaryLabel} <ArrowRight />
                 </a>
               )}
               {secondaryHref && (
-                <a href={secondaryHref}>
+                <a href={secondaryHref} onClick={(event) => handleNavigate(event, secondaryHref)}>
                   {secondaryLabel} <ArrowDown />
                 </a>
               )}

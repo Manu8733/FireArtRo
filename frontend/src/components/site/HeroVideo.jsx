@@ -2,15 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import { HERO_POSTER, HERO_VIDEOS } from "@/data/content";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 
+const HERO_LOOP_SECONDS = 7.85;
+
 export const HeroVideo = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
+  const switchingRef = useRef(false);
   const mobile = useIsMobile();
   const [enabled, setEnabled] = useState(true);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(0);
   const item = HERO_VIDEOS[active];
   const source = mobile ? item.mobileSrc : item.src;
+
+  useEffect(() => {
+    switchingRef.current = false;
+  }, [source]);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -63,6 +70,8 @@ export const HeroVideo = () => {
   }, [active, enabled, source]);
 
   const queueNext = () => {
+    if (switchingRef.current) return;
+    switchingRef.current = true;
     setReady(false);
     setActive((current) => (current + 1) % HERO_VIDEOS.length);
   };
@@ -84,11 +93,11 @@ export const HeroVideo = () => {
           key={source}
           ref={videoRef}
           className="hero-media-surface hero-media-video absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
-          style={{ opacity: ready ? 1 : 0 }}
+          style={{ opacity: ready ? 1 : 0, objectPosition: item.position || "52% center" }}
           poster={HERO_POSTER}
           autoPlay
           muted
-          loop={HERO_VIDEOS.length === 1}
+          loop={false}
           playsInline
           preload={active === 0 ? "auto" : "metadata"}
           disablePictureInPicture
@@ -98,7 +107,10 @@ export const HeroVideo = () => {
           onPlaying={() => setReady(true)}
           onTimeUpdate={(event) => {
             const video = event.currentTarget;
-            if (video.duration - video.currentTime < 0.45) setReady(false);
+            const mediaDuration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : HERO_LOOP_SECONDS;
+            const clipDuration = Math.min(mediaDuration, HERO_LOOP_SECONDS);
+            if (clipDuration - video.currentTime < 0.45) setReady(false);
+            if (video.currentTime >= clipDuration) queueNext();
           }}
           onEnded={queueNext}
           aria-label={`Fundal video: ${item.label}`}

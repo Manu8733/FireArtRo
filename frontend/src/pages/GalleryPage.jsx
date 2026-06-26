@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Maximize2, Play, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Maximize2, X } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Navbar from "@/components/site/Navbar";
@@ -10,98 +10,117 @@ import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
 import { MEDIA_ITEMS, SITE_DETAILS } from "@/data/businessContent";
 
-const getYouTubeId = (url = "") =>
-  url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/i)?.[1] || "";
-
-const getMediaSource = (item) => item.thumbnail || item.poster || item.src;
-
-const schemaForMedia = (items) => ({
+const schemaForPhotos = (items) => ({
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  name: "Galerie FireArtRo",
+  name: "Galerie foto FireArtRo",
   url: `${SITE_DETAILS.siteUrl}/galerie`,
-  hasPart: items.map((item) =>
-    item.type === "video" || item.type === "youtube"
-      ? {
-          "@type": "VideoObject",
-          name: item.title,
-          description: item.shortDescription,
-          thumbnailUrl: item.poster || item.thumbnail,
-          contentUrl: item.src,
-          embedUrl: item.youtubeUrl,
-          uploadDate: item.date,
-        }
-      : {
-          "@type": "ImageObject",
-          name: item.title,
-          description: item.shortDescription,
-          contentUrl: item.src,
-          thumbnailUrl: item.thumbnail,
-        }
-  ),
+  hasPart: items.map((item) => ({
+    "@type": "ImageObject",
+    name: item.title,
+    description: item.shortDescription,
+    contentUrl: item.src,
+    thumbnailUrl: item.thumbnail || item.src,
+  })),
 });
 
 export default function GalleryPage() {
   const location = useLocation();
   const media = useManagedContent("mediaItems", MEDIA_ITEMS);
+  const photos = useMemo(
+    () => [...media]
+      .filter((item) => item.type === "image")
+      .sort((a, b) => (a.order || 0) - (b.order || 0)),
+    [media]
+  );
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const initialFilter = params.get("filtru") || "Toate";
   const [filter, setFilter] = useState(initialFilter);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const pointerStart = useRef(null);
-  const wheelLock = useRef(false);
+  const didSwipe = useRef(false);
 
   const categories = useMemo(
-    () => ["Toate", ...new Set(media.map((item) => item.category).filter(Boolean))],
-    [media]
+    () => ["Toate", ...new Set(photos.flatMap((item) => [item.category, ...(item.tags || [])]).filter(Boolean))],
+    [photos]
   );
-  const visibleMedia = useMemo(
-    () =>
-      [...media]
-        .sort((a, b) => (a.order || 0) - (b.order || 0))
-        .filter((item) => filter === "Toate" || item.category === filter || item.tags?.includes(filter)),
-    [filter, media]
+  const visiblePhotos = useMemo(
+    () => photos.filter((item) => filter === "Toate" || item.category === filter || item.tags?.includes(filter)),
+    [filter, photos]
   );
-  const activeItem = visibleMedia[activeIndex];
-  const moveCarousel = (direction) =>
-    setCarouselIndex((index) => (index + direction + visibleMedia.length) % visibleMedia.length);
-  const relativeOffset = (index) => {
-    let distance = index - carouselIndex;
-    const half = visibleMedia.length / 2;
-    if (distance > half) distance -= visibleMedia.length;
-    if (distance < -half) distance += visibleMedia.length;
-    return distance;
+  const current = visiblePhotos[carouselIndex] || visiblePhotos[0];
+  const activeItem = visiblePhotos[activeIndex];
+
+  const moveCarousel = useCallback((direction) => {
+    if (!visiblePhotos.length) return;
+    setCarouselIndex((index) => (index + direction + visiblePhotos.length) % visiblePhotos.length);
+  }, [visiblePhotos.length]);
+  const moveLightbox = useCallback((direction) => {
+    if (!visiblePhotos.length) return;
+    setActiveIndex((index) => (index + direction + visiblePhotos.length) % visiblePhotos.length);
+  }, [visiblePhotos.length]);
+  const openCurrent = () => {
+    if (didSwipe.current) {
+      didSwipe.current = false;
+      return;
+    }
+    setActiveIndex(carouselIndex);
   };
 
   usePageMeta({
-    title: "Galerie spectacole cu drone și artificii | FireArtRo",
+    title: "Galerie foto spectacole cu drone și artificii | FireArtRo",
     description:
-      "Galerie unificată FireArtRo cu imagini și video din spectacole cu drone, artificii de zi și de noapte, cold sparks și efecte speciale.",
+      "Galerie foto FireArtRo cu spectacole de drone, artificii profesionale, cold sparks și efecte speciale pentru evenimente.",
     path: "/galerie",
-    schema: schemaForMedia(media),
+    schema: schemaForPhotos(photos),
   });
+
+  useEffect(() => {
+    setCarouselIndex(0);
+    setActiveIndex(-1);
+  }, [filter]);
 
   useEffect(() => {
     const mediaId = params.get("media");
     if (!mediaId) return;
-    const index = visibleMedia.findIndex((item) => item.id === mediaId);
-    if (index >= 0) setActiveIndex(index);
-  }, [params, visibleMedia]);
+    const index = visiblePhotos.findIndex((item) => item.id === mediaId);
+    if (index >= 0) {
+      setCarouselIndex(index);
+      setActiveIndex(index);
+    }
+  }, [params, visiblePhotos]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (activeIndex < 0) return;
-      if (event.key === "ArrowRight") setActiveIndex((index) => (index + 1) % visibleMedia.length);
-      if (event.key === "ArrowLeft") setActiveIndex((index) => (index - 1 + visibleMedia.length) % visibleMedia.length);
+      if (activeIndex >= 0) {
+        if (event.key === "ArrowRight") moveLightbox(1);
+        if (event.key === "ArrowLeft") moveLightbox(-1);
+        if (event.key === "Escape") setActiveIndex(-1);
+        return;
+      }
+      if (event.key === "ArrowRight") moveCarousel(1);
+      if (event.key === "ArrowLeft") moveCarousel(-1);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [activeIndex, visibleMedia.length]);
+  }, [activeIndex, moveCarousel, moveLightbox]);
 
-  const close = () => setActiveIndex(-1);
-  const move = (direction) =>
-    setActiveIndex((index) => (index + direction + visibleMedia.length) % visibleMedia.length);
+  const handlePointerDown = (event) => {
+    pointerStart.current = event.clientX;
+    didSwipe.current = false;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+  const handlePointerUp = (event) => {
+    if (pointerStart.current === null) return;
+    const delta = event.clientX - pointerStart.current;
+    if (Math.abs(delta) > 42) {
+      didSwipe.current = true;
+      moveCarousel(delta < 0 ? 1 : -1);
+    }
+    pointerStart.current = null;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  };
 
   return (
     <main className="gallery-page min-h-screen overflow-x-clip bg-[#050308] text-white">
@@ -109,156 +128,109 @@ export default function GalleryPage() {
       <Navbar />
       <InteriorHero
         eyebrow="Galerie FireArtRo"
-        title="Foto. Film. Spectacol."
-        accent="Momente reale."
-        description="O selecție scurtă din producțiile FireArtRo. Derulează cadrele și deschide orice moment în lightbox."
+        title="Cadre reale."
+        accent="Spectacol în mișcare."
+        description="O galerie foto concentrată, cu imagini din producțiile FireArtRo. Alege o categorie, glisează cadrele și deschide fotografia în lightbox."
         primaryHref="#galerie-media"
-        primaryLabel="Explorează galeria"
+        primaryLabel="Vezi fotografiile"
         secondaryHref="/contact"
         secondaryLabel="Solicită ofertă"
       />
 
-      <section id="galerie-media" className="unified-gallery" aria-labelledby="unified-gallery-title">
-        <header className="unified-gallery-header">
+      <section id="galerie-media" className="photo-gallery-section" aria-labelledby="photo-gallery-title">
+        <header className="photo-gallery-header">
           <div>
-            <span>Media unificată</span>
-            <h1 id="unified-gallery-title">Imagini, video și promoții</h1>
+            <span>Selecție foto</span>
+            <h2 id="photo-gallery-title">Fotografii din spectacole FireArtRo</h2>
           </div>
-          <p>Conținutul YouTube se încarcă doar când alegi să îl redai.</p>
+          <p>Filtrează rapid după tipul momentului. Cardul central se poate glisa pe telefon sau controla din săgeți.</p>
         </header>
 
-        <div className="gallery-filter-row" aria-label="Filtre galerie">
+        <div className="photo-gallery-filters" aria-label="Filtre galerie foto">
           {categories.map((category) => (
             <button
               key={category}
               type="button"
               className={filter === category ? "is-active" : ""}
               aria-pressed={filter === category}
-              onClick={() => {
-                setFilter(category);
-                setActiveIndex(-1);
-                setCarouselIndex(0);
-              }}
+              onClick={() => setFilter(category)}
             >
               {category}
             </button>
           ))}
         </div>
 
-        <div
-          className="gallery-orbit"
-          onPointerDown={(event) => {
-            pointerStart.current = event.clientX;
-            event.currentTarget.setPointerCapture?.(event.pointerId);
-          }}
-          onPointerUp={(event) => {
-            if (pointerStart.current === null) return;
-            const delta = event.clientX - pointerStart.current;
-            if (Math.abs(delta) > 45) moveCarousel(delta < 0 ? 1 : -1);
-            pointerStart.current = null;
-            event.currentTarget.releasePointerCapture?.(event.pointerId);
-          }}
-          onPointerCancel={() => {
-            pointerStart.current = null;
-          }}
-          onWheel={(event) => {
-            if (Math.abs(event.deltaX) < 12 || wheelLock.current) return;
-            wheelLock.current = true;
-            moveCarousel(event.deltaX > 0 ? 1 : -1);
-            window.setTimeout(() => {
-              wheelLock.current = false;
-            }, 420);
-          }}
-        >
-          <div className="gallery-orbit-track">
-            {visibleMedia.map((item, index) => {
-              const offset = relativeOffset(index);
-              if (Math.abs(offset) > 2) return null;
-              const centered = offset === 0;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`gallery-orbit-card gallery-orbit-offset-${offset + 2} ${centered ? "is-centered" : ""}`}
-                  onClick={() => centered ? setActiveIndex(index) : setCarouselIndex(index)}
-                  aria-label={`${centered ? "Deschide" : "Adu în centru"}: ${item.title}`}
-                >
-                  <img
-                    src={getMediaSource(item)}
-                    alt={item.alt}
-                    width="1280"
-                    height="853"
-                    loading={Math.abs(offset) <= 1 ? "eager" : "lazy"}
-                    decoding="async"
-                  />
-                  <span className="unified-media-shade" />
-                  <span className="unified-media-type">
-                    {item.type === "youtube" || item.type === "video" ? <Play /> : <Maximize2 />}
-                    {item.category}
-                  </span>
-                  <span className="unified-media-copy">
-                    <strong>{item.title}</strong>
-                    <small>{item.shortDescription}</small>
-                  </span>
-                </button>
-              );
-            })}
+        {current && (
+          <div className="photo-gallery-stage">
+            <button type="button" className="photo-gallery-arrow photo-gallery-arrow-left" onClick={() => moveCarousel(-1)} aria-label="Fotografia anterioară">
+              <ArrowLeft />
+            </button>
+
+            <button
+              type="button"
+              className="photo-gallery-feature"
+              onPointerDown={handlePointerDown}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={() => { pointerStart.current = null; }}
+              onClick={openCurrent}
+              aria-label={`Deschide fotografia: ${current.title}`}
+            >
+              <img src={current.src} alt={current.alt} width="1440" height="960" decoding="async" />
+              <span className="photo-gallery-feature-shade" />
+              <span className="photo-gallery-kicker">{current.category}</span>
+              <span className="photo-gallery-open"><Maximize2 /> Deschide</span>
+              <span className="photo-gallery-copy">
+                <strong>{current.title}</strong>
+                <small>{current.shortDescription}</small>
+              </span>
+            </button>
+
+            <button type="button" className="photo-gallery-arrow photo-gallery-arrow-right" onClick={() => moveCarousel(1)} aria-label="Fotografia următoare">
+              <ArrowRight />
+            </button>
           </div>
-          <div className="gallery-orbit-controls">
-            <button type="button" onClick={() => moveCarousel(-1)} aria-label="Element anterior"><ArrowLeft /></button>
-            <span>{String(carouselIndex + 1).padStart(2, "0")} / {String(visibleMedia.length).padStart(2, "0")}</span>
-            <button type="button" onClick={() => moveCarousel(1)} aria-label="Element următor"><ArrowRight /></button>
-          </div>
+        )}
+
+        <div className="photo-gallery-thumbs" aria-label="Miniaturi galerie">
+          {visiblePhotos.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              className={index === carouselIndex ? "is-active" : ""}
+              onClick={() => setCarouselIndex(index)}
+              aria-label={`Afișează ${item.title}`}
+            >
+              <img src={item.thumbnail || item.src} alt="" width="320" height="220" loading="lazy" decoding="async" />
+              <span>{String(index + 1).padStart(2, "0")}</span>
+            </button>
+          ))}
         </div>
       </section>
 
       <Footer />
 
-      <Dialog open={activeIndex >= 0} onOpenChange={(open) => !open && close()}>
+      <Dialog open={activeIndex >= 0} onOpenChange={(open) => !open && setActiveIndex(-1)}>
         <DialogContent className="media-lightbox">
           {activeItem && (
             <>
               <DialogTitle className="sr-only">{activeItem.title}</DialogTitle>
               <div className="media-lightbox-stage" onContextMenu={(event) => event.preventDefault()}>
-                {/* Web media cannot be made impossible to download; these controls only deter casual downloads. */}
-                {activeItem.type === "youtube" ? (
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${getYouTubeId(activeItem.youtubeUrl)}?autoplay=1&rel=0&playsinline=1`}
-                    title={activeItem.title}
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                ) : activeItem.type === "video" ? (
-                  <video
-                    src={activeItem.src}
-                    poster={activeItem.poster}
-                    controls
-                    autoPlay
-                    playsInline
-                    controlsList="nodownload noplaybackrate"
-                    disablePictureInPicture
-                  />
-                ) : (
-                  <img src={activeItem.src} alt={activeItem.alt} width="1600" height="1067" draggable="false" />
-                )}
+                <img src={activeItem.src} alt={activeItem.alt} width="1600" height="1067" draggable="false" />
               </div>
               <div className="media-lightbox-meta">
                 <span>{activeItem.category}</span>
                 <h2>{activeItem.title}</h2>
                 <p>{activeItem.shortDescription}</p>
-                {activeItem.type === "promo" && activeItem.ctaHref && (
-                  <a href={activeItem.ctaHref}>{activeItem.ctaLabel || "Solicită ofertă"} <ArrowRight /></a>
-                )}
               </div>
-              <button type="button" className="media-lightbox-close" onClick={close} aria-label="Închide">
+              <button type="button" className="media-lightbox-close" onClick={() => setActiveIndex(-1)} aria-label="Închide">
                 <X />
               </button>
-              {visibleMedia.length > 1 && (
+              {visiblePhotos.length > 1 && (
                 <>
-                  <button type="button" className="media-lightbox-prev" onClick={() => move(-1)} aria-label="Anterior">
+                  <button type="button" className="media-lightbox-prev" onClick={() => moveLightbox(-1)} aria-label="Anterior">
                     <ArrowLeft />
                   </button>
-                  <button type="button" className="media-lightbox-next" onClick={() => move(1)} aria-label="Următor">
+                  <button type="button" className="media-lightbox-next" onClick={() => moveLightbox(1)} aria-label="Următor">
                     <ArrowRight />
                   </button>
                 </>

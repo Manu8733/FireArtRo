@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Maximize2, X } from "lucide-react";
-import { useLocation } from "react-router-dom";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, Maximize2 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import useEmblaCarousel from "embla-carousel-react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import ScrollProgress from "@/components/site/ScrollProgress";
@@ -19,13 +20,14 @@ const schemaForPhotos = (items) => ({
     "@type": "ImageObject",
     name: item.title,
     description: item.shortDescription,
-    contentUrl: item.src,
-    thumbnailUrl: item.thumbnail || item.src,
+    contentUrl: new URL(item.src, SITE_DETAILS.siteUrl).toString(),
+    thumbnailUrl: new URL(item.thumbnail || item.src, SITE_DETAILS.siteUrl).toString(),
   })),
 });
 
 export default function GalleryPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const media = useManagedContent("mediaItems", MEDIA_ITEMS);
   const photos = useMemo(
     () => [...media]
@@ -38,48 +40,70 @@ export default function GalleryPage() {
   const [filter, setFilter] = useState(initialFilter);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const pointerStart = useRef(null);
-  const didSwipe = useRef(false);
+  const [carouselRef, carouselApi] = useEmblaCarousel({
+    align: "center",
+    containScroll: "trimSnaps",
+    loop: true,
+    skipSnaps: false,
+  });
 
   const categories = useMemo(
-    () => ["Toate", ...new Set(photos.flatMap((item) => [item.category, ...(item.tags || [])]).filter(Boolean))],
+    () => ["Toate", ...new Set(photos.map((item) => item.category).filter(Boolean))],
     [photos]
   );
+  const activeFilter = categories.includes(filter) ? filter : "Toate";
   const visiblePhotos = useMemo(
-    () => photos.filter((item) => filter === "Toate" || item.category === filter || item.tags?.includes(filter)),
-    [filter, photos]
+    () => photos.filter((item) => activeFilter === "Toate" || item.category === activeFilter),
+    [activeFilter, photos]
   );
-  const current = visiblePhotos[carouselIndex] || visiblePhotos[0];
   const activeItem = visiblePhotos[activeIndex];
+  const gallerySchema = useMemo(() => schemaForPhotos(photos), [photos]);
 
   const moveCarousel = useCallback((direction) => {
-    if (!visiblePhotos.length) return;
-    setCarouselIndex((index) => (index + direction + visiblePhotos.length) % visiblePhotos.length);
-  }, [visiblePhotos.length]);
+    if (!carouselApi) return;
+    if (direction > 0) carouselApi.scrollNext();
+    else carouselApi.scrollPrev();
+  }, [carouselApi]);
   const moveLightbox = useCallback((direction) => {
     if (!visiblePhotos.length) return;
     setActiveIndex((index) => (index + direction + visiblePhotos.length) % visiblePhotos.length);
   }, [visiblePhotos.length]);
-  const openCurrent = () => {
-    if (didSwipe.current) {
-      didSwipe.current = false;
-      return;
-    }
-    setActiveIndex(carouselIndex);
-  };
+  const selectFilter = useCallback((nextFilter) => {
+    setFilter(nextFilter);
+    const nextParams = new URLSearchParams(location.search);
+    nextParams.delete("media");
+    if (nextFilter === "Toate") nextParams.delete("filtru");
+    else nextParams.set("filtru", nextFilter);
+    const search = nextParams.toString();
+    navigate(`${location.pathname}${search ? `?${search}` : ""}`, { replace: true });
+  }, [location.pathname, location.search, navigate]);
 
   usePageMeta({
     title: "Galerie foto spectacole cu drone și artificii | FireArtRo",
     description:
       "Galerie foto FireArtRo cu spectacole de drone, artificii profesionale, cold sparks și efecte speciale pentru evenimente.",
     path: "/galerie",
-    schema: schemaForPhotos(photos),
+    schema: gallerySchema,
   });
 
   useEffect(() => {
     setCarouselIndex(0);
     setActiveIndex(-1);
-  }, [filter]);
+    carouselApi?.scrollTo(0, true);
+    carouselApi?.reInit();
+  }, [carouselApi, filter, visiblePhotos.length]);
+
+  useEffect(() => {
+    if (!carouselApi) return undefined;
+    const onSelect = () => setCarouselIndex(carouselApi.selectedScrollSnap());
+    onSelect();
+    carouselApi.on("select", onSelect);
+    carouselApi.on("reInit", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+      carouselApi.off("reInit", onSelect);
+    };
+  }, [carouselApi]);
 
   useEffect(() => {
     const mediaId = params.get("media");
@@ -88,8 +112,14 @@ export default function GalleryPage() {
     if (index >= 0) {
       setCarouselIndex(index);
       setActiveIndex(index);
+      carouselApi?.scrollTo(index, true);
     }
-  }, [params, visiblePhotos]);
+  }, [carouselApi, params, visiblePhotos]);
+
+  useEffect(() => {
+    const requestedFilter = params.get("filtru") || "Toate";
+    setFilter(categories.includes(requestedFilter) ? requestedFilter : "Toate");
+  }, [categories, params]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -106,22 +136,6 @@ export default function GalleryPage() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [activeIndex, moveCarousel, moveLightbox]);
 
-  const handlePointerDown = (event) => {
-    pointerStart.current = event.clientX;
-    didSwipe.current = false;
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-  };
-  const handlePointerUp = (event) => {
-    if (pointerStart.current === null) return;
-    const delta = event.clientX - pointerStart.current;
-    if (Math.abs(delta) > 42) {
-      didSwipe.current = true;
-      moveCarousel(delta < 0 ? 1 : -1);
-    }
-    pointerStart.current = null;
-    event.currentTarget.releasePointerCapture?.(event.pointerId);
-  };
-
   return (
     <main className="gallery-page min-h-screen overflow-x-clip bg-[#050308] text-white">
       <ScrollProgress />
@@ -129,80 +143,99 @@ export default function GalleryPage() {
       <InteriorHero
         eyebrow="Galerie FireArtRo"
         title="Cadre reale."
-        accent="Spectacol în mișcare."
-        description="O galerie foto concentrată, cu imagini din producțiile FireArtRo. Alege o categorie, glisează cadrele și deschide fotografia în lightbox."
+        accent="Lumina rămâne în fotografie."
+        description="O selecție din spectacolele FireArtRo, surprinsă din mijlocul publicului și de lângă scenă."
         primaryHref="#galerie-media"
-        primaryLabel="Vezi fotografiile"
+        primaryLabel="Explorează galeria"
         secondaryHref="/contact"
-        secondaryLabel="Solicită ofertă"
+        secondaryLabel="Discută evenimentul"
       />
 
       <section id="galerie-media" className="photo-gallery-section" aria-labelledby="photo-gallery-title">
         <header className="photo-gallery-header">
           <div>
             <span>Selecție foto</span>
-            <h2 id="photo-gallery-title">Fotografii din spectacole FireArtRo</h2>
+            <h2 id="photo-gallery-title">Privește spectacolul, cadru cu cadru.</h2>
           </div>
-          <p>Filtrează rapid după tipul momentului. Cardul central se poate glisa pe telefon sau controla din săgeți.</p>
+          <div className="photo-gallery-header-tools">
+            <p>Glisează colecția sau folosește săgețile. Fiecare fotografie se poate deschide la dimensiune mare.</p>
+          </div>
         </header>
 
-        <div className="photo-gallery-filters" aria-label="Filtre galerie foto">
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              className={filter === category ? "is-active" : ""}
-              aria-pressed={filter === category}
-              onClick={() => setFilter(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {current && (
-          <div className="photo-gallery-stage">
-            <button type="button" className="photo-gallery-arrow photo-gallery-arrow-left" onClick={() => moveCarousel(-1)} aria-label="Fotografia anterioară">
+        <div className="photo-gallery-toolbar">
+          <div className="photo-gallery-filters" aria-label="Filtre galerie foto">
+            {categories.map((category) => (
+              <button
+                key={category}
+                type="button"
+                className={activeFilter === category ? "is-active" : ""}
+                aria-pressed={activeFilter === category}
+                onClick={() => selectFilter(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+          <div className="photo-gallery-controls" aria-label="Navigare fotografii">
+            <button type="button" onClick={() => moveCarousel(-1)} aria-label="Fotografia anterioară">
               <ArrowLeft />
             </button>
-
-            <button
-              type="button"
-              className="photo-gallery-feature"
-              onPointerDown={handlePointerDown}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={() => { pointerStart.current = null; }}
-              onClick={openCurrent}
-              aria-label={`Deschide fotografia: ${current.title}`}
-            >
-              <img src={current.src} alt={current.alt} width="1440" height="960" decoding="async" />
-              <span className="photo-gallery-feature-shade" />
-              <span className="photo-gallery-kicker">{current.category}</span>
-              <span className="photo-gallery-open"><Maximize2 /> Deschide</span>
-              <span className="photo-gallery-copy">
-                <strong>{current.title}</strong>
-                <small>{current.shortDescription}</small>
-              </span>
-            </button>
-
-            <button type="button" className="photo-gallery-arrow photo-gallery-arrow-right" onClick={() => moveCarousel(1)} aria-label="Fotografia următoare">
+            <span aria-live="polite">
+              {String(carouselIndex + 1).padStart(2, "0")} / {String(visiblePhotos.length).padStart(2, "0")}
+            </span>
+            <button type="button" onClick={() => moveCarousel(1)} aria-label="Fotografia următoare">
               <ArrowRight />
             </button>
           </div>
+        </div>
+
+        {visiblePhotos.length > 0 && (
+          <div className="photo-carousel-shell">
+            <div className="photo-carousel" ref={carouselRef}>
+              <div className="photo-carousel-track">
+                {visiblePhotos.map((item, index) => (
+                  <div
+                    className={`photo-carousel-slide ${index === carouselIndex ? "is-active" : ""}`}
+                    key={item.id}
+                  >
+                    <button
+                      type="button"
+                      className="photo-carousel-card"
+                      onClick={() => setActiveIndex(index)}
+                      aria-label={`Deschide fotografia: ${item.title}`}
+                    >
+                      <img
+                        src={item.src}
+                        alt={item.alt}
+                        width="1440"
+                        height="960"
+                        loading={Math.abs(index - carouselIndex) <= 1 ? "eager" : "lazy"}
+                        decoding="async"
+                      />
+                      <span className="photo-gallery-feature-shade" />
+                      <span className="photo-gallery-kicker">{item.category}</span>
+                      <span className="photo-gallery-open"><Maximize2 /> Deschide</span>
+                      <span className="photo-gallery-copy">
+                        <strong>{item.title}</strong>
+                        <small>{item.shortDescription}</small>
+                      </span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
 
-        <div className="photo-gallery-thumbs" aria-label="Miniaturi galerie">
+        <div className="photo-gallery-pagination" aria-label="Navigare galerie">
           {visiblePhotos.map((item, index) => (
             <button
               key={item.id}
               type="button"
               className={index === carouselIndex ? "is-active" : ""}
-              onClick={() => setCarouselIndex(index)}
+              onClick={() => carouselApi?.scrollTo(index)}
               aria-label={`Afișează ${item.title}`}
-            >
-              <img src={item.thumbnail || item.src} alt="" width="320" height="220" loading="lazy" decoding="async" />
-              <span>{String(index + 1).padStart(2, "0")}</span>
-            </button>
+            />
           ))}
         </div>
       </section>
@@ -214,6 +247,9 @@ export default function GalleryPage() {
           {activeItem && (
             <>
               <DialogTitle className="sr-only">{activeItem.title}</DialogTitle>
+              <DialogDescription className="sr-only">
+                {activeItem.shortDescription}
+              </DialogDescription>
               <div className="media-lightbox-stage" onContextMenu={(event) => event.preventDefault()}>
                 <img src={activeItem.src} alt={activeItem.alt} width="1600" height="1067" draggable="false" />
               </div>
@@ -222,9 +258,6 @@ export default function GalleryPage() {
                 <h2>{activeItem.title}</h2>
                 <p>{activeItem.shortDescription}</p>
               </div>
-              <button type="button" className="media-lightbox-close" onClick={() => setActiveIndex(-1)} aria-label="Închide">
-                <X />
-              </button>
               {visiblePhotos.length > 1 && (
                 <>
                   <button type="button" className="media-lightbox-prev" onClick={() => moveLightbox(-1)} aria-label="Anterior">

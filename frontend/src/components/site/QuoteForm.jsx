@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { CheckCircle2, Clock3, Loader2, Mail, MessageCircle, Phone, Sparkles } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
@@ -14,6 +13,31 @@ import { readContactPrefill } from "@/lib/contactNavigation";
 
 const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/$/, "");
 const API = `${BACKEND_URL}/api`;
+const REQUEST_TIMEOUT_MS = 12_000;
+
+const postQuote = async (payload) => {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${API}/quotes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const error = new Error("Cererea nu a putut fi trimisă.");
+      error.status = response.status;
+      throw error;
+    }
+
+    return response.json();
+  } finally {
+    window.clearTimeout(timeout);
+  }
+};
 
 const empty = {
   first_name: "",
@@ -92,17 +116,15 @@ export const QuoteForm = () => {
 
     setLoading(true);
     try {
-      await axios.post(`${API}/quotes`, form, {
-        headers: { "Content-Type": "application/json" },
-        timeout: 12000,
-      });
+      await postQuote(form);
       setDone(true);
       setForm(empty);
       toast.success("Cererea a fost trimisă. Revenim cu următorii pași.");
     } catch (error) {
-      console.error(error);
-      const message = error.response?.status === 429
+      const message = error.status === 429
         ? "Ai trimis mai multe solicitări într-un interval scurt. Încearcă mai târziu."
+        : error.name === "AbortError"
+          ? "Trimiterea a durat prea mult. Încearcă din nou sau folosește WhatsApp."
         : "Cererea nu a putut fi trimisă. Folosește WhatsApp sau email.";
       toast.error(message);
     } finally {
@@ -168,38 +190,38 @@ export const QuoteForm = () => {
                   <button type="button" onClick={() => setDone(false)}>Trimite altă cerere</button>
                 </div>
               ) : (
-                <form onSubmit={submit} className="contact-form-grid" data-testid="quote-form" noValidate>
+                <form onSubmit={submit} className="contact-form-grid" data-testid="quote-form" aria-busy={loading}>
                   <div className="contact-field">
                     <label htmlFor="quote-first-name">Nume *</label>
-                    <input id="quote-first-name" value={form.first_name} onChange={(e) => update("first_name", e.target.value)} autoComplete="family-name" />
+                    <input id="quote-first-name" name="family-name" value={form.first_name} onChange={(e) => update("first_name", e.target.value)} autoComplete="family-name" maxLength={80} required />
                   </div>
                   <div className="contact-field">
                     <label htmlFor="quote-last-name">Prenume *</label>
-                    <input id="quote-last-name" value={form.last_name} onChange={(e) => update("last_name", e.target.value)} autoComplete="given-name" />
+                    <input id="quote-last-name" name="given-name" value={form.last_name} onChange={(e) => update("last_name", e.target.value)} autoComplete="given-name" maxLength={80} required />
                   </div>
                   <div className="contact-field">
                     <label htmlFor="quote-phone">Telefon *</label>
-                    <input id="quote-phone" type="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} autoComplete="tel" placeholder="07xx xxx xxx" />
+                    <input id="quote-phone" name="tel" type="tel" inputMode="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} autoComplete="tel" maxLength={30} placeholder="07xx xxx xxx" required />
                   </div>
                   <div className="contact-field">
                     <label htmlFor="quote-email">Email *</label>
-                    <input id="quote-email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} autoComplete="email" />
+                    <input id="quote-email" name="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} autoComplete="email" maxLength={160} required />
                   </div>
                   <div className="contact-field">
                     <label htmlFor="quote-locality">Localitatea *</label>
-                    <input id="quote-locality" value={form.locality} onChange={(e) => update("locality", e.target.value)} autoComplete="address-level2" />
+                    <input id="quote-locality" name="address-level2" value={form.locality} onChange={(e) => update("locality", e.target.value)} autoComplete="address-level2" maxLength={120} required />
                   </div>
                   <div className="contact-field">
                     <label htmlFor="quote-event-location">Locația evenimentului</label>
-                    <input id="quote-event-location" value={form.event_location} onChange={(e) => update("event_location", e.target.value)} placeholder="Sală, adresă sau reper" />
+                    <input id="quote-event-location" name="event-location" value={form.event_location} onChange={(e) => update("event_location", e.target.value)} maxLength={180} placeholder="Sală, adresă sau reper" />
                   </div>
                   <div className="contact-field">
                     <label htmlFor="quote-date">Data evenimentului *</label>
-                    <input id="quote-date" type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} />
+                    <input id="quote-date" name="event-date" type="date" value={form.event_date} onChange={(e) => update("event_date", e.target.value)} required />
                   </div>
                   <div className="contact-field">
                     <label htmlFor="quote-event-type">Tip eveniment *</label>
-                    <select id="quote-event-type" value={form.event_type} onChange={(e) => update("event_type", e.target.value)}>
+                    <select id="quote-event-type" name="event-type" value={form.event_type} onChange={(e) => update("event_type", e.target.value)} required>
                       <option value="">Alege tipul</option>
                       {CONTACT_EVENT_TYPES.map((item) => <option key={item} value={item}>{item}</option>)}
                     </select>
@@ -208,6 +230,7 @@ export const QuoteForm = () => {
                     <label htmlFor="quote-package">Pachet selectat</label>
                     <select
                       id="quote-package"
+                      name="package"
                       value={form.package_id}
                       onChange={(e) => {
                         const item = PACKAGE_ITEMS.find((entry) => entry.id === e.target.value);
@@ -220,7 +243,7 @@ export const QuoteForm = () => {
                     </select>
                   </div>
                   <details className="contact-services contact-field-wide" open={form.services.length > 0}>
-                    <summary>
+                    <summary id="quote-services-label">
                       <span>Servicii de interes *</span>
                       <small>
                         {form.services.length
@@ -228,11 +251,12 @@ export const QuoteForm = () => {
                           : "Alege una sau mai multe"}
                       </small>
                     </summary>
-                    <div className="contact-services-options">
+                    <div className="contact-services-options" role="group" aria-labelledby="quote-services-label">
                       {SERVICE_INTEREST_OPTIONS.map((service) => (
                         <label key={service}>
                           <input
                             type="checkbox"
+                            name="services"
                             checked={form.services.includes(service)}
                             onChange={() => toggleService(service)}
                           />
@@ -243,14 +267,14 @@ export const QuoteForm = () => {
                   </details>
                   <div className="contact-field contact-field-wide">
                     <label htmlFor="quote-message">Mesaj</label>
-                    <textarea id="quote-message" value={form.message} onChange={(e) => update("message", e.target.value)} rows={4} placeholder="Detalii despre moment, public, muzică sau accesul în locație" />
+                    <textarea id="quote-message" name="message" value={form.message} onChange={(e) => update("message", e.target.value)} rows={4} maxLength={3000} placeholder="Detalii despre moment, public, muzică sau accesul în locație" />
                   </div>
                   <div className="contact-honeypot" aria-hidden="true">
                     <label htmlFor="company-website">Website companie</label>
                     <input id="company-website" tabIndex="-1" autoComplete="off" value={form.company_website} onChange={(e) => update("company_website", e.target.value)} />
                   </div>
                   <label className="contact-consent">
-                    <input type="checkbox" checked={form.consent} onChange={(e) => update("consent", e.target.checked)} />
+                    <input name="consent" type="checkbox" checked={form.consent} onChange={(e) => update("consent", e.target.checked)} required />
                     <span>Sunt de acord cu prelucrarea datelor conform <a href="/confidentialitate">politicii de confidențialitate</a>.</span>
                   </label>
                   <button type="submit" disabled={loading} className="contact-submit">

@@ -5,6 +5,7 @@ import ScrollProgress from "@/components/site/ScrollProgress";
 import Footer from "@/components/site/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
 import { EMAIL } from "@/lib/constants";
+import { SITE_DETAILS } from "@/data/businessContent";
 
 const LEGAL_PAGES = {
   confidentialitate: {
@@ -18,7 +19,8 @@ const LEGAL_PAGES = {
       {
         title: "Operatorul datelor",
         body: [
-          `Datele transmise prin acest site sunt administrate de FireArtRo. Pentru orice solicitare privind datele personale ne poți scrie la ${EMAIL}.`,
+          `Site-ul FireArtRo este operat de ${SITE_DETAILS.legalName}, CUI ${SITE_DETAILS.taxId}, înregistrată la Registrul Comerțului sub nr. ${SITE_DETAILS.registrationNumber}, cu sediul social în ${SITE_DETAILS.registeredOffice}.`,
+          `Activitatea este coordonată din sediul principal din ${SITE_DETAILS.mainOffice}. Pentru solicitări privind datele personale ne poți scrie la ${EMAIL}.`,
         ],
       },
       {
@@ -63,6 +65,12 @@ const LEGAL_PAGES = {
       "Regulile generale pentru utilizarea site-ului și solicitarea serviciilor FireArtRo.",
     updated: "24 iunie 2026",
     sections: [
+      {
+        title: "Furnizorul serviciilor",
+        body: [
+          `Serviciile prezentate sub marca FireArtRo sunt furnizate de ${SITE_DETAILS.legalName}, CUI ${SITE_DETAILS.taxId}, nr. Registrul Comerțului ${SITE_DETAILS.registrationNumber}. Sediul social este în ${SITE_DETAILS.registeredOffice}, iar sediul principal de lucru este în ${SITE_DETAILS.mainOffice}.`,
+        ],
+      },
       {
         title: "Rolul site-ului",
         body: [

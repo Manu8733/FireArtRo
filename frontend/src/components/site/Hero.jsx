@@ -73,21 +73,21 @@ export const Hero = () => {
         className="hero-aurora hero-aurora-bottom absolute bottom-0 -left-1/4 z-[5] h-[50vw] w-[50vw] rounded-full animate-float-eff"
       />
 
-      <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full pt-28 pb-20 md:pt-28 md:pb-20">
-        <motion.div variants={container} initial="hidden" animate="show" className="max-w-3xl">
-          <h1 className="max-w-[14ch] font-display text-[clamp(1.75rem,3.7vw,3.45rem)] font-extrabold leading-[1.07] tracking-[-0.04em] text-white">
+      <div className="hero-content relative z-20 max-w-7xl mx-auto px-5 sm:px-6 md:px-12 w-full pt-28 pb-20 md:pt-28 md:pb-20">
+        <motion.div variants={container} initial="hidden" animate="show" className="hero-copy max-w-3xl">
+          <h1 className="hero-title max-w-[14ch] font-display text-[clamp(1.75rem,3.7vw,3.45rem)] font-extrabold leading-[1.07] tracking-[-0.04em] text-white">
             Spectacole de drone și artificii pentru
             <span className="text-gradient text-bloom"> momente imposibil de uitat</span>
           </h1>
 
           <motion.p
             variants={fadeItem}
-            className="mt-5 text-sm sm:text-base text-white/70 font-light leading-relaxed max-w-xl"
+            className="hero-description mt-5 text-sm sm:text-base text-white/70 font-light leading-relaxed max-w-xl"
           >
             FireArtRo transformă evenimentele în experiențe vizuale cinematice, cu drone show-uri, artificii și efecte speciale sincronizate.
           </motion.p>
 
-          <motion.div variants={fadeItem} className="mt-8 flex flex-col xs:flex-row gap-3 sm:gap-4">
+          <motion.div variants={fadeItem} className="hero-actions mt-8 flex flex-col xs:flex-row gap-3 sm:gap-4">
             <MagneticButton
               onClick={() => goToContact()}
               data-testid="hero-primary-cta"

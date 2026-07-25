@@ -32,11 +32,7 @@ export default function InteriorHero({
 
   return (
     <section className="interior-hero" aria-labelledby="interior-page-title">
-      <div className="interior-hero-grid" aria-hidden="true" />
-      <div className="interior-hero-orbit" aria-hidden="true">
-        <span />
-        <span />
-      </div>
+      <div className="interior-hero-backdrop" aria-hidden="true" />
       <div className="interior-hero-inner">
         <motion.div className="interior-hero-copy" {...item}>
           <span className="interior-hero-eyebrow">{eyebrow}</span>
@@ -59,6 +55,7 @@ export default function InteriorHero({
               )}
             </div>
           )}
+          <span className="interior-hero-rule" aria-hidden="true" />
         </motion.div>
       </div>
     </section>

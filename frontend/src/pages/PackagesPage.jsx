@@ -4,9 +4,12 @@ import InteriorHero from "@/components/site/InteriorHero";
 import Packages from "@/components/site/Packages";
 import Footer from "@/components/site/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import useManagedContent from "@/hooks/useManagedContent";
 import { PACKAGE_ITEMS, SITE_DETAILS } from "@/data/businessContent";
 
 export default function PackagesPage() {
+  const packages = useManagedContent("packages", PACKAGE_ITEMS);
+
   usePageMeta({
     title: "Pachete spectacole cu drone și artificii — FireArtRo",
     description:
@@ -17,7 +20,7 @@ export default function PackagesPage() {
       "@type": "ItemList",
       name: "Pachete FireArtRo",
       url: `${SITE_DETAILS.siteUrl}/pachete`,
-      itemListElement: PACKAGE_ITEMS.map((item, index) => ({
+      itemListElement: packages.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
         item: {
@@ -31,21 +34,21 @@ export default function PackagesPage() {
   });
 
   return (
-    <main className="interior-page min-h-screen overflow-x-clip bg-[#050308] text-white">
+    <main className="interior-page packages-page min-h-screen overflow-x-clip bg-[#050308] text-white">
       <ScrollProgress />
       <Navbar />
       <InteriorHero
         eyebrow="Pachete FireArtRo"
         title="Un punct de plecare clar."
-        accent="Un spectacol construit pentru tine."
-        description="Alegi direcția vizuală, iar noi adaptăm durata, tehnologia, logistica și intensitatea la locația și momentul evenimentului."
+        accent="Noi îl adaptăm evenimentului."
+        description="Compară formatele disponibile. Configurația finală se stabilește după locație, dată, public și efectul dorit."
         primaryHref="/contact"
-        primaryLabel="Solicită configurația"
+        primaryLabel="Solicită ofertă"
         secondaryHref="#optiuni"
-        secondaryLabel="Compară opțiunile"
+        secondaryLabel="Vezi formatele"
       />
       <div id="optiuni" className="interior-section-anchor">
-        <Packages full />
+        <Packages full items={packages} />
       </div>
       <Footer />
     </main>

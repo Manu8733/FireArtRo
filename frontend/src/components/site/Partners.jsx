@@ -1,58 +1,39 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { PARTNER_ITEMS } from "@/data/businessContent";
-import useManagedContent from "@/hooks/useManagedContent";
+import { Building2, CalendarDays, MapPinned, UsersRound } from "lucide-react";
 
 const EASE = [0.16, 1, 0.3, 1];
+const COLLABORATIONS = [
+  { title: "Organizatori", text: "Proiecte private și publice", icon: CalendarDays },
+  { title: "Agenții", text: "Campanii și lansări de brand", icon: UsersRound },
+  { title: "Locații", text: "Spații indoor și outdoor", icon: MapPinned },
+  { title: "Producții", text: "Scene, festivaluri și city events", icon: Building2 },
+];
 
 export default function Partners() {
-  const partners = useManagedContent("partners", PARTNER_ITEMS);
   const reduce = useReducedMotion();
 
   return (
-    <section className="partners-marquee" aria-labelledby="partners-title">
-      <div className="partners-marquee-heading">
-        <motion.span
-          initial={reduce ? false : { opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.7 }}
-          transition={{ duration: 0.55, ease: EASE }}
-        >
-          Ecosistem de producție
-        </motion.span>
-        <motion.h2
-          id="partners-title"
-          initial={reduce ? false : { opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.65 }}
-          transition={{ duration: 0.7, ease: EASE }}
-        >
-          Spații pregătite pentru partenerii confirmați.
-        </motion.h2>
-        <p>Identitățile de mai jos sunt demonstrative și vor fi înlocuite cu partenerii aprobați.</p>
+    <section className="home-collaboration" aria-labelledby="partners-title">
+      <div className="home-collaboration-copy">
+        <span>Colaborare</span>
+        <h2 id="partners-title">Intrăm firesc în echipa care construiește evenimentul.</h2>
+        <p>Lucrăm coordonat cu organizatorii, locațiile și furnizorii tehnici, de la primul plan până la execuția live.</p>
       </div>
 
-      <div className="partners-marquee-window">
-        <motion.div
-          className="partners-marquee-reveal"
-          initial={reduce ? false : { opacity: 0, x: 80 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 0.9, ease: EASE }}
-        >
-          <div className="partners-marquee-track">
-            {[...partners, ...partners].map((partner, index) => (
-              <article key={`${partner.id}-${index}`} className="partner-demo-card">
-                <span>{String((index % partners.length) + 1).padStart(2, "0")}</span>
-                {partner.logo ? (
-                  <img src={partner.logo} alt={partner.name} loading="lazy" />
-                ) : (
-                  <strong>{partner.logoPlaceholder || partner.name}</strong>
-                )}
-                <small>Identitate demonstrativă</small>
-              </article>
-            ))}
-          </div>
-        </motion.div>
+      <div className="home-collaboration-grid">
+        {COLLABORATIONS.map((item, index) => (
+          <motion.article
+            key={item.title}
+            initial={reduce ? false : { opacity: 0, y: 18 }}
+            whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.5, delay: index * 0.05, ease: EASE }}
+          >
+            <item.icon aria-hidden="true" />
+            <strong>{item.title}</strong>
+            <span>{item.text}</span>
+          </motion.article>
+        ))}
       </div>
     </section>
   );

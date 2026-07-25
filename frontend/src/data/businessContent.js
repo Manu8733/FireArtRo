@@ -1,9 +1,15 @@
 export const SITE_DETAILS = {
   name: "FireArtRo",
   siteUrl: "https://www.fireartro.ro",
-  email: "contact@fireartro.ro",
+  email: "contact@fireart.ro",
   googleReviewsUrl: process.env.REACT_APP_GOOGLE_REVIEWS_URL || "",
   areaServed: "România",
+  legalName: "1A BEST EVENTS SRL",
+  registrationNumber: "J2017000108306",
+  taxId: "RO37037033",
+  registeredOffice: "Satu Mare, Piața Soarelui, Bl. UU6, et. 3, ap. 9, 440221",
+  mainOffice: "Seini, Piața Unirii nr. 2",
+  secondaryOffice: "Cluj-Napoca, Strada Oltului nr. 1",
 };
 
 export const BUSINESS_HOURS = {
@@ -13,9 +19,9 @@ export const BUSINESS_HOURS = {
 };
 
 export const SOCIAL_LINKS = [
-  { id: "youtube", label: "YouTube", href: "https://youtube.com/@fireartro", placeholder: true },
-  { id: "facebook", label: "Facebook", href: "https://facebook.com/fireartro", placeholder: true },
-  { id: "instagram", label: "Instagram", href: "https://instagram.com/fireartro", placeholder: false },
+  { id: "youtube", label: "YouTube", href: "https://www.youtube.com/@fireart6369", placeholder: false },
+  { id: "facebook", label: "Facebook", href: "https://www.facebook.com/FireArtRo", placeholder: false },
+  { id: "instagram", label: "Instagram", href: "https://www.instagram.com/fireartro/", placeholder: false },
 ];
 
 export const TRUST_BADGES = [
@@ -30,7 +36,7 @@ export const PROMO_SLIDES = [
     id: "promo-drone-show",
     type: "video",
     title: "Coregrafii luminoase pentru cerul evenimentului",
-    shortText: "Forme, simboluri și mesaje construite cu până la 150 de drone.",
+    shortText: "Forme, simboluri și mesaje construite cu o flotă de aproximativ 150 de drone.",
     badge: "Drone show",
     media: "/media/fireart-drone.mp4",
     poster: "/media/drone-show.webp",
@@ -316,7 +322,7 @@ export const OFFER_DIRECTIONS = [
     no: "03",
     category: "Show drone",
     title: "Povestea devine lumină pe cer.",
-    shortDescription: "Forme, simboluri și identitate vizuală construite cu până la 150 de drone.",
+    shortDescription: "Forme, simboluri și identitate vizuală construite cu o flotă de aproximativ 150 de drone.",
     image: "/media/drone-show.webp",
     accent: "#5cb7ff",
     detail: "Silențios · precis · personalizat",
@@ -419,8 +425,8 @@ export const PACKAGE_ITEMS = [
     title: "Drone Story 150",
     category: "Show drone",
     bestFor: "Festivaluri și producții premium",
-    shortDescription: "Coregrafie extinsă cu până la 150 de drone disponibile.",
-    visualImpact: "Maxim pentru flota actuală",
+    shortDescription: "Coregrafie extinsă construită în jurul unei flote de aproximativ 150 de drone.",
+    visualImpact: "Densitate vizuală pentru producții ample",
     duration: "8–12 minute",
     droneCount: 150,
     badge: "Premium",
@@ -488,7 +494,7 @@ export const PACKAGE_ITEMS = [
 
 export const STATS_ITEMS = [
   { id: "moments", value: "500+", label: "spectacole & momente pirotehnice" },
-  { id: "drones", value: "150", label: "de drone disponibile" },
+  { id: "drones", value: "≈150", label: "de drone disponibile pentru coregrafii" },
   { id: "formats", value: "4", label: "direcții: zi, noapte, drone și efecte" },
   { id: "events", value: "3", label: "scări: privat, corporate și festival" },
 ];

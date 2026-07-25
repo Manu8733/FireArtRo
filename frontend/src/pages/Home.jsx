@@ -1,19 +1,17 @@
 import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
-import CinematicPrologue from "@/components/site/CinematicPrologue";
 import Stats from "@/components/site/Stats";
+import ServicesOverview from "@/components/site/ServicesOverview";
 import Showcase from "@/components/site/Showcase";
 import WhyUs from "@/components/site/WhyUs";
 import Process from "@/components/site/Process";
-import Testimonials from "@/components/site/Testimonials";
 import Partners from "@/components/site/Partners";
 import FinalCta from "@/components/site/FinalCta";
 import Footer from "@/components/site/Footer";
 import SocialDock from "@/components/site/SocialDock";
 import ScrollProgress from "@/components/site/ScrollProgress";
-import CinematicScene from "@/components/site/CinematicScene";
 import usePageMeta from "@/hooks/usePageMeta";
-import { BUSINESS_HOURS, SITE_DETAILS } from "@/data/businessContent";
+import { BUSINESS_HOURS, SITE_DETAILS, SOCIAL_LINKS } from "@/data/businessContent";
 
 export default function Home() {
   usePageMeta({
@@ -27,8 +25,16 @@ export default function Home() {
         {
           "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
           name: SITE_DETAILS.name,
+          legalName: SITE_DETAILS.legalName,
           url: SITE_DETAILS.siteUrl,
           email: SITE_DETAILS.email,
+          taxID: SITE_DETAILS.taxId,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: SITE_DETAILS.mainOffice,
+            addressCountry: "RO",
+          },
+          sameAs: SOCIAL_LINKS.map((profile) => profile.href),
           areaServed: { "@type": "Country", name: SITE_DETAILS.areaServed },
           openingHours: BUSINESS_HOURS.schema,
           description:
@@ -45,30 +51,17 @@ export default function Home() {
   });
 
   return (
-    <main className="min-h-screen overflow-x-clip bg-[#050308]">
+    <main className="home-page min-h-screen overflow-x-clip bg-[#050308]">
       <ScrollProgress />
       <Navbar />
       <Hero />
 
       <span id="intro" className="interior-section-anchor" aria-hidden="true" />
+      <Stats />
+      <ServicesOverview />
       <Showcase />
-
-      <CinematicScene index={2} label="Dovezi" accent="#8F6BFF" motionType="focus">
-        <Stats />
-      </CinematicScene>
-
-      <CinematicScene index={4} label="Siguranță" accent="#3A86FF" motionType="aperture">
-        <WhyUs />
-      </CinematicScene>
-
+      <WhyUs />
       <Process />
-
-      <CinematicPrologue />
-
-      <CinematicScene index={7} label="Încredere" accent="#8F6BFF" motionType="lift">
-        <Testimonials />
-      </CinematicScene>
-
       <Partners />
 
       <div className="site-ending">

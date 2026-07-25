@@ -170,7 +170,7 @@ async def security_headers(request: Request, call_next):
 
 allowed_origins = [
     origin.strip()
-    for origin in os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
+    for origin in os.environ.get("CORS_ORIGINS", "https://www.fireartro.ro").split(",")
     if origin.strip()
 ]
 

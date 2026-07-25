@@ -12,7 +12,7 @@ import {
   whatsappLink,
 } from "@/lib/constants";
 import { NAV_LINKS } from "@/data/content";
-import { BUSINESS_HOURS } from "@/data/businessContent";
+import { BUSINESS_HOURS, SITE_DETAILS } from "@/data/businessContent";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/site/CookieConsent";
 import { navigateToHref, scrollToTop } from "@/lib/scrollNavigation";
 
@@ -85,6 +85,7 @@ export const Footer = () => {
           <a href={`mailto:${EMAIL}`}><Mail /> {EMAIL}</a>
           <p>{BUSINESS_HOURS.label}</p>
           <small>{BUSINESS_HOURS.note}</small>
+          <small>Sediu principal: {SITE_DETAILS.mainOffice}</small>
         </div>
 
         <div className="site-footer-column">
@@ -124,7 +125,7 @@ export const Footer = () => {
 
       <div className="site-footer-bottom">
         <span>© {new Date().getFullYear()} FireArtRo</span>
-        <span>România · Drone shows · Artificii profesionale</span>
+        <span>{SITE_DETAILS.legalName} · CUI {SITE_DETAILS.taxId} · {SITE_DETAILS.registrationNumber}</span>
       </div>
     </footer>
   );

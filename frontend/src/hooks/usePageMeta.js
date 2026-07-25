@@ -18,6 +18,8 @@ export default function usePageMeta({
   schema,
   noindex = false,
 }) {
+  const schemaText = schema ? JSON.stringify(schema).replace(/</g, "\\u003c") : "";
+
   useEffect(() => {
     const canonicalUrl = `${SITE_DETAILS.siteUrl}${path}`;
     const imageUrl = image.startsWith("http") ? image : `${SITE_DETAILS.siteUrl}${image}`;
@@ -46,14 +48,14 @@ export default function usePageMeta({
 
     const schemaId = "page-structured-data";
     document.getElementById(schemaId)?.remove();
-    if (schema) {
+    if (schemaText) {
       const script = document.createElement("script");
       script.id = schemaId;
       script.type = "application/ld+json";
-      script.textContent = JSON.stringify(schema).replace(/</g, "\\u003c");
+      script.textContent = schemaText;
       document.head.appendChild(script);
     }
 
     return () => document.getElementById(schemaId)?.remove();
-  }, [description, image, noindex, path, schema, title]);
+  }, [description, image, noindex, path, schemaText, title]);
 }

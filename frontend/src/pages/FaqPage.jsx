@@ -14,16 +14,16 @@ export default function FaqPage() {
   });
 
   return (
-    <main className="interior-page min-h-screen overflow-x-clip bg-[#050308] text-white">
+    <main className="interior-page faq-page min-h-screen overflow-x-clip bg-[#050308] text-white">
       <ScrollProgress />
       <Navbar />
       <InteriorHero
         eyebrow="Întrebări frecvente"
-        title="Claritate înainte"
-        accent="de primul semnal luminos."
-        description="Am adunat răspunsurile care scurtează planificarea și te ajută să înțelegi rapid ce este posibil pentru evenimentul tău."
+        title="Răspunsuri înainte să începi."
+        accent="Fără jargon."
+        description="Rezervare, locație, vreme, autorizări și costuri, explicate pe scurt."
         primaryHref="/contact"
-        primaryLabel="Discută evenimentul"
+        primaryLabel="Întreabă echipa"
         secondaryHref="#raspunsuri"
         secondaryLabel="Vezi răspunsurile"
       />

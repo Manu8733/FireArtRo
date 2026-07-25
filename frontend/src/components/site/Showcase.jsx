@@ -49,7 +49,7 @@ export const Showcase = () => {
       ref={ref}
       id="spectacole"
       className="relative bg-[#050308]"
-      style={{ height: `${PORTFOLIO.length * (compactMotion ? 92 : 82)}svh` }}
+      style={{ height: `${PORTFOLIO.length * 58}svh` }}
       data-testid="showcase-section"
     >
       <div className="apple-viewport-height sticky top-0 h-[100svh] overflow-hidden bg-[#050308]">
@@ -157,7 +157,7 @@ export const Showcase = () => {
               >
                 <span className={`block h-1 rounded-full transition-all duration-500 md:h-px ${
                   index === active
-                    ? "bg-gradient-to-r from-[#3A86FF] via-[#176BFF] to-[#8F6BFF]"
+                    ? "bg-[#2f9fe3]"
                     : "bg-white/18 group-hover:bg-white/38"
                 }`} />
                 <span className={`mt-2 hidden truncate text-[10px] uppercase tracking-[0.16em] lg:block ${

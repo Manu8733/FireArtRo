@@ -3,6 +3,7 @@ import { ArrowRight, Check, Flame, MoonStar, Plane, Sparkles, Sun, Wand2 } from 
 import Reveal from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/cinematic";
 import { PACKAGE_CATEGORIES, PACKAGE_ITEMS } from "@/data/businessContent";
+import { MEDIA } from "@/data/content";
 import useManagedContent from "@/hooks/useManagedContent";
 import { goToContact } from "@/lib/contactNavigation";
 
@@ -15,6 +16,15 @@ const categoryIcons = {
   "Corporate / Festival": Flame,
 };
 
+const categoryVisuals = {
+  "Artificii de zi": MEDIA.crowd,
+  "Artificii de noapte": MEDIA.fireworksSky,
+  "Show drone": MEDIA.droneShow,
+  "Drone + artificii": MEDIA.hybrid,
+  "Efecte speciale": MEDIA.coldSparks,
+  "Corporate / Festival": MEDIA.corporate,
+};
+
 const selectPackage = (item) => {
   goToContact({
     package_id: item.id,
@@ -23,8 +33,9 @@ const selectPackage = (item) => {
   });
 };
 
-export const Packages = ({ full = false }) => {
-  const packages = useManagedContent("packages", PACKAGE_ITEMS);
+export const Packages = ({ full = false, items }) => {
+  const managedPackages = useManagedContent("packages", PACKAGE_ITEMS);
+  const packages = items || managedPackages;
   const [category, setCategory] = useState(full ? "Toate" : "Drone + artificii");
   const [expanded, setExpanded] = useState(false);
 
@@ -38,9 +49,9 @@ export const Packages = ({ full = false }) => {
     <section className="package-system" data-testid="packages-section" aria-labelledby="packages-title">
       <div className="package-system-inner">
         <SectionHeader
-          kicker="Direcții de ofertă"
-          title="Pachete clare, configurate pentru context."
-          subtitle="Alege o categorie. Durata, tehnologia și logistica se adaptează după locație și obiectiv."
+          kicker="Puncte de plecare"
+          title="Alege atmosfera. Configurația o construim împreună."
+          subtitle="Fiecare opțiune pornește de la un rezultat vizual clar și se adaptează locației, publicului și momentului."
         />
         <h2 id="packages-title" className="sr-only">Pachete FireArtRo</h2>
 
@@ -61,29 +72,45 @@ export const Packages = ({ full = false }) => {
           ))}
         </div>
 
-        <div className="package-compact-grid">
+        <div className="package-editorial-grid">
           {shown.map((item, index) => {
             const Icon = categoryIcons[item.category] || Sparkles;
+            const visual = categoryVisuals[item.category] || MEDIA.fireworksSky;
             return (
               <Reveal key={item.id} delay={Math.min(index * 0.035, 0.18)}>
-                <article className={`package-compact-card package-tone-${item.category.toLowerCase().replace(/[^a-z]+/g, "-")}`}>
-                  <div className="package-compact-top">
-                    <span><Icon /></span>
-                    {item.badge && <small>{item.badge}</small>}
+                <article className="package-editorial-card">
+                  <figure className="package-editorial-media">
+                    <img
+                      src={visual}
+                      alt=""
+                      aria-hidden="true"
+                      width="900"
+                      height="620"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span>{item.category}</span>
+                  </figure>
+                  <div className="package-editorial-copy">
+                    <header>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <Icon aria-hidden="true" />
+                    </header>
+                    <div>
+                      <h3>{item.title}</h3>
+                      <p>{item.shortDescription}</p>
+                    </div>
+                    <dl>
+                      <div><dt>Potrivit pentru</dt><dd>{item.bestFor}</dd></div>
+                      <div><dt>Atmosferă</dt><dd>{item.visualImpact}</dd></div>
+                      {item.duration && <div><dt>Durată</dt><dd>{item.duration}</dd></div>}
+                      {item.droneCount && <div><dt>Drone</dt><dd>aproximativ {item.droneCount}</dd></div>}
+                      {item.effectsCount && <div><dt>Configurație</dt><dd>{item.effectsCount} grupe de efecte</dd></div>}
+                    </dl>
+                    <button type="button" onClick={() => selectPackage(item)}>
+                      Configurează opțiunea <ArrowRight aria-hidden="true" />
+                    </button>
                   </div>
-                  <p className="package-compact-category">{item.category}</p>
-                  <h3>{item.title}</h3>
-                  <p>{item.shortDescription}</p>
-                  <dl>
-                    <div><dt>Potrivit pentru</dt><dd>{item.bestFor}</dd></div>
-                    <div><dt>Impact</dt><dd>{item.visualImpact}</dd></div>
-                    {item.duration && <div><dt>Durată</dt><dd>{item.duration}</dd></div>}
-                    {item.droneCount && <div><dt>Drone</dt><dd>până la {item.droneCount}</dd></div>}
-                    {item.effectsCount && <div><dt>Configurație</dt><dd>{item.effectsCount} grupe de efecte</dd></div>}
-                  </dl>
-                  <button type="button" onClick={() => selectPackage(item)}>
-                    {item.cta || "Cere ofertă"} <ArrowRight />
-                  </button>
                 </article>
               </Reveal>
             );
@@ -97,10 +124,9 @@ export const Packages = ({ full = false }) => {
         )}
 
         <div className="package-pricing-note">
-          <Check />
+          <Check aria-hidden="true" />
           <p>
-            Prețul final depinde de locație, durată, complexitatea designului, numărul de drone, tipul efectelor,
-            cerințele de siguranță și logistica evenimentului.
+            Oferta finală se stabilește după locație, durată, complexitatea designului, tehnologie și cerințele de siguranță.
           </p>
         </div>
       </div>

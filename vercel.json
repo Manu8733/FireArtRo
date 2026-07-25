@@ -38,6 +38,14 @@
           "value": "same-origin-allow-popups"
         },
         {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "X-Permitted-Cross-Domain-Policies",
+          "value": "none"
+        },
+        {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://img.youtube.com; media-src 'self' blob:; frame-src https://www.youtube-nocookie.com; connect-src 'self' https:; upgrade-insecure-requests"
         }

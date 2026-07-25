@@ -176,6 +176,7 @@ export const Navbar = () => {
         }}
         data-testid={`nav-link-${link.href.replace(/[#/]/g, "") || "home"}`}
         className={isActive ? "is-active" : ""}
+        aria-current={isActive ? "page" : undefined}
       >
         {link.label}
         {isActive && (
@@ -213,7 +214,7 @@ export const Navbar = () => {
         <div className="site-navbar-mobile">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <button data-testid="mobile-menu-trigger" className="menu-button" aria-label="Deschide meniul">
+              <button type="button" data-testid="mobile-menu-trigger" className="menu-button" aria-label="Deschide meniul">
                 <Menu />
               </button>
             </SheetTrigger>
@@ -231,7 +232,7 @@ export const Navbar = () => {
                     setOpen(false);
                     window.setTimeout(() => goHome("auto"), 150);
                   }} />
-                  <button onClick={() => setOpen(false)} aria-label="Închide meniul" data-testid="mobile-menu-close">
+                  <button type="button" onClick={() => setOpen(false)} aria-label="Închide meniul" data-testid="mobile-menu-close">
                     <X />
                   </button>
                 </div>
@@ -246,6 +247,7 @@ export const Navbar = () => {
                         closeAndGoTo(link.href);
                       }}
                       data-testid={`mobile-nav-link-${link.href.replace(/[#/]/g, "") || "home"}`}
+                      aria-current={active === link.href ? "page" : undefined}
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.04 + index * 0.035 }}

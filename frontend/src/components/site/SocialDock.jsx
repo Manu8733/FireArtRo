@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Phone } from "lucide-react";
 import {
@@ -8,24 +8,14 @@ import {
   YouTubeIcon,
 } from "@/components/site/BrandIcons";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import useManagedContent from "@/hooks/useManagedContent";
 import {
-  FACEBOOK,
-  INSTAGRAM,
-  PHONE_TEL,
-  YOUTUBE,
-  whatsappLink,
-} from "@/lib/constants";
+  CONTACT_SETTINGS_DEFAULT,
+  SOCIAL_LINKS,
+} from "@/data/businessContent";
+import { buildWhatsappLink } from "@/lib/constants";
 
 const EASE = [0.22, 1, 0.36, 1];
-const whatsappHref = whatsappLink();
-
-const ITEMS = [
-  { key: "youtube", label: "YouTube", href: YOUTUBE, Icon: YouTubeIcon, color: "#ff1744", external: true },
-  { key: "facebook", label: "Facebook", href: FACEBOOK, Icon: FacebookIcon, color: "#1877f2", external: true },
-  { key: "instagram", label: "Instagram", href: INSTAGRAM, Icon: InstagramIcon, color: "#e1306c", external: true },
-  { key: "whatsapp", label: "WhatsApp", href: whatsappHref || "/contact", Icon: WhatsAppIcon, color: "#25d366", external: Boolean(whatsappHref) },
-  { key: "phone", label: "Telefon", href: PHONE_TEL ? `tel:${PHONE_TEL}` : "/contact", Icon: Phone, color: "#5cb7ff", external: false },
-].filter((item) => item.href);
 
 const DockButton = ({ item, mobile = false }) => {
   const { label, href, Icon, color, external } = item;
@@ -44,7 +34,7 @@ const DockButton = ({ item, mobile = false }) => {
   );
 };
 
-const DesktopDock = () => (
+const DesktopDock = ({ items }) => (
   <motion.aside
     initial={{ opacity: 0, x: 28 }}
     animate={{ opacity: 1, x: 0 }}
@@ -54,11 +44,11 @@ const DesktopDock = () => (
     data-testid="social-dock"
     aria-label="Rețele sociale și contact"
   >
-    {ITEMS.map((item) => <DockButton key={item.key} item={item} />)}
+    {items.map((item) => <DockButton key={item.key} item={item} />)}
   </motion.aside>
 );
 
-const MobileDock = () => (
+const MobileDock = ({ items }) => (
   <motion.aside
     initial={{ opacity: 0, y: 18 }}
     animate={{ opacity: 1, y: 0 }}
@@ -68,13 +58,27 @@ const MobileDock = () => (
     data-testid="social-dock"
     aria-label="Rețele sociale și contact"
   >
-    {ITEMS.map((item) => <DockButton key={item.key} item={item} mobile />)}
+    {items.map((item) => <DockButton key={item.key} item={item} mobile />)}
   </motion.aside>
 );
 
 export const SocialDock = () => {
   const mobile = useIsMobile();
   const [visible, setVisible] = useState(true);
+  const socialLinks = useManagedContent("socialLinks", SOCIAL_LINKS);
+  const contactSettings = useManagedContent("contactSettings", CONTACT_SETTINGS_DEFAULT);
+  const items = useMemo(() => {
+    const socialMap = Object.fromEntries(socialLinks.map((item) => [item.id, item.href]));
+    const whatsappHref = buildWhatsappLink(contactSettings.whatsappNumber);
+    const phoneHref = contactSettings.phoneTel || contactSettings.phoneDisplay?.replace(/\s/g, "");
+    return [
+      { key: "youtube", label: "YouTube", href: socialMap.youtube, Icon: YouTubeIcon, color: "#ff1744", external: true },
+      { key: "facebook", label: "Facebook", href: socialMap.facebook, Icon: FacebookIcon, color: "#1877f2", external: true },
+      { key: "instagram", label: "Instagram", href: socialMap.instagram, Icon: InstagramIcon, color: "#e1306c", external: true },
+      { key: "whatsapp", label: "WhatsApp", href: whatsappHref || "/contact", Icon: WhatsAppIcon, color: "#25d366", external: Boolean(whatsappHref) },
+      { key: "phone", label: "Telefon", href: phoneHref ? `tel:${phoneHref}` : "/contact", Icon: Phone, color: "#5cb7ff", external: false },
+    ].filter((item) => item.href);
+  }, [contactSettings, socialLinks]);
 
   useEffect(() => {
     const hero = document.getElementById("acasa");
@@ -89,7 +93,7 @@ export const SocialDock = () => {
 
   return (
     <AnimatePresence>
-      {visible && (mobile ? <MobileDock key="mobile" /> : <DesktopDock key="desktop" />)}
+      {visible && (mobile ? <MobileDock key="mobile" items={items} /> : <DesktopDock key="desktop" items={items} />)}
     </AnimatePresence>
   );
 };

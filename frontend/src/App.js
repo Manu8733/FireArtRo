@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-route
 import { Toaster } from "@/components/ui/sonner";
 import Home from "@/pages/Home";
 import CookieConsent from "@/components/site/CookieConsent";
+import RouteShutter from "@/components/night/RouteShutter";
 import { scrollToHash, scrollToTop, syncScrollOffset } from "@/lib/scrollNavigation";
 
 const GalleryPage = lazy(() => import("@/pages/GalleryPage"));
@@ -19,16 +20,50 @@ function RouteScrollManager() {
   useEffect(() => {
     syncScrollOffset();
     const timer = window.setTimeout(() => {
-      if (location.hash) {
-        scrollToHash(location.hash, "auto");
-      } else {
-        scrollToTop("auto");
-      }
+      if (location.hash) scrollToHash(location.hash, "auto");
+      else scrollToTop("auto");
     }, 90);
     return () => window.clearTimeout(timer);
   }, [location.pathname, location.hash]);
 
   return null;
+}
+
+function GlobalUi() {
+  const location = useLocation();
+
+  return (
+    <>
+      {location.pathname !== "/admin" && <CookieConsent />}
+      <Toaster position="top-center" richColors />
+    </>
+  );
+}
+
+function AppRoutes() {
+  const location = useLocation();
+
+  return (
+    <div className="route-stage">
+      <Suspense fallback={<div className="route-loading" role="status" aria-label="Se încarcă pagina" />}>
+        <Routes location={location}>
+          <Route path="/" element={<Home />} />
+          <Route path="/galerie" element={<GalleryPage />} />
+          <Route path="/pachete" element={<PackagesPage />} />
+          <Route path="/intrebari-frecvente" element={<FaqPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/confidentialitate" element={<LegalPage type="confidentialitate" />} />
+          <Route path="/termeni-si-conditii" element={<LegalPage type="termeni" />} />
+          <Route path="/cookies" element={<LegalPage type="cookies" />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/legal/confidentialitate" element={<Navigate to="/confidentialitate" replace />} />
+          <Route path="/legal/termeni" element={<Navigate to="/termeni-si-conditii" replace />} />
+          <Route path="/legal/cookies" element={<Navigate to="/cookies" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </div>
+  );
 }
 
 function App() {
@@ -56,32 +91,15 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <a className="skip-link" href="#main-content">
-          Sari la conținut
-        </a>
-        <RouteScrollManager />
-        <div id="main-content" tabIndex="-1">
-          <Suspense fallback={<div className="route-loading" role="status" aria-label="Se încarcă pagina" />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/galerie" element={<GalleryPage />} />
-              <Route path="/pachete" element={<PackagesPage />} />
-              <Route path="/intrebari-frecvente" element={<FaqPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/confidentialitate" element={<LegalPage type="confidentialitate" />} />
-              <Route path="/termeni-si-conditii" element={<LegalPage type="termeni" />} />
-              <Route path="/cookies" element={<LegalPage type="cookies" />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/legal/confidentialitate" element={<Navigate to="/confidentialitate" replace />} />
-              <Route path="/legal/termeni" element={<Navigate to="/termeni-si-conditii" replace />} />
-              <Route path="/legal/cookies" element={<Navigate to="/cookies" replace />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </div>
+        <RouteShutter>
+          <a className="skip-link" href="#main-content">Sari la conținut</a>
+          <RouteScrollManager />
+          <div id="main-content" tabIndex="-1">
+            <AppRoutes />
+          </div>
+          <GlobalUi />
+        </RouteShutter>
       </BrowserRouter>
-      <CookieConsent />
-      <Toaster position="top-center" richColors />
     </div>
   );
 }

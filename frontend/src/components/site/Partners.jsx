@@ -1,5 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Building2, CalendarDays, MapPinned, UsersRound } from "lucide-react";
+import { PARTNER_ITEMS } from "@/data/businessContent";
+import useManagedContent from "@/hooks/useManagedContent";
 
 const EASE = [0.16, 1, 0.3, 1];
 const COLLABORATIONS = [
@@ -11,6 +13,7 @@ const COLLABORATIONS = [
 
 export default function Partners() {
   const reduce = useReducedMotion();
+  const partners = useManagedContent("partners", PARTNER_ITEMS);
 
   return (
     <section className="home-collaboration" aria-labelledby="partners-title">
@@ -35,6 +38,30 @@ export default function Partners() {
           </motion.article>
         ))}
       </div>
+
+      {partners.length > 0 && (
+        <div className="home-partner-rail" aria-label="Parteneri și colaboratori">
+          <span>Parteneri și colaboratori</span>
+          <div>
+            {partners.map((partner, index) => (
+              <motion.article
+                key={partner.id || partner.name}
+                initial={reduce ? false : { opacity: 0, y: 12 }}
+                whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.4, delay: index * 0.04, ease: EASE }}
+              >
+                {partner.logo ? (
+                  <img src={partner.logo} alt={partner.name} loading="lazy" decoding="async" />
+                ) : (
+                  <strong>{partner.logoPlaceholder || partner.name}</strong>
+                )}
+                <span>{partner.name}</span>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

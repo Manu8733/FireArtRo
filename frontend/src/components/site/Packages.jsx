@@ -1,133 +1,298 @@
-import { useMemo, useState } from "react";
-import { ArrowRight, Check, Flame, MoonStar, Plane, Sparkles, Sun, Wand2 } from "lucide-react";
-import Reveal from "@/components/site/Reveal";
-import { SectionHeader } from "@/components/site/cinematic";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
+import { ExternalLink, Play, X } from "lucide-react";
+import NightButton from "@/components/night/NightButton";
 import { PACKAGE_CATEGORIES, PACKAGE_ITEMS } from "@/data/businessContent";
 import { MEDIA } from "@/data/content";
 import useManagedContent from "@/hooks/useManagedContent";
 import { goToContact } from "@/lib/contactNavigation";
 
-const categoryIcons = {
-  "Artificii de zi": Sun,
-  "Artificii de noapte": MoonStar,
-  "Show drone": Plane,
-  "Drone + artificii": Sparkles,
-  "Efecte speciale": Wand2,
-  "Corporate / Festival": Flame,
-};
-
-const categoryVisuals = {
-  "Artificii de zi": MEDIA.crowd,
+const visualByCategory = {
+  "Artificii de zi": MEDIA.corporate,
   "Artificii de noapte": MEDIA.fireworksSky,
   "Show drone": MEDIA.droneShow,
   "Drone + artificii": MEDIA.hybrid,
   "Efecte speciale": MEDIA.coldSparks,
-  "Corporate / Festival": MEDIA.corporate,
+  "Corporate / Festival": MEDIA.crowd,
 };
 
-const selectPackage = (item) => {
-  goToContact({
-    package_id: item.id,
-    package_title: item.title,
-    services: [item.category],
-  });
+const packageConfiguration = (item) => {
+  if (item.droneCount && item.effectsCount) return `${item.droneCount} drone + ${item.effectsCount} grupe de efecte`;
+  if (item.droneCount) return `${item.droneCount} drone`;
+  if (item.effectsCount) return `${item.effectsCount} grupe de efecte`;
+  if (item.category === "Artificii de zi") return "Pachet pirotehnic de zi";
+  if (item.category === "Artificii de noapte") return "Pachet pirotehnic de noapte";
+  if (item.category === "Efecte speciale") return "Configurație mixtă";
+  return "După brief";
 };
 
-export const Packages = ({ full = false, items }) => {
+const getYouTubeId = (value = "") => {
+  try {
+    const url = new URL(value);
+    if (url.hostname === "youtu.be") return url.pathname.split("/").filter(Boolean)[0] || "";
+    if (url.hostname.endsWith("youtube.com")) {
+      if (url.pathname === "/watch") return url.searchParams.get("v") || "";
+      const segments = url.pathname.split("/").filter(Boolean);
+      if (["embed", "shorts", "live"].includes(segments[0])) return segments[1] || "";
+    }
+  } catch {
+    return "";
+  }
+  return "";
+};
+
+const getYouTubeEmbedUrl = (value) => {
+  const id = getYouTubeId(value);
+  return id
+    ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1`
+    : "";
+};
+
+const getYouTubeThumbnailUrl = (value) => {
+  const id = getYouTubeId(value);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
+};
+
+export const Packages = ({ items }) => {
   const managedPackages = useManagedContent("packages", PACKAGE_ITEMS);
-  const packages = items || managedPackages;
-  const [category, setCategory] = useState(full ? "Toate" : "Drone + artificii");
-  const [expanded, setExpanded] = useState(false);
-
-  const filtered = useMemo(
-    () => packages.filter((item) => category === "Toate" || item.category === category),
-    [category, packages]
+  const packages = Array.isArray(items) ? items : managedPackages;
+  const categories = useMemo(
+    () => PACKAGE_CATEGORIES.filter(
+      (category) => category !== "Toate" && packages.some((item) => item.category === category),
+    ),
+    [packages],
   );
-  const shown = full && !expanded && category === "Toate" ? filtered.slice(0, 6) : filtered;
+  const initialCategory = categories.includes("Drone + artificii") ? "Drone + artificii" : categories[0];
+  const initialPackage = packages.find((item) => item.category === initialCategory) || packages[0];
+  const [category, setCategory] = useState(initialCategory);
+  const [selectedId, setSelectedId] = useState(initialPackage?.id || "");
+  const [displayedId, setDisplayedId] = useState(initialPackage?.id || "");
+  const [transitionState, setTransitionState] = useState("idle");
+  const [videoPackageId, setVideoPackageId] = useState("");
+  const variantRefs = useRef([]);
+  const timersRef = useRef([]);
+  const reduceMotion = useReducedMotion();
+
+  const variants = useMemo(
+    () => packages.filter((item) => item.category === category),
+    [category, packages],
+  );
+  const activePackage = packages.find((item) => item.id === displayedId) || variants[0] || packages[0];
+  const primaryVideoUrl = activePackage?.videoUrl?.trim() || "";
+  const videoEmbedUrl = getYouTubeEmbedUrl(primaryVideoUrl);
+  const packageThumbnail = getYouTubeThumbnailUrl(primaryVideoUrl)
+    || activePackage?.image
+    || visualByCategory[activePackage?.category]
+    || MEDIA.fireworksSky;
+  const additionalVideos = Array.isArray(activePackage?.moreVideoUrls)
+    ? activePackage.moreVideoUrls.filter(Boolean)
+    : [];
+  const isVideoOpen = Boolean(primaryVideoUrl) && videoPackageId === activePackage?.id;
+
+  useEffect(() => () => timersRef.current.forEach(window.clearTimeout), []);
+
+  const swapPackage = (nextPackage) => {
+    if (!nextPackage || nextPackage.id === selectedId) return;
+    setVideoPackageId("");
+    setSelectedId(nextPackage.id);
+    timersRef.current.forEach(window.clearTimeout);
+    timersRef.current = [];
+
+    if (reduceMotion) {
+      setDisplayedId(nextPackage.id);
+      setTransitionState("idle");
+      return;
+    }
+
+    setTransitionState("cover");
+    timersRef.current.push(window.setTimeout(() => setDisplayedId(nextPackage.id), 310));
+    timersRef.current.push(window.setTimeout(() => setTransitionState("idle"), 860));
+  };
+
+  const changeCategory = (nextCategory) => {
+    const first = packages.find((item) => item.category === nextCategory);
+    setCategory(nextCategory);
+    if (!first) return;
+    if (first.id === selectedId) {
+      setDisplayedId(first.id);
+      return;
+    }
+    swapPackage(first);
+  };
+
+  const chooseVariant = (index, focus = false) => {
+    const next = variants[index];
+    swapPackage(next);
+    if (focus) window.requestAnimationFrame(() => variantRefs.current[index]?.focus());
+  };
+
+  const handleVariantKeyDown = (event, index) => {
+    let nextIndex = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % variants.length;
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + variants.length) % variants.length;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = variants.length - 1;
+    if (nextIndex === null) return;
+    event.preventDefault();
+    chooseVariant(nextIndex, true);
+  };
+
+  const requestPackage = () => {
+    if (!activePackage) return;
+    goToContact({
+      package_id: activePackage.id,
+      package_title: activePackage.title,
+      services: [activePackage.category],
+    });
+  };
+
+  if (!activePackage) return null;
 
   return (
-    <section className="package-system" data-testid="packages-section" aria-labelledby="packages-title">
-      <div className="package-system-inner">
-        <SectionHeader
-          kicker="Puncte de plecare"
-          title="Alege atmosfera. Configurația o construim împreună."
-          subtitle="Fiecare opțiune pornește de la un rezultat vizual clar și se adaptează locației, publicului și momentului."
-        />
-        <h2 id="packages-title" className="sr-only">Pachete FireArtRo</h2>
+    <section className="nr-package-comparator" data-testid="package-comparator" aria-labelledby="packages-title">
+      <div className="nr-shell nr-package-comparator__shell">
+        <header className="nr-package-comparator__header">
+          <div>
+            <p>Formate FireArtRo</p>
+            <h1 id="packages-title">Pachete</h1>
+          </div>
+          <p>Alege direcția. Configurația finală se stabilește după locație și brief.</p>
+        </header>
 
-        <div className="package-filter-row" aria-label="Categorii pachete">
-          {PACKAGE_CATEGORIES.map((item) => (
-            <button
-              key={item}
-              type="button"
-              aria-pressed={category === item}
-              className={category === item ? "is-active" : ""}
-              onClick={() => {
-                setCategory(item);
-                setExpanded(false);
-              }}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+        <div className="nr-package-workspace">
+          <nav className="nr-package-categories" role="tablist" aria-label="Categorii de spectacol">
+            {categories.map((item, index) => (
+              <button
+                key={item}
+                type="button"
+                role="tab"
+                aria-selected={category === item}
+                className={category === item ? "is-active" : ""}
+                onClick={() => changeCategory(item)}
+              >
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                {item}
+              </button>
+            ))}
+          </nav>
 
-        <div className="package-editorial-grid">
-          {shown.map((item, index) => {
-            const Icon = categoryIcons[item.category] || Sparkles;
-            const visual = categoryVisuals[item.category] || MEDIA.fireworksSky;
-            return (
-              <Reveal key={item.id} delay={Math.min(index * 0.035, 0.18)}>
-                <article className="package-editorial-card">
-                  <figure className="package-editorial-media">
-                    <img
-                      src={visual}
-                      alt=""
-                      aria-hidden="true"
-                      width="900"
-                      height="620"
-                      loading="lazy"
-                      decoding="async"
+          <article
+            className="nr-package-stage"
+            data-testid="package-stage"
+            data-transition-state={transitionState}
+            aria-live="polite"
+          >
+            <figure className="nr-package-stage__media">
+              {isVideoOpen ? (
+                <div className="nr-package-video" data-testid="package-inline-video">
+                  {videoEmbedUrl ? (
+                    <iframe
+                      src={videoEmbedUrl}
+                      title={`Video demonstrativ pentru pachetul ${activePackage.title}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
                     />
-                    <span>{item.category}</span>
-                  </figure>
-                  <div className="package-editorial-copy">
-                    <header>
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <Icon aria-hidden="true" />
-                    </header>
+                  ) : (
+                    <video src={primaryVideoUrl} controls autoPlay playsInline preload="metadata" />
+                  )}
+                  <button
+                    type="button"
+                    className="nr-package-video__close"
+                    onClick={() => setVideoPackageId("")}
+                    aria-label={`Închide videoclipul pentru ${activePackage.title}`}
+                  >
+                    <X aria-hidden="true" />
+                  </button>
+                </div>
+              ) : (
+                <img
+                  key={activePackage.id}
+                  src={packageThumbnail}
+                  alt={`Atmosferă vizuală pentru ${activePackage.title}`}
+                  loading="eager"
+                  decoding="async"
+                />
+              )}
+              {primaryVideoUrl && !isVideoOpen && (
+                <button
+                  type="button"
+                  className="nr-package-video-trigger"
+                  onClick={() => setVideoPackageId(activePackage.id)}
+                  aria-label={`Redă videoclipul pachetului ${activePackage.title}`}
+                >
+                  <Play aria-hidden="true" fill="currentColor" />
+                  <span>Vezi video</span>
+                </button>
+              )}
+              <figcaption>{activePackage.category}</figcaption>
+            </figure>
+
+            <div className="nr-package-stage__fragments" aria-hidden="true">
+              {Array.from({ length: 5 }, (_, index) => (
+                <i key={index} data-testid="package-transition-band" style={{ "--fragment-index": 4 - index }} />
+              ))}
+            </div>
+
+            <div className="nr-package-stage__content">
+              <div className="nr-package-variants" role="tablist" aria-label={`Variante pentru ${category}`}>
+                {variants.map((item, index) => (
+                  <button
+                    key={item.id}
+                    ref={(node) => { variantRefs.current[index] = node; }}
+                    type="button"
+                    role="tab"
+                    aria-selected={item.id === selectedId}
+                    tabIndex={item.id === selectedId ? 0 : -1}
+                    className={item.id === selectedId ? "is-active" : ""}
+                    onClick={() => chooseVariant(index)}
+                    onKeyDown={(event) => handleVariantKeyDown(event, index)}
+                  >
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    {item.title}
+                  </button>
+                ))}
+              </div>
+
+              <div className="nr-package-stage__copy">
+                <p>{activePackage.badge || activePackage.visualImpact}</p>
+                <h2 data-testid="packages-active-title">{activePackage.title}</h2>
+                <span>{activePackage.shortDescription}</span>
+                {Array.isArray(activePackage.highlights) && activePackage.highlights.length > 0 && (
+                  <ul className="nr-package-highlights" aria-label="Caracteristici incluse">
+                    {activePackage.highlights.slice(0, 5).map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                )}
+              </div>
+
+              <div className="nr-package-stage__decision">
+                <dl className="nr-package-stage__facts">
+                  <div><dt>Pentru</dt><dd>{activePackage.bestFor}</dd></div>
+                  <div><dt>Durată</dt><dd>{activePackage.duration || "După brief"}</dd></div>
+                  <div><dt>Format</dt><dd>{packageConfiguration(activePackage)}</dd></div>
+                </dl>
+
+                {activePackage.bonus && <p className="nr-package-bonus"><strong>Inclus:</strong> {activePackage.bonus}</p>}
+                {activePackage.videoNote && <p className="nr-package-video-note">{activePackage.videoNote}</p>}
+
+                {additionalVideos.length > 0 && (
+                  <details className="nr-package-more-videos">
+                    <summary>Vezi și alte videoclipuri ({additionalVideos.length})</summary>
                     <div>
-                      <h3>{item.title}</h3>
-                      <p>{item.shortDescription}</p>
+                      {additionalVideos.map((url, index) => (
+                        <a key={`${url}-${index}`} href={url} target="_blank" rel="noopener noreferrer">
+                          Video {index + 2} <ExternalLink aria-hidden="true" />
+                        </a>
+                      ))}
                     </div>
-                    <dl>
-                      <div><dt>Potrivit pentru</dt><dd>{item.bestFor}</dd></div>
-                      <div><dt>Atmosferă</dt><dd>{item.visualImpact}</dd></div>
-                      {item.duration && <div><dt>Durată</dt><dd>{item.duration}</dd></div>}
-                      {item.droneCount && <div><dt>Drone</dt><dd>aproximativ {item.droneCount}</dd></div>}
-                      {item.effectsCount && <div><dt>Configurație</dt><dd>{item.effectsCount} grupe de efecte</dd></div>}
-                    </dl>
-                    <button type="button" onClick={() => selectPackage(item)}>
-                      Configurează opțiunea <ArrowRight aria-hidden="true" />
-                    </button>
-                  </div>
-                </article>
-              </Reveal>
-            );
-          })}
-        </div>
+                  </details>
+                )}
 
-        {full && category === "Toate" && filtered.length > 6 && (
-          <button type="button" className="package-expand" onClick={() => setExpanded((value) => !value)}>
-            {expanded ? "Arată selecția compactă" : `Vezi toate cele ${filtered.length} pachete`}
-          </button>
-        )}
-
-        <div className="package-pricing-note">
-          <Check aria-hidden="true" />
-          <p>
-            Oferta finală se stabilește după locație, durată, complexitatea designului, tehnologie și cerințele de siguranță.
-          </p>
+                <NightButton data-testid="packages-direct-cta" onClick={requestPackage}>
+                  Cere configurația
+                </NightButton>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>

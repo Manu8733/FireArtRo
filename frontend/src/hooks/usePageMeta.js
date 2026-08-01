@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { SITE_DETAILS } from "@/data/businessContent";
+import useManagedContent from "@/hooks/useManagedContent";
 
 const ensureMeta = (selector, attributes) => {
   let element = document.head.querySelector(selector);
@@ -18,11 +19,12 @@ export default function usePageMeta({
   schema,
   noindex = false,
 }) {
+  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
   const schemaText = schema ? JSON.stringify(schema).replace(/</g, "\\u003c") : "";
 
   useEffect(() => {
-    const canonicalUrl = `${SITE_DETAILS.siteUrl}${path}`;
-    const imageUrl = image.startsWith("http") ? image : `${SITE_DETAILS.siteUrl}${image}`;
+    const canonicalUrl = `${siteDetails.siteUrl}${path}`;
+    const imageUrl = image.startsWith("http") ? image : `${siteDetails.siteUrl}${image}`;
     document.title = title;
 
     ensureMeta('meta[name="description"]', { name: "description", content: description });
@@ -57,5 +59,5 @@ export default function usePageMeta({
     }
 
     return () => document.getElementById(schemaId)?.remove();
-  }, [description, image, noindex, path, schemaText, title]);
+  }, [description, image, noindex, path, schemaText, siteDetails.siteUrl, title]);
 }

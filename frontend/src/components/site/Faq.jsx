@@ -1,15 +1,47 @@
+import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowUpRight, MessageCircle } from "lucide-react";
-import Reveal from "@/components/site/Reveal";
 import { FAQS } from "@/data/content";
-import { whatsappLink } from "@/lib/constants";
+import useManagedContent from "@/hooks/useManagedContent";
+
+const EDITORIAL_ANSWERS = {
+  "Cu cât timp înainte trebuie rezervat spectacolul?":
+    "Pentru majoritatea evenimentelor, recomandăm să ne contactezi cu 3–4 săptămâni înainte. Pentru date aglomerate sau producții ample, este util un interval de 1–2 luni.",
+  "Se pot combina dronele cu artificiile?":
+    "Da. Dronele și artificiile pot fi sincronizate într-un singur moment, în funcție de locație și condițiile tehnice.",
+  "Ce se întâmplă dacă vremea este nefavorabilă?":
+    "Dacă vântul sau alte condiții nu permit desfășurarea în siguranță, adaptăm sau reprogramăm momentul conform variantei stabilite înainte de eveniment.",
+  "Sunt necesare autorizații?":
+    "Da. Stabilim autorizațiile și responsabilitățile necesare după verificarea locației, conform cerințelor aplicabile fiecărui tip de spectacol.",
+  "Se pot face spectacole pentru nunți?":
+    "Da. Formatul se poate integra la primul dans, într-un moment intermediar sau la finalul serii.",
+  "Se pot face spectacole corporate sau festivaluri?":
+    "Da. Configurăm show-uri pentru evenimente corporate, lansări, gale și festivaluri, în funcție de spațiu și public.",
+  "Cât durează un spectacol?":
+    "De regulă, între 3 și 12 minute. Durata finală depinde de concept, locație și buget.",
+  "Ce informații trebuie trimise pentru ofertă?":
+    "Avem nevoie de tipul evenimentului, data, locația aproximativă și formatul dorit. Clarificăm restul într-o discuție scurtă.",
+  "Sunt disponibile efecte speciale indoor?":
+    "Da, dacă spațiul și regulile locației permit. Verificăm distanțele și condițiile tehnice înainte de confirmare.",
+  "De ce prețul este personalizat?":
+    "Oferta ține cont de locație, durată, numărul de drone, tipul efectelor, cerințele de siguranță și logistică.",
+};
+
+const DEFAULT_ANSWERS = new Map(FAQS.map((item) => [item.q, item.a]));
+
+const getEditorialAnswer = (item) => {
+  const isUnmodifiedDefault = DEFAULT_ANSWERS.get(item.q) === item.a;
+  return isUnmodifiedDefault ? EDITORIAL_ANSWERS[item.q] || item.a : item.a;
+};
 
 export const Faq = () => {
-  const directContactHref = whatsappLink();
+  const managedFaqs = useManagedContent("faqs", FAQS);
+  const faqs = managedFaqs.map((item) => ({ ...item, a: getEditorialAnswer(item) }));
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQS.map((item) => ({
+    mainEntity: faqs.map((item) => ({
       "@type": "Question",
       name: item.q,
       acceptedAnswer: { "@type": "Answer", text: item.a },
@@ -17,51 +49,59 @@ export const Faq = () => {
   };
 
   return (
-    <section className="faq-editorial" data-testid="faq-section" aria-labelledby="faq-editorial-title">
+    <section
+      id="raspunsuri"
+      className="nr-faq"
+      data-testid="faq-section"
+      aria-labelledby="nr-faq-content-title"
+    >
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-      <div className="faq-editorial-inner">
-        <Reveal>
-          <aside className="faq-editorial-intro">
-            <span>Întrebări frecvente</span>
-            <h2 id="faq-editorial-title">
-              Răspunsuri clare înainte de primul plan.
-            </h2>
-            <p>
-              Fiecare locație vine cu alte condiții. Am adunat aici informațiile care te ajută să pregătești o discuție utilă.
-            </p>
-            <a
-              href={directContactHref || "/contact"}
-              {...(directContactHref ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            >
-              <MessageCircle aria-hidden="true" />
-              Întreabă echipa
-              <ArrowUpRight aria-hidden="true" />
-            </a>
-          </aside>
-        </Reveal>
 
-        <Reveal delay={0.08}>
-          <Accordion type="single" collapsible className="faq-editorial-list" data-testid="faq-accordion">
-            {FAQS.map((item, index) => (
+      <div className="nr-shell nr-faq__layout">
+        <div className="nr-faq__rail" aria-hidden="true">
+          <span>{String(faqs.length).padStart(2, "0")}</span>
+          <p>Răspunsuri</p>
+        </div>
+
+        <div className="nr-faq__content">
+          <h2 id="nr-faq-content-title" className="nr-faq__sr-only">
+            Răspunsuri la întrebările frecvente
+          </h2>
+
+          <Accordion type="single" collapsible className="nr-faq__questions">
+            {faqs.map((item, index) => (
               <AccordionItem
-                key={item.q}
-                value={`item-${index}`}
-                className="faq-editorial-item"
-                data-testid={`faq-item-${index}`}
+                key={`${item.q}-${index}`}
+                value={`faq-${index}`}
+                className="nr-faq__question"
+                data-testid="faq-question"
               >
-                <AccordionTrigger className="faq-editorial-trigger">
-                  <span>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <span>{item.q}</span>
-                  </span>
+                <AccordionTrigger className="nr-faq__trigger">
+                  <span className="nr-faq__index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="nr-faq__question-copy">{item.q}</span>
                 </AccordionTrigger>
-                <AccordionContent className="faq-editorial-answer">
-                  {item.a}
+                <AccordionContent className="nr-faq__answer">
+                  <p>{item.a}</p>
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </Reveal>
+
+          <section
+            className="nr-faq__contact"
+            data-testid="faq-contact-close"
+            aria-labelledby="faq-contact-title"
+          >
+            <div>
+              <h2 id="faq-contact-title">Nu ai găsit răspunsul?</h2>
+              <p>Spune-ne data și locația.</p>
+            </div>
+            <Link to="/contact">
+              Contactează-ne
+              <ArrowUpRight aria-hidden="true" />
+            </Link>
+          </section>
+        </div>
       </div>
     </section>
   );

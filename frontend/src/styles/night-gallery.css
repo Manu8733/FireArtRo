@@ -1,0 +1,376 @@
+.nr-gallery-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow-x: clip;
+  color: #f5f5f2;
+  background: #06080b;
+}
+
+.nr-gallery-thread-field {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100svh;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.nr-gallery-thread-field canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nr-gallery-stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  padding: clamp(5.25rem, 6vw, 6rem) 0 clamp(3.25rem, 5vw, 4.5rem);
+  background: radial-gradient(circle at 80% 8%, rgba(181, 103, 55, 0.055), transparent 24rem);
+}
+
+.nr-gallery-stage__shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(calc(100% - (2 * var(--nr-gutter))), 66rem);
+  gap: clamp(0.85rem, 1.4vw, 1.15rem);
+}
+
+.nr-gallery-page > footer {
+  position: relative;
+  z-index: 2;
+}
+
+.nr-gallery-header {
+  display: flex;
+  max-width: 34rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding-bottom: 0.35rem;
+}
+
+.nr-gallery-header__title > p {
+  margin: 0 0 0.55rem;
+  color: #75c7eb;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.nr-gallery-header h1 {
+  margin: 0;
+  font-family: "Bricolage Grotesque", "Sora", sans-serif;
+  font-size: clamp(2rem, 3vw, 2.7rem);
+  font-weight: 520;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.nr-gallery-header__intro {
+  max-width: 30rem;
+  margin: 0;
+  color: #a9acb3;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.nr-gallery-filters {
+  display: flex;
+  gap: 1.15rem;
+  width: 100%;
+  overflow-x: auto;
+  padding: 0.85rem 0 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  scrollbar-width: none;
+}
+
+.nr-gallery-filters::-webkit-scrollbar { display: none; }
+
+.nr-gallery-filters button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 2.15rem;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.4rem 0 0.52rem;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  color: #a6a8ae;
+  background: transparent;
+  font: 620 0.64rem/1.1 "Sora", sans-serif;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.nr-gallery-filters button small {
+  color: #6e737b;
+  font: 600 0.62rem/1 "IBM Plex Mono", monospace;
+}
+
+.nr-gallery-filters button:hover {
+  border-bottom-color: rgba(117, 199, 235, 0.48);
+  color: #fff;
+}
+
+.nr-gallery-filters button.is-active {
+  border-bottom-color: #75c7eb;
+  color: #eaf7ff;
+}
+
+.nr-gallery-filters button.is-active small { color: #75c7eb; }
+
+.nr-gallery-mosaic {
+  --gallery-row-height: clamp(8.75rem, 10vw, 10.75rem);
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.55rem, 0.85vw, 0.8rem);
+  width: 100%;
+  min-width: 0;
+}
+
+.nr-gallery-mosaic::after {
+  flex: 999 1 calc(var(--gallery-row-height) * 1.6);
+  height: 0;
+  content: "";
+}
+
+.nr-gallery-card {
+  position: relative;
+  flex: var(--media-ratio) 1 calc(var(--media-ratio) * var(--gallery-row-height));
+  align-self: flex-start;
+  min-width: clamp(7.25rem, 8vw, 8.5rem);
+  aspect-ratio: var(--media-ratio);
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.6rem;
+  background: #0b0e13;
+  animation: nr-gallery-card-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: min(calc(var(--gallery-index) * 45ms), 280ms);
+}
+
+@keyframes nr-gallery-card-in {
+  from { opacity: 0; transform: translateY(1rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nr-gallery-card > button {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  text-align: left;
+  cursor: zoom-in;
+}
+
+.nr-gallery-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.9) contrast(1.04) brightness(0.88);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms ease;
+}
+
+.nr-gallery-card > button::after {
+  position: absolute;
+  inset: 38% 0 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(180deg, transparent, rgba(3, 5, 8, 0.84));
+}
+
+.nr-gallery-card__copy {
+  position: absolute;
+  z-index: 2;
+  right: 0.8rem;
+  bottom: 0.75rem;
+  left: 0.8rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.nr-gallery-card__copy small {
+  color: #9ed9f2;
+  font: 650 0.62rem/1.2 "IBM Plex Mono", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nr-gallery-card__copy strong {
+  max-width: 24ch;
+  font: 520 clamp(0.84rem, 1vw, 1rem)/1.12 "Bricolage Grotesque", "Sora", sans-serif;
+  letter-spacing: 0;
+}
+
+.nr-gallery-card__expand {
+  position: absolute;
+  z-index: 2;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  width: 2.35rem;
+  height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(5, 7, 10, 0.55);
+  opacity: 0;
+  transform: translateY(-0.35rem);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.nr-gallery-card__expand svg { width: 0.95rem; height: 0.95rem; }
+
+.nr-gallery-card:hover img { transform: scale(1.018); filter: saturate(1) contrast(1.03) brightness(0.96); }
+.nr-gallery-card:hover .nr-gallery-card__expand,
+.nr-gallery-card:focus-within .nr-gallery-card__expand { opacity: 1; transform: translateY(0); }
+
+.nr-gallery-empty {
+  display: grid;
+  min-height: 18rem;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #a9acb3;
+  text-align: center;
+}
+
+.nr-gallery-empty p { margin: 0; }
+.nr-gallery-empty button {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid rgba(117, 199, 235, 0.55);
+  border-radius: 0.3rem;
+  color: #f5f5f2;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nr-gallery-page :where(button, a):focus-visible {
+  outline: 2px solid #9ed9f2;
+  outline-offset: 3px;
+}
+
+.nr-gallery-lightbox {
+  display: grid;
+  width: min(72rem, calc(100vw - 2rem));
+  height: auto;
+  max-width: none;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100svh - 2rem);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.35rem;
+  background: #080a0e;
+  color: #f5f5f2;
+  aspect-ratio: var(--preview-ratio, 16 / 9);
+}
+
+.nr-gallery-lightbox > button { display: none; }
+
+.nr-gallery-lightbox__layout {
+  display: contents;
+}
+
+.nr-gallery-lightbox__media {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+  background: #020304;
+}
+
+.nr-gallery-lightbox__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+}
+
+@media (max-width: 860px) {
+  .nr-gallery-mosaic { --gallery-row-height: clamp(9rem, 22vw, 11.5rem); }
+}
+
+@media (max-width: 640px) {
+  .nr-gallery-thread-field { opacity: 0.76; }
+  .nr-gallery-stage { padding: 5.15rem 0 3.25rem; }
+  .nr-gallery-stage__shell { gap: 0.95rem; }
+
+  .nr-gallery-header {
+    padding-bottom: 1.25rem;
+  }
+
+  .nr-gallery-header h1 { font-size: clamp(1.95rem, 9vw, 2.35rem); }
+
+  .nr-gallery-header__intro {
+    max-width: 31rem;
+    font-size: 0.86rem;
+  }
+
+  .nr-gallery-filters {
+    width: calc(100% + (2 * var(--nr-gutter)));
+    margin-inline: calc(var(--nr-gutter) * -1);
+    padding-inline: var(--nr-gutter);
+  }
+
+  .nr-gallery-mosaic {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .nr-gallery-mosaic::after { display: none; }
+
+  .nr-gallery-card {
+    width: 100%;
+    min-width: 0;
+    max-height: 72svh;
+    aspect-ratio: var(--media-ratio);
+  }
+
+  .nr-gallery-card__copy strong { font-size: 1.15rem; }
+  .nr-gallery-card__expand { opacity: 1; transform: none; }
+
+  .nr-gallery-lightbox {
+    width: calc(100vw - 1rem);
+    max-height: calc(100svh - 1rem);
+  }
+
+  .nr-gallery-lightbox__layout {
+    display: contents;
+  }
+
+  .nr-gallery-lightbox__media img {
+    max-width: none;
+    max-height: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nr-gallery-card,
+  .nr-gallery-card img,
+  .nr-gallery-card__expand,
+  .nr-gallery-filters button {
+    animation: none !important;
+    transition: none !important;
+  }
+}

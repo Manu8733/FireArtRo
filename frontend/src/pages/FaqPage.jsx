@@ -1,9 +1,9 @@
 import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
-import InteriorHero from "@/components/site/InteriorHero";
 import Faq from "@/components/site/Faq";
 import Footer from "@/components/site/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import "@/styles/night-faq.css";
 
 export default function FaqPage() {
   usePageMeta({
@@ -14,23 +14,27 @@ export default function FaqPage() {
   });
 
   return (
-    <main className="interior-page faq-page min-h-screen overflow-x-clip bg-[#050308] text-white">
+    <div className="nr-faq-route">
       <ScrollProgress />
       <Navbar />
-      <InteriorHero
-        eyebrow="Întrebări frecvente"
-        title="Răspunsuri înainte să începi."
-        accent="Fără jargon."
-        description="Rezervare, locație, vreme, autorizări și costuri, explicate pe scurt."
-        primaryHref="/contact"
-        primaryLabel="Întreabă echipa"
-        secondaryHref="#raspunsuri"
-        secondaryLabel="Vezi răspunsurile"
-      />
-      <div id="raspunsuri" className="interior-section-anchor">
+
+      <main className="nr-faq-page" data-design="night-runway">
+        <header className="nr-faq-hero">
+          <div className="nr-shell nr-faq-hero__inner">
+            <div>
+              <p className="nr-faq-hero__eyebrow">Întrebări</p>
+              <h1>Întrebări.</h1>
+            </div>
+            <p className="nr-faq-hero__description">
+              Ce contează înainte de rezervare.
+            </p>
+          </div>
+        </header>
+
         <Faq />
-      </div>
+      </main>
+
       <Footer />
-    </main>
+    </div>
   );
 }

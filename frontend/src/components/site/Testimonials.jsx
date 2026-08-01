@@ -6,6 +6,7 @@ import useManagedContent from "@/hooks/useManagedContent";
 
 export const Testimonials = () => {
   const testimonials = useManagedContent("testimonials", TESTIMONIAL_ITEMS);
+  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
 
   return (
     <section className="testimonial-system" data-testid="testimonials-section" aria-labelledby="testimonial-title">
@@ -36,8 +37,8 @@ export const Testimonials = () => {
             <span>Google Reviews</span>
             <p>Conectează profilul Google Business pentru recenzii verificabile.</p>
           </div>
-          {SITE_DETAILS.googleReviewsUrl ? (
-            <a href={SITE_DETAILS.googleReviewsUrl} target="_blank" rel="noopener noreferrer">
+          {siteDetails.googleReviewsUrl ? (
+            <a href={siteDetails.googleReviewsUrl} target="_blank" rel="noopener noreferrer">
               Vezi recenziile pe Google <ArrowUpRight />
             </a>
           ) : (

@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ExternalLink, Mail } from "lucide-react";
 import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import Footer from "@/components/site/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import useManagedContent from "@/hooks/useManagedContent";
 import { EMAIL } from "@/lib/constants";
 import { SITE_DETAILS } from "@/data/businessContent";
 
@@ -14,7 +16,7 @@ const LEGAL_PAGES = {
     title: "Politica de confidențialitate",
     description:
       "Cum colectează, folosește și protejează FireArtRo datele transmise prin site.",
-    updated: "24 iunie 2026",
+    updated: "25 iulie 2026",
     sections: [
       {
         title: "Operatorul datelor",
@@ -28,6 +30,7 @@ const LEGAL_PAGES = {
         body: [
           "Prin formularul de ofertă putem colecta numele, prenumele, telefonul, emailul, localitatea, locația și data evenimentului, tipul evenimentului, serviciile selectate, pachetul preferat și mesajul transmis.",
           "Colectăm numai informațiile necesare pentru a analiza solicitarea și a continua discuția comercială.",
+          "Pentru protecția site-ului împotriva folosirii abuzive a formularului, reținem temporar, în memoria serverului și nu în baza de date, adresa IP a solicitării, strict pentru a limita numărul de trimiteri de la aceeași sursă într-un interval scurt de timp.",
         ],
       },
       {
@@ -52,10 +55,16 @@ const LEGAL_PAGES = {
         ],
       },
     ],
-    source: {
-      label: "Informații oficiale ANSPDCP despre GDPR",
-      href: "https://www.dataprotection.ro/?page=noua+_pagina_regulamentul_GDPR",
-    },
+    sources: [
+      {
+        label: "Informații oficiale ANSPDCP despre GDPR",
+        href: "https://www.dataprotection.ro/?page=noua+_pagina_regulamentul_GDPR",
+      },
+      {
+        label: "Cum depui o plângere la ANSPDCP",
+        href: "https://www.dataprotection.ro/?page=Plangeri_RGPD&lang=ro",
+      },
+    ],
   },
   termeni: {
     path: "/termeni-si-conditii",
@@ -63,7 +72,7 @@ const LEGAL_PAGES = {
     title: "Termeni și condiții",
     description:
       "Regulile generale pentru utilizarea site-ului și solicitarea serviciilor FireArtRo.",
-    updated: "24 iunie 2026",
+    updated: "25 iulie 2026",
     sections: [
       {
         title: "Furnizorul serviciilor",
@@ -103,6 +112,29 @@ const LEGAL_PAGES = {
           "FireArtRo urmărește menținerea informațiilor corecte și a site-ului disponibil, dar nu poate garanta funcționarea neîntreruptă sau lipsa completă a erorilor tehnice.",
           "Condițiile specifice fiecărui proiect sunt cele prevăzute în oferta și documentele acceptate de părți.",
         ],
+      },
+      {
+        title: "Soluționarea litigiilor",
+        body: [
+          `Dacă ai o nemulțumire legată de serviciile FireArtRo, te încurajăm să ne scrii mai întâi direct la ${EMAIL}, ca să găsim împreună o soluție pe cale amiabilă.`,
+          "Te poți adresa și Autorității Naționale pentru Protecția Consumatorilor (ANPC) — telefon 021 9551 sau formularul de pe eservicii.anpc.ro — ori sistemului național de soluționare alternativă a litigiilor (SAL), disponibil la reclamatiisal.anpc.ro.",
+        ],
+      },
+      {
+        title: "Legea aplicabilă",
+        body: [
+          "Acești termeni sunt guvernați de legislația română. Orice litigiu care nu poate fi soluționat pe cale amiabilă sau prin procedurile de mai sus este de competența instanțelor române.",
+        ],
+      },
+    ],
+    sources: [
+      {
+        label: "Sesizare SAL (ANPC)",
+        href: "https://reclamatiisal.anpc.ro/",
+      },
+      {
+        label: "Formular reclamație ANPC",
+        href: "https://eservicii.anpc.ro/",
       },
     ],
   },
@@ -174,7 +206,31 @@ const LEGAL_NAV = [
 ];
 
 export default function LegalPage({ type = "confidentialitate" }) {
-  const data = LEGAL_PAGES[type] || LEGAL_PAGES.confidentialitate;
+  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
+  const email = siteDetails.email || EMAIL;
+  const data = useMemo(() => {
+    const template = LEGAL_PAGES[type] || LEGAL_PAGES.confidentialitate;
+    const replacements = [
+      [SITE_DETAILS.legalName, siteDetails.legalName],
+      [SITE_DETAILS.taxId, siteDetails.taxId],
+      [SITE_DETAILS.registrationNumber, siteDetails.registrationNumber],
+      [SITE_DETAILS.registeredOffice, siteDetails.registeredOffice],
+      [SITE_DETAILS.mainOffice, siteDetails.mainOffice],
+      [EMAIL, email],
+    ].filter(([from, to]) => from && to && from !== to);
+    const replaceDetails = (value) => replacements.reduce(
+      (result, [from, to]) => result.split(from).join(to),
+      value
+    );
+
+    return {
+      ...template,
+      sections: template.sections.map((section) => ({
+        ...section,
+        body: section.body.map(replaceDetails),
+      })),
+    };
+  }, [email, siteDetails, type]);
 
   usePageMeta({
     title: `${data.title} — FireArtRo`,
@@ -223,17 +279,27 @@ export default function LegalPage({ type = "confidentialitate" }) {
             </section>
           ))}
 
-          {data.source && (
-            <a className="legal-source" href={data.source.href} target="_blank" rel="noopener noreferrer">
-              {data.source.label} <ExternalLink />
-            </a>
+          {data.sources && data.sources.length > 0 && (
+            <div className="legal-sources">
+              {data.sources.map((item) => (
+                <a
+                  key={item.href}
+                  className="legal-source"
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {item.label} <ExternalLink />
+                </a>
+              ))}
+            </div>
           )}
 
           <div className="legal-contact">
             <Mail />
             <div>
               <span>Ai o solicitare legată de acest document?</span>
-              <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+              <a href={`mailto:${email}`}>{email}</a>
             </div>
           </div>
         </article>

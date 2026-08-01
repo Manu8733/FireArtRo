@@ -64,9 +64,9 @@ export const Navbar = () => {
     window.setTimeout(() => goTo(href, "auto"), 150);
   }, [goTo]);
 
-  const desktopLinks = NAV_LINKS.slice(0, 8);
-  const leftLinks = desktopLinks.slice(0, 4);
-  const rightLinks = desktopLinks.slice(4, 8);
+  const desktopLinks = NAV_LINKS.filter((link) => link.href !== "#acasa");
+  const leftLinks = desktopLinks.slice(0, 3);
+  const rightLinks = desktopLinks.slice(3, 6);
 
   useEffect(() => {
     const updateNavigation = () => {

@@ -127,30 +127,24 @@
 .nr-gallery-filters button.is-active small { color: #75c7eb; }
 
 .nr-gallery-mosaic {
-  --gallery-row-height: clamp(8.75rem, 10vw, 10.75rem);
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(0.55rem, 0.85vw, 0.8rem);
+  column-count: 4;
+  column-gap: clamp(0.65rem, 1vw, 0.9rem);
   width: 100%;
   min-width: 0;
 }
 
-.nr-gallery-mosaic::after {
-  flex: 999 1 calc(var(--gallery-row-height) * 1.6);
-  height: 0;
-  content: "";
-}
-
 .nr-gallery-card {
   position: relative;
-  flex: var(--media-ratio) 1 calc(var(--media-ratio) * var(--gallery-row-height));
-  align-self: flex-start;
-  min-width: clamp(7.25rem, 8vw, 8.5rem);
+  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 clamp(0.65rem, 1vw, 0.9rem);
   aspect-ratio: var(--media-ratio);
   overflow: hidden;
   border: 0;
   border-radius: 0.6rem;
   background: #0b0e13;
+  break-inside: avoid;
   animation: nr-gallery-card-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: min(calc(var(--gallery-index) * 45ms), 280ms);
 }
@@ -181,31 +175,6 @@
   object-fit: cover;
   filter: saturate(0.9) contrast(1.04) brightness(0.88);
   transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms ease;
-}
-
-.nr-gallery-card > button::after {
-  position: absolute;
-  inset: 38% 0 0;
-  pointer-events: none;
-  content: "";
-  background: linear-gradient(180deg, transparent, rgba(3, 5, 8, 0.84));
-}
-
-.nr-gallery-card__copy {
-  position: absolute;
-  z-index: 2;
-  right: 0.8rem;
-  bottom: 0.75rem;
-  left: 0.8rem;
-  display: grid;
-  gap: 0.25rem;
-}
-
-.nr-gallery-card__copy small {
-  color: #9ed9f2;
-  font: 650 0.62rem/1.2 "IBM Plex Mono", monospace;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .nr-gallery-card__expand {
@@ -276,7 +245,33 @@
   aspect-ratio: var(--preview-ratio, 16 / 9);
 }
 
-.nr-gallery-lightbox > button { display: none; }
+.nr-gallery-lightbox > button {
+  position: absolute;
+  z-index: 5;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(3, 5, 8, 0.72);
+  opacity: 1;
+  backdrop-filter: blur(0.45rem);
+  cursor: pointer;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.nr-gallery-lightbox > button:hover {
+  border-color: rgba(158, 217, 242, 0.78);
+  background: rgba(8, 18, 29, 0.9);
+  transform: scale(1.04);
+}
+
+.nr-gallery-lightbox > button svg { width: 1rem; height: 1rem; }
 
 .nr-gallery-lightbox__layout {
   display: contents;
@@ -300,8 +295,37 @@
   object-fit: contain;
 }
 
+.nr-gallery-lightbox__nav {
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(3, 5, 8, 0.72);
+  backdrop-filter: blur(0.45rem);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.nr-gallery-lightbox__nav:hover {
+  border-color: rgba(158, 217, 242, 0.78);
+  background: rgba(8, 18, 29, 0.9);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.nr-gallery-lightbox__nav svg { width: 1.15rem; height: 1.15rem; }
+.nr-gallery-lightbox__nav--previous { left: 0.75rem; }
+.nr-gallery-lightbox__nav--next { right: 0.75rem; }
+
 @media (max-width: 860px) {
-  .nr-gallery-mosaic { --gallery-row-height: clamp(9rem, 22vw, 11.5rem); }
+  .nr-gallery-mosaic { column-count: 3; }
 }
 
 @media (max-width: 640px) {
@@ -327,17 +351,14 @@
   }
 
   .nr-gallery-mosaic {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    column-count: 1;
+    column-gap: 0;
   }
-
-  .nr-gallery-mosaic::after { display: none; }
 
   .nr-gallery-card {
     width: 100%;
     min-width: 0;
-    max-height: 72svh;
+    margin-bottom: 0.75rem;
     aspect-ratio: var(--media-ratio);
   }
 
@@ -356,6 +377,16 @@
     max-width: none;
     max-height: none;
   }
+
+  .nr-gallery-lightbox > button,
+  .nr-gallery-lightbox__nav {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .nr-gallery-lightbox > button { top: 0.45rem; right: 0.45rem; }
+  .nr-gallery-lightbox__nav--previous { left: 0.45rem; }
+  .nr-gallery-lightbox__nav--next { right: 0.45rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

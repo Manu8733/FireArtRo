@@ -296,7 +296,6 @@ const MEDIA_ITEMS_SOURCE = [
 ];
 
 const CURATED_LEGACY_MEDIA_IDS = new Set([
-  "photo-drone-show",
   "video-final",
   "video-drone",
 ]);
@@ -311,7 +310,7 @@ export const MEDIA_ITEMS = MEDIA_ITEMS_SOURCE
     ? { ...item, category: "Artificii de noapte", tags: ["Video", "Artificii de noapte"] }
     : item));
 
-export const MEDIA_CATALOG_VERSION = "fireartro-gallery-2026-v3";
+export const MEDIA_CATALOG_VERSION = "fireartro-gallery-2026-v4";
 
 export const PACKAGE_CATEGORIES = [
   "Toate",
@@ -323,7 +322,7 @@ export const PACKAGE_CATEGORIES = [
   "Corporate / Festival",
 ];
 
-export const PACKAGE_CATALOG_VERSION = "fireworks-2026-v2";
+export const PACKAGE_CATALOG_VERSION = "fireworks-2026-v3";
 
 export const LEGACY_PACKAGE_IDS = [
   "day-color",

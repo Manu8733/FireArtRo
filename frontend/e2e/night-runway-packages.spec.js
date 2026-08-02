@@ -46,6 +46,32 @@ test.describe("Night Runway package stage", () => {
     expect(inspectedPackages).toBe(8);
   });
 
+  test("replaces a stale Admin package catalog with the current YouTube previews", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify({
+        packageCatalogVersion: "fireworks-2026-v2",
+        packages: [{
+          id: "fireworks-bronze-2026",
+          title: "Bronze",
+          category: "Artificii de noapte",
+          image: "/media/fireworks-sky.webp",
+          videoUrl: "",
+        }],
+      }));
+    });
+    await page.reload({ waitUntil: "domcontentloaded" });
+
+    await page
+      .getByRole("tablist", { name: "Categorii de spectacol" })
+      .getByRole("tab", { name: "Artificii de noapte" })
+      .click();
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Bronze");
+    await expect(page.locator(".nr-package-stage__media img")).toHaveAttribute(
+      "src",
+      "https://i.ytimg.com/vi/j2BGRd88qBc/hqdefault.jpg",
+    );
+  });
+
   test("compares categories and variants with keyboard-safe controls", async ({ page }) => {
     const categories = page.getByRole("tablist", { name: "Categorii de spectacol" });
     await expect(categories.getByRole("tab")).toHaveCount(6);

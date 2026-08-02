@@ -18,8 +18,14 @@ test.describe("Editorial mosaic gallery", () => {
 
     await expect(page.locator("main[data-design='editorial-mosaic']")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Galerie" })).toHaveCount(1);
-    await expect(page.getByTestId("gallery-card")).toHaveCount(50);
-    await expect(page.locator(".nr-gallery-card__copy strong")).toHaveCount(0);
+    await expect(page.getByTestId("gallery-card")).toHaveCount(49);
+    await expect(page.locator(".nr-gallery-card__copy")).toHaveCount(0);
+    await expect(page.locator('[data-media-id="photo-drone-show"]')).toHaveCount(0);
+
+    const cardWidths = await page.getByTestId("gallery-card").evaluateAll((cards) => (
+      cards.slice(0, 16).map((card) => card.getBoundingClientRect().width)
+    ));
+    cardWidths.forEach((width) => expect(width).toBeGreaterThan(210));
 
     const cards = page.getByTestId("gallery-card");
     for (let index = 0; index < Math.min(await cards.count(), 12); index += 1) {
@@ -47,9 +53,63 @@ test.describe("Editorial mosaic gallery", () => {
     expect(metrics.document).toBeLessThanOrEqual(metrics.viewport + 1);
     expect(metrics.rows).toBeGreaterThan(1);
     metrics.cardRatios.forEach((ratio, index) => {
-      const expected = Math.min(2.25, Math.max(0.56, metrics.naturalRatios[index]));
+      const expected = metrics.naturalRatios[index];
       expect(Math.abs(ratio - expected)).toBeLessThan(0.08);
     });
+  });
+
+  test("keeps very tall photographs in their exact natural frame", async ({ page }) => {
+    await openGallery(page);
+
+    const card = page.locator('[data-media-id="gallery-import-010"]');
+    await card.scrollIntoViewIfNeeded();
+    await expect.poll(() => card.locator("img").evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
+
+    const ratios = await card.evaluate((element) => {
+      const image = element.querySelector("img");
+      const frame = element.getBoundingClientRect();
+      return {
+        natural: image.naturalWidth / image.naturalHeight,
+        frame: frame.width / frame.height,
+      };
+    });
+
+    expect(Math.abs(ratios.frame - ratios.natural)).toBeLessThan(0.02);
+  });
+
+  test("ships the curated photographs without solid black capture borders", async ({ page }) => {
+    await openGallery(page);
+
+    for (const mediaId of ["gallery-import-001", "gallery-import-002", "gallery-import-006"]) {
+      const image = page.locator(`[data-media-id="${mediaId}"] img`);
+      await image.scrollIntoViewIfNeeded();
+      await expect.poll(() => image.evaluate((node) => node.naturalWidth)).toBeGreaterThan(0);
+
+      const darkestEdgeShare = await image.evaluate((node) => {
+        const canvas = document.createElement("canvas");
+        canvas.width = node.naturalWidth;
+        canvas.height = node.naturalHeight;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        context.drawImage(node, 0, 0);
+        const countDark = (x, y, width, height) => {
+          const pixels = context.getImageData(x, y, width, height).data;
+          let dark = 0;
+          for (let index = 0; index < pixels.length; index += 4) {
+            const luminance = (pixels[index] * 54 + pixels[index + 1] * 183 + pixels[index + 2] * 19) / 256;
+            if (luminance <= 10) dark += 1;
+          }
+          return dark / (pixels.length / 4);
+        };
+        return Math.max(
+          countDark(0, 0, canvas.width, 1),
+          countDark(0, canvas.height - 1, canvas.width, 1),
+          countDark(0, 0, 1, canvas.height),
+          countDark(canvas.width - 1, 0, 1, canvas.height),
+        );
+      });
+
+      expect(darkestEdgeShare, mediaId).toBeLessThan(0.985);
+    }
   });
 
   test("publishes a clean, SEO-named FireArtRo photo catalog", async ({ page }) => {
@@ -91,8 +151,30 @@ test.describe("Editorial mosaic gallery", () => {
     });
 
     await openGallery(page);
-    await expect(page.getByTestId("gallery-card")).toHaveCount(51);
+    await expect(page.getByTestId("gallery-card")).toHaveCount(50);
     await expect(page.locator('[data-testid="gallery-card"][data-media-id="admin-custom-photo"]')).toBeVisible();
+  });
+
+  test("migrates the previous catalog without restoring its generic drone placeholder", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify({
+        mediaCatalogVersion: "fireartro-gallery-2026-v3",
+        mediaItems: [{
+          id: "photo-drone-show",
+          type: "image",
+          title: "Placeholder drone",
+          category: "Drone show",
+          thumbnail: "/media/drone-show.webp",
+          src: "/media/drone-show.webp",
+          alt: "Imagine generica",
+          order: 1,
+        }],
+      }));
+    });
+
+    await openGallery(page);
+    await expect(page.locator('[data-media-id="photo-drone-show"]')).toHaveCount(0);
+    await expect(page.getByTestId("gallery-card")).toHaveCount(49);
   });
 
   test("does not resurrect removed photographs during an Admin catalog migration", async ({ page }) => {
@@ -144,6 +226,18 @@ test.describe("Editorial mosaic gallery", () => {
     expect(await page.getByTestId("gallery-card").count()).toBeLessThanOrEqual(initialCount);
   });
 
+  test("interleaves day and night photographs in the complete collection", async ({ page }) => {
+    await openGallery(page);
+    const categories = await page.getByTestId("gallery-card").evaluateAll((cards) => (
+      cards.slice(0, 12).map((card) => card.dataset.category)
+    ));
+
+    expect(new Set(categories)).toEqual(new Set(["Artificii de zi", "Artificii de noapte"]));
+    categories.slice(1).forEach((category, index) => {
+      expect(category).not.toBe(categories[index]);
+    });
+  });
+
   test("opens a distraction-free image preview", async ({ page }) => {
     await openGallery(page);
     await page.getByTestId("gallery-card").first().locator("button").click();
@@ -153,18 +247,24 @@ test.describe("Editorial mosaic gallery", () => {
     await expect(page).toHaveURL(/media=/);
     await expect(dialog.locator("img")).toHaveCount(1);
     await expect(dialog.locator(".nr-gallery-lightbox__copy")).toHaveCount(0);
-    await expect(dialog.locator(".nr-gallery-lightbox__nav")).toHaveCount(0);
-    await expect(dialog.locator("button:visible")).toHaveCount(0);
+    await expect(dialog.getByRole("button", { name: "Imaginea anterioară" })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Imaginea următoare" })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Close" })).toBeVisible();
 
-    const ratios = await dialog.evaluate((element) => {
+    const firstSource = await dialog.locator("img").getAttribute("src");
+    await dialog.getByRole("button", { name: "Imaginea următoare" }).click();
+    await expect(dialog.locator("img")).not.toHaveAttribute("src", firstSource);
+    await expect(page).toHaveURL(/media=/);
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(dialog.locator("img")).toHaveAttribute("src", firstSource);
+
+    await expect.poll(() => dialog.evaluate((element) => {
       const image = element.querySelector("img");
       const frame = element.getBoundingClientRect();
-      return {
-        natural: image.naturalWidth / image.naturalHeight,
-        frame: frame.width / frame.height,
-      };
-    });
-    expect(Math.abs(ratios.frame - ratios.natural)).toBeLessThan(0.02);
+      const naturalRatio = image.naturalWidth / image.naturalHeight;
+      return Math.abs((frame.width / frame.height) - naturalRatio);
+    })).toBeLessThan(0.02);
 
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();

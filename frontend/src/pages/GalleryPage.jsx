@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Expand } from "lucide-react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Navbar from "@/components/site/Navbar";
@@ -12,6 +12,25 @@ import { MEDIA_ITEMS, SITE_DETAILS } from "@/data/businessContent";
 import "@/styles/night-gallery.css";
 
 const GALLERY_CATEGORIES = ["Artificii de zi", "Artificii de noapte", "Drone show"];
+
+const interleaveByCategory = (items) => {
+  const queues = GALLERY_CATEGORIES
+    .map((category) => items.filter((item) => item.category === category))
+    .filter((queue) => queue.length);
+  const knownItems = new Set(queues.flat().map((item) => item.id));
+  const customItems = items.filter((item) => !knownItems.has(item.id));
+  if (customItems.length) queues.push(customItems);
+  const mixedItems = [];
+
+  while (queues.some((queue) => queue.length)) {
+    queues.forEach((queue) => {
+      const item = queue.shift();
+      if (item) mixedItems.push(item);
+    });
+  }
+
+  return mixedItems;
+};
 
 const gallerySchema = (items, siteUrl) => ({
   "@context": "https://schema.org",
@@ -39,16 +58,13 @@ export default function GalleryPage() {
     [media],
   );
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const categories = useMemo(
-    () => ["Toate", ...GALLERY_CATEGORIES.filter(
-      (category) => photos.some((item) => item.category === category),
-    )],
-    [photos],
-  );
+  const categories = useMemo(() => ["Toate", ...GALLERY_CATEGORIES], []);
   const requestedFilter = params.get("filtru") || "Toate";
   const activeFilter = categories.includes(requestedFilter) ? requestedFilter : "Toate";
   const visiblePhotos = useMemo(
-    () => photos.filter((item) => activeFilter === "Toate" || item.category === activeFilter),
+    () => (activeFilter === "Toate"
+      ? interleaveByCategory(photos)
+      : photos.filter((item) => item.category === activeFilter)),
     [activeFilter, photos],
   );
   const [expandedIndex, setExpandedIndex] = useState(-1);
@@ -91,7 +107,7 @@ export default function GalleryPage() {
     setExpandedIndex(index);
   }, [params, visiblePhotos]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!expandedItem) {
       setPreviewFrame(null);
       return undefined;
@@ -105,7 +121,6 @@ export default function GalleryPage() {
 
       setPreviewFrame({
         width: `${Math.floor(width)}px`,
-        height: `${Math.floor(width / previewRatio)}px`,
       });
     };
 
@@ -122,7 +137,7 @@ export default function GalleryPage() {
   const rememberRatio = (itemId, event) => {
     const { naturalWidth, naturalHeight } = event.currentTarget;
     if (!naturalWidth || !naturalHeight) return;
-    const ratio = Math.min(2.25, Math.max(0.56, naturalWidth / naturalHeight));
+    const ratio = naturalWidth / naturalHeight;
     setImageRatios((current) => {
       if (Math.abs((current[itemId] || 0) - ratio) < 0.01) return current;
       return { ...current, [itemId]: ratio };
@@ -140,6 +155,27 @@ export default function GalleryPage() {
     setExpandedIndex(-1);
     replaceQuery({ media: null });
   };
+
+  const movePhoto = useCallback((direction) => {
+    if (!visiblePhotos.length || expandedIndex < 0) return;
+    const nextIndex = (expandedIndex + direction + visiblePhotos.length) % visiblePhotos.length;
+    const nextItem = visiblePhotos[nextIndex];
+
+    setExpandedIndex(nextIndex);
+    replaceQuery({ media: nextItem.id });
+  }, [expandedIndex, replaceQuery, visiblePhotos]);
+
+  useEffect(() => {
+    if (expandedIndex < 0) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowLeft") movePhoto(-1);
+      if (event.key === "ArrowRight") movePhoto(1);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [expandedIndex, movePhoto]);
 
   return (
     <main className="nr-gallery-page" data-design="editorial-mosaic">
@@ -185,6 +221,7 @@ export default function GalleryPage() {
                   className="nr-gallery-card"
                   data-testid="gallery-card"
                   data-media-id={item.id}
+                  data-category={item.category}
                   style={{
                     "--media-ratio": imageRatios[item.id] || item.aspectRatio || (item.featured ? 1.5 : 1.333),
                     "--gallery-index": index,
@@ -198,9 +235,6 @@ export default function GalleryPage() {
                       decoding="async"
                       onLoad={(event) => rememberRatio(item.id, event)}
                     />
-                    <span className="nr-gallery-card__copy">
-                      <small>{item.category}</small>
-                    </span>
                     <span className="nr-gallery-card__expand" aria-hidden="true">
                       <Expand />
                     </span>
@@ -231,6 +265,22 @@ export default function GalleryPage() {
               <div className="nr-gallery-lightbox__media">
                 <img src={expandedItem.src} alt={expandedItem.alt} loading="eager" decoding="async" />
               </div>
+              <button
+                className="nr-gallery-lightbox__nav nr-gallery-lightbox__nav--previous"
+                type="button"
+                aria-label="Imaginea anterioară"
+                onClick={() => movePhoto(-1)}
+              >
+                <ChevronLeft aria-hidden="true" />
+              </button>
+              <button
+                className="nr-gallery-lightbox__nav nr-gallery-lightbox__nav--next"
+                type="button"
+                aria-label="Imaginea următoare"
+                onClick={() => movePhoto(1)}
+              >
+                <ChevronRight aria-hidden="true" />
+              </button>
               <DialogTitle className="sr-only">{expandedItem.title}</DialogTitle>
             </div>
           )}

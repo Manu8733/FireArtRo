@@ -51,6 +51,22 @@ export default function HomeTeam() {
 
   useEffect(() => () => window.clearTimeout(hoverTimerRef.current), []);
 
+  useEffect(() => {
+    if (!activeId) return undefined;
+
+    const dismissOutside = (event) => {
+      if (event.target.closest?.("[data-team-person], [data-team-copy]")) return;
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+      setActiveId(null);
+      stageRef.current?.style.setProperty("--team-copy-shift-x", "0px");
+      stageRef.current?.style.setProperty("--team-copy-shift-y", "0px");
+    };
+
+    document.addEventListener("pointerdown", dismissOutside);
+    return () => document.removeEventListener("pointerdown", dismissOutside);
+  }, [activeId]);
+
   const queueActivePerson = (personId, delay = 200, onActivate) => {
     window.clearTimeout(hoverTimerRef.current);
     hoverTimerRef.current = window.setTimeout(() => {
@@ -65,17 +81,6 @@ export default function HomeTeam() {
     hoverTimerRef.current = null;
     setActiveId(null);
     resetCopyParallax();
-  };
-
-  const startTouchPreview = (event, personId) => {
-    if (typeof event.pointerId === "number") {
-      event.currentTarget.setPointerCapture?.(event.pointerId);
-    }
-    queueActivePerson(personId, 220);
-  };
-
-  const endTouchPreview = () => {
-    clearActivePerson();
   };
 
   const updateCopyParallax = (event) => {
@@ -98,6 +103,7 @@ export default function HomeTeam() {
 
   return (
     <section
+      id="intro"
       className="fa-team"
       data-home-scene="team"
       data-testid="home-team"
@@ -113,9 +119,12 @@ export default function HomeTeam() {
         className="fa-team__stage"
         ref={stageRef}
         onPointerMove={(event) => {
+          if (event.pointerType === "touch") return;
           if (activeId && !event.target.closest("[data-team-person]")) clearActivePerson();
         }}
-        onPointerLeave={clearActivePerson}
+        onPointerLeave={(event) => {
+          if (event.pointerType !== "touch") clearActivePerson();
+        }}
       >
         <img
           className="fa-team__base"
@@ -153,20 +162,23 @@ export default function HomeTeam() {
                 data-copy-side={TEAM_COPY_LAYOUT[person.id].side}
                 data-active={activeId === person.id ? "true" : undefined}
                 style={{ clipPath: person.clipPolygon }}
-                aria-label={`Menține apăsat pentru a previzualiza rolul: ${person.label}`}
-                onPointerEnter={() => queueActivePerson(person.id)}
-                onPointerMove={updateCopyParallax}
-                onPointerLeave={clearActivePerson}
+                aria-label={`Vezi rolul: ${person.label}`}
+                onPointerEnter={(event) => {
+                  if (event.pointerType !== "touch") queueActivePerson(person.id);
+                }}
+                onPointerMove={(event) => {
+                  if (event.pointerType !== "touch") updateCopyParallax(event);
+                }}
+                onPointerLeave={(event) => {
+                  if (event.pointerType !== "touch") clearActivePerson();
+                }}
                 onPointerDown={(event) => {
-                  if (event.pointerType === "touch") startTouchPreview(event, person.id);
+                  if (event.pointerType === "touch") {
+                    window.clearTimeout(hoverTimerRef.current);
+                    setActiveId(person.id);
+                    resetCopyParallax();
+                  }
                 }}
-                onPointerUp={(event) => {
-                  if (event.pointerType === "touch") endTouchPreview();
-                }}
-                onPointerCancel={clearActivePerson}
-                onTouchStart={(event) => startTouchPreview(event, person.id)}
-                onTouchEnd={endTouchPreview}
-                onTouchCancel={clearActivePerson}
                 onFocus={() => setActiveId(person.id)}
                 onBlur={clearActivePerson}
               >

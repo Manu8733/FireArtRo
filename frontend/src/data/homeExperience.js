@@ -87,8 +87,8 @@ export const HOME_PACKAGES = [
     note: "Ritm construit pentru momentul central al serii.",
     image: MEDIA.fireworksSky,
     alt: "Spectacol pirotehnic FireArtRo pentru un moment central de seară",
-    description: "Un final pirotehnic construit în ritmul serii.",
-    detail: "Spectacol sincronizat pe muzică",
+    description: "Ritmul serii, ridicat la cer.",
+    detail: "Final pirotehnic sincronizat pe muzică",
     youtubeUrl: "https://youtu.be/_qfvKDitA0Q",
   },
   {
@@ -99,8 +99,8 @@ export const HOME_PACKAGES = [
     note: "Forme, simboluri și transformări desenate în aer.",
     image: MEDIA.droneShow3,
     alt: "Coregrafie cu drone FireArtRo deasupra orașului",
-    description: "Forme luminoase desenate deasupra evenimentului.",
-    detail: "Coregrafie de drone personalizată",
+    description: "Povestea evenimentului, desenată în aer.",
+    detail: "Coregrafie de drone creată pentru moment",
     youtubeUrl: "https://www.youtube.com/watch?v=vfuBWWr7-EE",
   },
   {
@@ -111,8 +111,8 @@ export const HOME_PACKAGES = [
     note: "O singură poveste, construită în două limbaje vizuale.",
     image: MEDIA.hybrid,
     alt: "Spectacol FireArtRo care combină drone și artificii",
-    description: "Două limbaje vizuale într-un singur moment.",
-    detail: "Drone, artificii și efecte scenice",
+    description: "Cerul vorbește în lumină și foc.",
+    detail: "Drone și artificii într-o singură regie",
     youtubeUrl: "https://www.youtube.com/watch?v=AyU0-6KQJXc",
   },
   {

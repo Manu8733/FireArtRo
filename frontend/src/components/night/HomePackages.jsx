@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
@@ -13,6 +13,16 @@ const featuredPackages = featuredPackageIds
   .map((id) => HOME_PACKAGES.find((item) => item.id === id))
   .filter(Boolean);
 const handoffGalleryItem = HOME_GALLERY[2];
+
+const getYoutubePoster = (url, fallback) => {
+  const match = String(url || "").match(/(?:youtu\.be\/|v=)([^?&/]+)/);
+  return match?.[1]
+    ? {
+      primary: `https://i.ytimg.com/vi/${match[1]}/hqdefault.jpg`,
+      fallback,
+    }
+    : { primary: fallback, fallback };
+};
 
 export default function HomePackages() {
   const sectionRef = useRef(null);
@@ -81,8 +91,9 @@ export default function HomePackages() {
       panels.forEach((panel, index) => {
         timeline.to(panel, {
           y: 0,
-          x: 0,
-          scale: 1,
+          x: () => (window.innerWidth <= 520 ? (index - 1) * Math.min(window.innerWidth * 0.17, 68) : 0),
+          rotation: () => (window.innerWidth <= 520 ? (index - 1) * 3.5 : 0),
+          scale: () => (window.innerWidth <= 520 && index !== 1 ? 0.94 : 1),
           autoAlpha: 1,
           duration: panelDuration,
         }, panelsStart + index * panelStagger);
@@ -148,36 +159,47 @@ export default function HomePackages() {
           data-sequence="before-packages"
         >
           <p className="fa-kicker">Pachete FireArtRo</p>
-          <h2 id="fa-packages-title">O noapte.<br />Trei direcții.</h2>
+          <h2 id="fa-packages-title">Trei moduri de a<br />aprinde noaptea.</h2>
         </header>
 
         <div className="fa-packages__lineup nr-shell" data-package-dock>
           {featuredPackages.map((item) => (
-            <a
-              className="fa-package-slab"
-              data-package-slab
-              data-package-youtube
-              href={item.youtubeUrl}
-              key={item.id}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                data-package-media="poster"
-                src={item.image}
-                alt={item.alt}
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="fa-package-slab__veil" />
-              <div className="fa-package-slab__copy">
-                <p data-package-type>{item.type}</p>
-                <h3>{item.title}</h3>
-                <p className="fa-package-slab__description" data-package-description>{item.description}</p>
-                <small data-package-detail>{item.detail}</small>
-                <span className="fa-package-slab__link">Vezi clipul <ArrowUpRight aria-hidden="true" /></span>
-              </div>
-            </a>
+            (() => {
+              const poster = getYoutubePoster(item.youtubeUrl, item.image);
+              return (
+                <a
+                  className="fa-package-slab"
+                  data-package-slab
+                  data-package-youtube
+                  href={item.youtubeUrl}
+                  key={item.id}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    data-package-media="poster"
+                    src={poster.primary}
+                    alt={item.alt}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(event) => {
+                      if (event.currentTarget.src !== poster.fallback) {
+                        event.currentTarget.src = poster.fallback;
+                      }
+                    }}
+                  />
+                  <div className="fa-package-slab__veil" />
+                  <span className="fa-package-slab__play" data-package-play aria-hidden="true"><Play fill="currentColor" /></span>
+                  <div className="fa-package-slab__copy">
+                    <p data-package-type>{item.type}</p>
+                    <h3>{item.title}</h3>
+                    <p className="fa-package-slab__description" data-package-description>{item.description}</p>
+                    <small data-package-detail>{item.detail}</small>
+                    <span className="fa-package-slab__link">Vezi clipul <ArrowUpRight aria-hidden="true" /></span>
+                  </div>
+                </a>
+              );
+            })()
           ))}
         </div>
 

@@ -52,7 +52,7 @@ export default function HomeGallery() {
           ) / viewportWidth;
           const riseProgress = gsap.utils.clamp(0, 1, (1.2 - centerRatio) / 0.7);
           const outroSettleProgress = index === panels.length - 1
-            ? gsap.utils.clamp(0, 1, (progress - 0.48) / 0.18)
+            ? gsap.utils.clamp(0, 1, (progress - 0.28) / 0.12)
             : 0;
           const resolvedRise = Math.max(riseProgress, outroSettleProgress);
           const y = liftDistance * ((1 - resolvedRise) ** 3);
@@ -107,6 +107,7 @@ export default function HomeGallery() {
 
   return (
     <section
+      id="spectacole"
       ref={sectionRef}
       className="fa-work"
       data-home-scene="gallery"

@@ -46,7 +46,6 @@ test.describe("FireArt home responsive matrix", () => {
         ["team", page.getByTestId("home-team")],
         ["partners", page.getByTestId("home-partners")],
         ["brief", page.getByTestId("home-brief")],
-        ["reviews", page.getByTestId("facebook-reviews")],
       ];
 
       for (const [name, section] of sections) {

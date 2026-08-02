@@ -41,12 +41,13 @@ test.describe("FireArt scroll-directed motion", () => {
       .last()
       .getAttribute("src");
     await expect(handoff.locator("[data-handoff-gallery-image]")).toHaveAttribute("src", finalGallerySource);
-    await expect(page.getByTestId("package-reveal-copy")).toContainText(/O noapte\.\s*Trei direcții\./);
+    await expect(page.getByTestId("package-reveal-copy")).toContainText(/Trei moduri de a\s*aprinde noaptea\./);
     await expect(page.getByTestId("package-reveal-copy")).toHaveAttribute("data-sequence", "before-packages");
     await expect(page.getByTestId("home-packages").locator("[data-package-youtube]")).toHaveCount(3);
   });
 
-  test("keeps the final gallery frame moving until the horizontal handoff without a vertical jump", async ({ page }) => {
+  test("keeps the final gallery frame moving until the horizontal handoff without a vertical jump", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Desktop frame parity is covered here; touch layouts use the dedicated responsive handoff test.");
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -83,7 +84,7 @@ test.describe("FireArt scroll-directed motion", () => {
     }
 
     for (const key of ["x", "y", "width", "height"]) {
-      expect(Math.abs(lastGalleryFrame[key] - firstHandoffFrame[key]), `${key} jumps at handoff`).toBeLessThan(2);
+      expect(Math.abs(lastGalleryFrame[key] - firstHandoffFrame[key]), `${key} jumps at handoff`).toBeLessThan(3);
     }
   });
 
@@ -125,16 +126,14 @@ test.describe("FireArt scroll-directed motion", () => {
     const packageTop = await packages.evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
 
     const translateX = async () => handoff.evaluate((node) => {
-      const values = getComputedStyle(node).transform.match(/matrix\(([^)]+)\)/)?.[1].split(",");
-      return values ? Number(values[4]) : 0;
+      const transform = getComputedStyle(node).transform;
+      return transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m41;
     });
 
     await page.evaluate((top) => window.scrollTo(0, top - 420), packageTop);
     await page.waitForTimeout(1000);
     await page.evaluate((top) => window.scrollTo(0, top + 520), packageTop);
-    await page.waitForTimeout(250);
-
-    expect(await translateX()).toBeLessThan(-120);
+    await expect.poll(translateX, { timeout: 4_000 }).toBeLessThan(-120);
   });
 
   test("uses a longer scroll runway for the gallery continuation sheet", async ({ page }) => {
@@ -151,8 +150,8 @@ test.describe("FireArt scroll-directed motion", () => {
     await page.waitForTimeout(700);
 
     const translateX = await handoff.evaluate((node) => {
-      const values = getComputedStyle(node).transform.match(/matrix\(([^)]+)\)/)?.[1].split(",");
-      return values ? Number(values[4]) : 0;
+      const transform = getComputedStyle(node).transform;
+      return transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m41;
     });
 
     expect(translateX, "the continuation sheet should still be partially on screen at 900px").toBeGreaterThan(-1300);

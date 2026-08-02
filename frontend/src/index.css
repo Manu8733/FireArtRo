@@ -251,6 +251,7 @@ a {
     padding: 1rem 1.1rem calc(1.5rem + env(safe-area-inset-bottom));
 }
 .mobile-nav-links a {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -269,6 +270,19 @@ a {
     display: flex;
     flex-direction: column;
     gap: .72rem;
+    transform: translateY(-50%);
+}
+.mobile-nav-links a.is-active { color: #fff; }
+.mobile-nav-links a.is-active::before {
+    position: absolute;
+    top: 50%;
+    left: -.15rem;
+    width: 2px;
+    height: 1.2rem;
+    content: "";
+    border-radius: 999px;
+    background: linear-gradient(180deg, #8dd6ff, #3874ff);
+    box-shadow: 0 0 1rem rgba(74, 137, 255, .8);
     transform: translateY(-50%);
 }
 .social-dock-link {

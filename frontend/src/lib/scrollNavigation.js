@@ -52,10 +52,9 @@ export const navigateToHref = ({ href, navigate, pathname, behavior = "smooth" }
   if (!href) return;
 
   if (href.startsWith("#")) {
-    if (document.querySelector(href)) {
+    if (pathname === "/" && document.querySelector(href)) {
       scrollToHash(href, behavior);
-      const basePath = pathname === "/" ? "/" : pathname;
-      window.history.pushState(null, "", href === "#acasa" ? basePath : `${basePath}${href}`);
+      window.history.pushState(null, "", href === "#acasa" ? "/" : `/${href}`);
       return;
     }
     navigate(`/${href}`);

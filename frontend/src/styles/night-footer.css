@@ -1,130 +1,30 @@
 .fa-footer {
   position: relative;
   overflow: hidden;
-  color: #f4f6fb;
-  background:
-    radial-gradient(circle at 84% 14%, rgba(50, 111, 196, 0.18), transparent 24rem),
-    #020305;
+  color: #f4f7fb;
+  background: #020407;
+  border-top: 1px solid rgba(130, 181, 255, 0.14);
+}
+
+.fa-footer::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(24, 93, 196, 0.12), transparent 34%, transparent 70%, rgba(65, 151, 255, 0.06));
 }
 
 .fa-footer__frame {
   position: relative;
-  padding-top: clamp(5rem, 8vw, 8rem);
+  padding-block: clamp(4.5rem, 8vw, 8rem) 1.25rem;
 }
 
-.fa-facebook-reviews {
+.fa-footer__mast {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(14rem, 0.8fr);
+  grid-template-columns: minmax(10rem, 0.8fr) minmax(16rem, 1.2fr);
   align-items: end;
-  gap: clamp(2rem, 6vw, 7rem);
-  padding-bottom: clamp(5rem, 9vw, 9rem);
-}
-
-.fa-facebook-reviews > div:first-child > p,
-.fa-footer__lead > p {
-  margin: 0 0 1rem;
-  color: #8eb8ff;
-  font-family: "Sora", sans-serif;
-  font-size: 0.68rem;
-  font-weight: 650;
-  text-transform: uppercase;
-}
-
-.fa-facebook-reviews h2 {
-  max-width: 12ch;
-  margin: 0;
-  font-family: "Sora", sans-serif;
-  font-size: clamp(2.5rem, 5vw, 5.4rem);
-  font-weight: 480;
-  line-height: 0.96;
-}
-
-.fa-facebook-reviews > a,
-.fa-footer__cta {
-  display: inline-flex;
-  width: max-content;
-  min-height: 3.8rem;
-  align-items: center;
-  gap: 1.2rem;
-  padding: 0.7rem 0.85rem 0.7rem 1.25rem;
-  border-radius: 2.4rem 0.9rem 2.4rem 2.4rem;
-  color: #07101a;
-  background: #f4f6fb;
-  font-family: "Sora", sans-serif;
-  font-size: 0.72rem;
-  font-weight: 680;
-  text-transform: uppercase;
-  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), background 220ms ease;
-}
-
-.fa-facebook-reviews > a svg,
-.fa-footer__cta svg {
-  width: 2.1rem;
-  height: 2.1rem;
-  padding: 0.52rem;
-  border-radius: 50%;
-  color: #fff;
-  background: #0d3154;
-}
-
-.fa-facebook-reviews > a:hover,
-.fa-footer__cta:hover {
-  background: #dceaff;
-  transform: translateY(-4px);
-}
-
-.fa-facebook-reviews__quotes {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2rem;
-}
-
-.fa-facebook-reviews__quotes blockquote {
-  margin: 0;
-  padding: 1.5rem 0;
-}
-
-.fa-facebook-reviews__quotes p {
-  margin: 0;
-  color: rgba(244, 246, 251, 0.78);
-  line-height: 1.65;
-}
-
-.fa-facebook-reviews__quotes cite {
-  display: block;
-  margin-top: 1rem;
-  color: #8eb8ff;
-  font-size: 0.72rem;
-  font-style: normal;
-}
-
-.fa-footer__lead {
-  padding-block: clamp(4rem, 7vw, 7rem);
-}
-
-.fa-footer__lead-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: clamp(2rem, 6vw, 7rem);
-}
-
-.fa-footer__lead h2 {
-  max-width: 13ch;
-  margin: 0;
-  font-family: "Sora", sans-serif;
-  font-size: clamp(2.6rem, 5.5vw, 6.2rem);
-  font-weight: 480;
-  line-height: 0.94;
-}
-
-.fa-footer__directory {
-  display: grid;
-  grid-template-columns: minmax(9rem, 0.65fr) minmax(22rem, 1.35fr) minmax(13rem, 0.9fr) auto;
-  align-items: center;
-  gap: clamp(1.5rem, 4vw, 4.5rem);
-  padding-block: 2rem;
+  gap: clamp(2rem, 8vw, 10rem);
+  padding-bottom: clamp(3.5rem, 7vw, 6.5rem);
 }
 
 .fa-footer__brand {
@@ -136,79 +36,58 @@
 
 .fa-footer__brand img {
   display: block;
-  width: 7.75rem;
+  width: clamp(8rem, 12vw, 11.5rem);
   height: auto;
-  filter: grayscale(1) brightness(2.3);
+  filter: grayscale(1) brightness(2.45);
 }
 
-.fa-footer__pages {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+.fa-footer__mast > p {
+  max-width: 16ch;
+  margin: 0;
+  color: rgba(244, 247, 251, 0.92);
+  font-family: "Bricolage Grotesque", "Sora", sans-serif;
+  font-size: clamp(1.65rem, 3.2vw, 3.4rem);
+  font-weight: 440;
+  line-height: 0.98;
 }
 
-.fa-footer__pages a {
+.fa-footer__directory {
   display: grid;
-  gap: 0.4rem;
-  min-height: 44px;
-  align-content: center;
-  color: rgba(244, 246, 251, 0.68);
-  font-size: 0.76rem;
+  grid-template-columns: minmax(13rem, 1.2fr) minmax(13rem, 1fr) minmax(10rem, 0.75fr);
+  gap: clamp(2rem, 7vw, 8rem);
+  padding-block: clamp(2.5rem, 4vw, 4rem);
+  border-top: 1px solid rgba(244, 247, 251, 0.12);
+  border-bottom: 1px solid rgba(244, 247, 251, 0.12);
+}
+
+.fa-footer__column {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 0.15rem;
+}
+
+.fa-footer__column > p {
+  margin: 0 0 1.05rem;
+  color: rgba(138, 188, 255, 0.76);
+  font-family: "Sora", sans-serif;
+  font-size: 0.64rem;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.fa-footer__column a {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  color: rgba(244, 247, 251, 0.62);
+  font-size: clamp(0.8rem, 0.95vw, 0.96rem);
   transition: color 180ms ease, transform 180ms ease;
 }
 
-.fa-footer__pages a span {
-  color: rgba(142, 184, 255, 0.54);
-  font-size: 0.58rem;
-}
-
-.fa-footer__pages a:hover {
+.fa-footer__column a:hover {
   color: #fff;
-  transform: translateY(-2px);
-}
-
-.fa-footer__contact {
-  display: grid;
-  justify-items: start;
-  gap: 0.4rem;
-}
-
-.fa-footer__contact a {
-  min-height: 24px;
-  color: rgba(244, 246, 251, 0.68);
-  font-size: 0.75rem;
-}
-
-.fa-footer__contact a:hover {
-  color: #fff;
-}
-
-.fa-footer__social {
-  display: flex;
-  gap: 0.45rem;
-}
-
-.fa-footer__social a {
-  display: inline-flex;
-  width: 44px;
-  height: 44px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: rgba(244, 246, 251, 0.62);
-  background: rgba(142, 184, 255, 0.08);
-  transition: color 180ms ease, transform 180ms ease, background 180ms ease;
-}
-
-.fa-footer__social a:hover {
-  color: #fff;
-  background: rgba(74, 130, 255, 0.24);
-  transform: translateY(-3px);
-}
-
-.fa-footer__social svg {
-  width: 0.95rem;
-  height: 0.95rem;
+  transform: translateX(0.22rem);
 }
 
 .fa-footer__bottom {
@@ -216,8 +95,8 @@
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1.5rem;
-  min-height: 4.5rem;
-  color: rgba(244, 246, 251, 0.4);
+  min-height: 5rem;
+  color: rgba(244, 247, 251, 0.34);
   font-size: 0.62rem;
 }
 
@@ -226,88 +105,54 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: 0.15rem;
 }
 
 .fa-footer__legal a,
 .fa-footer__legal button {
+  display: inline-flex;
   min-height: 44px;
-  padding-inline: 0.45rem;
+  align-items: center;
+  padding-inline: 0.5rem;
   border: 0;
-  color: rgba(244, 246, 251, 0.48);
+  color: rgba(244, 247, 251, 0.44);
   background: transparent;
   font: inherit;
   cursor: pointer;
 }
 
-.fa-footer__legal :where(a, button):hover {
-  color: #f4f6fb;
-}
-
-.fa-footer :where(a, button):focus-visible {
-  outline: 2px solid #8eb8ff;
-  outline-offset: 4px;
-}
-
-@media (max-width: 1050px) {
-  .fa-footer__directory {
-    grid-template-columns: auto 1fr auto;
-  }
-
-  .fa-footer__contact {
-    display: none;
-  }
-}
+.fa-footer__legal :where(a, button):hover { color: #f4f7fb; }
+.fa-footer :where(a, button):focus-visible { outline: 2px solid #85bdff; outline-offset: 4px; }
 
 @media (max-width: 720px) {
-  .fa-facebook-reviews,
-  .fa-footer__lead-row {
+  .fa-footer__frame { padding-top: 4rem; }
+
+  .fa-footer__mast {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
-  .fa-facebook-reviews h2,
-  .fa-footer__lead h2 {
-    max-width: 12ch;
-    font-size: clamp(2.35rem, 11vw, 3.7rem);
-    line-height: 0.98;
-  }
-
-  .fa-facebook-reviews > a,
-  .fa-footer__cta {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .fa-facebook-reviews__quotes {
-    grid-template-columns: 1fr;
-  }
+  .fa-footer__mast > p { font-size: clamp(1.8rem, 8vw, 2.8rem); }
 
   .fa-footer__directory {
-    grid-template-columns: 1fr auto;
-    gap: 1.5rem;
-    padding-block: 2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem 1.5rem;
   }
 
-  .fa-footer__pages {
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    order: 3;
-  }
+  .fa-footer__contact { grid-column: 1 / -1; }
 
   .fa-footer__bottom {
     grid-template-columns: 1fr;
     gap: 0;
-    padding-block: 1rem;
+    padding-top: 1rem;
   }
 
   .fa-footer__legal {
     justify-content: flex-start;
-    margin-inline: -0.45rem;
+    margin-inline: -0.5rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fa-footer a {
-    transition: none;
-  }
+  .fa-footer a { transition: none; }
 }

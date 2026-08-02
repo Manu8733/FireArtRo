@@ -36,13 +36,17 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(keyword).toHaveText("l");
     await page.clock.runFor(85);
     await expect(keyword).toHaveText("lu");
-    await page.clock.runFor(5 * 85);
-    await expect(keyword).toHaveText("lumină.");
+    for (const expectedWord of ["lum", "lumi", "lumin", "lumină", "lumină."]) {
+      await page.clock.runFor(85);
+      await expect(keyword).toHaveText(expectedWord);
+    }
 
     const firstTitleBox = await title.boundingBox();
     const firstCtaBox = await primary.boundingBox();
 
-    await page.clock.runFor(3200 + 55);
+    await page.clock.runFor(3200);
+    await expect(keyword).toHaveAttribute("data-phase", "deleting");
+    await page.clock.runFor(55);
     await expect(keyword).toHaveText("lumină");
     await page.clock.runFor(55);
     await expect(keyword).toHaveText("lumin");
@@ -88,8 +92,12 @@ test.describe("FireArt scroll canvas landing", () => {
     const socialLinks = page.getByTestId("social-dock").locator(".social-dock-link");
 
     const eyebrowBox = await eyebrow.boundingBox();
-    const primaryBox = await primary.boundingBox();
-    const secondaryBox = await secondary.boundingBox();
+    const [primaryBox, secondaryBox] = await page
+      .locator('[data-testid="hero-primary-cta"], [data-testid="hero-secondary-cta"]')
+      .evaluateAll((nodes) => nodes.map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+      }));
 
     expect(eyebrowBox?.y).toBeGreaterThanOrEqual(125);
     expect(Math.abs((primaryBox?.y || 0) - (secondaryBox?.y || 0))).toBeLessThan(2);
@@ -202,7 +210,7 @@ test.describe("FireArt scroll canvas landing", () => {
       .toHaveAttribute("href", "/galerie");
     await expect(page.getByTestId("home-packages").getByRole("link", { name: /pachete/i }))
       .toHaveAttribute("href", "/pachete");
-    await expect(page.getByTestId("home-brief").getByRole("link", { name: /brief/i }))
+    await expect(page.getByTestId("home-brief").getByRole("link", { name: /conversa/i }))
       .toHaveAttribute("href", "/contact");
   });
 
@@ -229,7 +237,7 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(packages.locator("[data-package-slab]")).toHaveCount(3);
     await expect(packages.locator("[data-package-transition-band]")).toHaveCount(0);
     await expect(packages.locator(".fa-packages__copy")).toHaveCount(0);
-    await expect(packages.locator(".fa-package-slab > span")).toHaveCount(0);
+    await expect(packages.locator("[data-package-play]")).toHaveCount(3);
     await expect(packages.locator(".fa-package-slab [data-package-type]")).toHaveText([
       "Artificii de noapte",
       "Show cu drone",
@@ -273,6 +281,10 @@ test.describe("FireArt scroll canvas landing", () => {
   test("reveals positioned team copy on desktop hover without opening a dialog", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
+    test.skip(
+      !(await page.evaluate(() => window.matchMedia("(hover: hover) and (pointer: fine)").matches)),
+      "Touch behavior is covered by night-runway-team-touch.spec.js",
+    );
     const team = page.getByTestId("home-team");
     const people = team.locator("[data-team-person]");
     const person = people.first();
@@ -326,15 +338,10 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(dialog).toBeHidden();
   });
 
-  test("shows Facebook reviews without fabricating review content", async ({ page }) => {
+  test("does not render review UI before a provider connection supplies verified content", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    const reviews = page.getByTestId("facebook-reviews");
-    await expect(reviews).toBeVisible();
-    await expect(reviews.getByRole("link", { name: /Facebook/i })).toHaveAttribute(
-      "href",
-      /facebook\.com\/FireArtRo\/reviews/,
-    );
-    await expect(reviews.locator("[data-review-placeholder]")).toHaveCount(0);
+    await expect(page.getByTestId("home-reviews")).toHaveCount(0);
+    await expect(page.getByTestId("facebook-reviews")).toHaveCount(0);
   });
 
   for (const viewport of responsiveViewports) {

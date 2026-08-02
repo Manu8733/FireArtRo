@@ -43,10 +43,10 @@ export default function HomeBrief() {
       <img className="fa-brief__image" src={MEDIA.crowd2} alt="Public privind un spectacol FireArtRo" loading="lazy" decoding="async" />
       <div className="fa-brief__shade" aria-hidden="true" />
       <div className="fa-brief__copy nr-shell">
-        <p className="fa-kicker">Următorul cadru</p>
-        <h2 id="fa-brief-title">Ai locul. Ai data. Construim momentul.</h2>
+        <p className="fa-kicker">Următorul spectacol</p>
+        <h2 id="fa-brief-title">Spune-ne ce sărbătorești.<br />Noi aprindem restul.</h2>
         <Link className="fa-brief__link" to="/contact">
-          <span>Trimite brief-ul</span>
+          <span>Începe conversația</span>
           <ArrowUpRight aria-hidden="true" />
         </Link>
       </div>

@@ -122,15 +122,30 @@ export const Navbar = () => {
     }
 
     const hashLinks = NAV_LINKS.filter((link) => link.href.startsWith("#"));
+    const requestedHash = hashLinks.some((link) => link.href === location.hash)
+      ? location.hash
+      : "";
     let raf = 0;
 
     const updateActive = () => {
+      if (requestedHash && Date.now() < programmaticScrollUntil.current) {
+        setActive(requestedHash);
+        raf = 0;
+        return;
+      }
+
       const probeY = getHeaderOffset() + window.innerHeight * 0.22;
       let next = "#acasa";
 
-      for (const link of hashLinks) {
-        const section = document.getElementById(link.href.slice(1));
-        if (!section) continue;
+      const sections = hashLinks
+        .map((link) => ({
+          link,
+          section: document.getElementById(link.href.slice(1)),
+        }))
+        .filter(({ section }) => section)
+        .sort((first, second) => first.section.offsetTop - second.section.offsetTop);
+
+      for (const { link, section } of sections) {
         const rect = section.getBoundingClientRect();
         if (rect.top <= probeY && rect.bottom > probeY) {
           next = link.href;
@@ -149,6 +164,10 @@ export const Navbar = () => {
       raf = window.requestAnimationFrame(updateActive);
     };
 
+    if (requestedHash) {
+      setActive(requestedHash);
+      window.requestAnimationFrame(() => scrollToHash(requestedHash, "auto"));
+    }
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule, { passive: true });
@@ -162,7 +181,7 @@ export const Navbar = () => {
       window.removeEventListener("orientationchange", schedule);
       window.removeEventListener("hashchange", schedule);
     };
-  }, [location.pathname]);
+  }, [location.hash, location.pathname]);
 
   const renderDesktopLink = (link) => {
     const isActive = active === link.href;
@@ -247,6 +266,7 @@ export const Navbar = () => {
                         closeAndGoTo(link.href);
                       }}
                       data-testid={`mobile-nav-link-${link.href.replace(/[#/]/g, "") || "home"}`}
+                      className={active === link.href ? "is-active" : ""}
                       aria-current={active === link.href ? "page" : undefined}
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}

@@ -208,12 +208,6 @@
   text-transform: uppercase;
 }
 
-.nr-gallery-card__copy strong {
-  max-width: 24ch;
-  font: 520 clamp(0.84rem, 1vw, 1rem)/1.12 "Bricolage Grotesque", "Sora", sans-serif;
-  letter-spacing: 0;
-}
-
 .nr-gallery-card__expand {
   position: absolute;
   z-index: 2;
@@ -347,7 +341,6 @@
     aspect-ratio: var(--media-ratio);
   }
 
-  .nr-gallery-card__copy strong { font-size: 1.15rem; }
   .nr-gallery-card__expand { opacity: 1; transform: none; }
 
   .nr-gallery-lightbox {

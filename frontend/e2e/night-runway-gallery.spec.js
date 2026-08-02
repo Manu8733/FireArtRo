@@ -18,7 +18,8 @@ test.describe("Editorial mosaic gallery", () => {
 
     await expect(page.locator("main[data-design='editorial-mosaic']")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Galerie" })).toHaveCount(1);
-    await expect(page.getByTestId("gallery-card")).toHaveCount(145);
+    await expect(page.getByTestId("gallery-card")).toHaveCount(50);
+    await expect(page.locator(".nr-gallery-card__copy strong")).toHaveCount(0);
 
     const cards = page.getByTestId("gallery-card");
     for (let index = 0; index < Math.min(await cards.count(), 12); index += 1) {
@@ -55,10 +56,22 @@ test.describe("Editorial mosaic gallery", () => {
     await openGallery(page);
 
     const cards = page.getByTestId("gallery-card");
-    expect(await cards.count()).toBeGreaterThanOrEqual(100);
+    expect(await cards.count()).toBeGreaterThanOrEqual(40);
 
     const sources = await cards.locator("img").evaluateAll((images) => images.map((image) => image.getAttribute("src") || ""));
-    expect(sources.filter((source) => source.includes("/media/gallery/fireartro-") && source.endsWith(".webp"))).toHaveLength(137);
+    expect(sources.filter((source) => source.includes("/media/gallery/fireartro-") && source.endsWith(".webp"))).toHaveLength(49);
+  });
+
+  test("exposes only the curated fireworks and drone categories", async ({ page }) => {
+    await openGallery(page);
+
+    const labels = await page.getByTestId("gallery-filters").locator("button span").allTextContents();
+    expect(labels).toEqual([
+      "Toate",
+      "Artificii de zi",
+      "Artificii de noapte",
+      "Drone show",
+    ]);
   });
 
   test("migrates an existing Admin catalog without removing a custom photograph", async ({ page }) => {
@@ -78,8 +91,42 @@ test.describe("Editorial mosaic gallery", () => {
     });
 
     await openGallery(page);
-    await expect(page.getByTestId("gallery-card")).toHaveCount(146);
-    await expect(page.getByRole("button", { name: /Custom/ })).toBeVisible();
+    await expect(page.getByTestId("gallery-card")).toHaveCount(51);
+    await expect(page.locator('[data-testid="gallery-card"][data-media-id="admin-custom-photo"]')).toBeVisible();
+  });
+
+  test("does not resurrect removed photographs during an Admin catalog migration", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify({
+        mediaCatalogVersion: "fireartro-gallery-2026-v2",
+        mediaItems: [
+          {
+            id: "gallery-import-137",
+            type: "image",
+            title: "Fotografie eliminata",
+            category: "Nunta",
+            thumbnail: "/media/gallery/fireartro-nunta-moment-special-137.webp",
+            src: "/media/gallery/fireartro-nunta-moment-special-137.webp",
+            alt: "Fotografie veche eliminata din catalog",
+            order: 137,
+          },
+          {
+            id: "admin-custom-photo",
+            type: "image",
+            title: "Fotografie administrata",
+            category: "Custom",
+            thumbnail: "/media/fireworks-sky.webp",
+            src: "/media/fireworks-sky.webp",
+            alt: "Fotografie incarcata prin Admin",
+            order: 999,
+          },
+        ],
+      }));
+    });
+
+    await openGallery(page);
+    await expect(page.locator('[data-testid="gallery-card"][data-media-id="gallery-import-137"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="gallery-card"][data-media-id="admin-custom-photo"]')).toBeVisible();
   });
 
   test("filters the collection and keeps URL state", async ({ page }) => {

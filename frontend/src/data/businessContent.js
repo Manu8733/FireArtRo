@@ -86,7 +86,7 @@ export const PROMO_SLIDES = [
   },
 ];
 
-export const MEDIA_ITEMS = [
+const MEDIA_ITEMS_SOURCE = [
   {
     id: "photo-fireworks-sky",
     type: "image",
@@ -295,7 +295,23 @@ export const MEDIA_ITEMS = [
   ...importedGalleryItems,
 ];
 
-export const MEDIA_CATALOG_VERSION = "fireartro-gallery-2026-v2";
+const CURATED_LEGACY_MEDIA_IDS = new Set([
+  "photo-drone-show",
+  "video-final",
+  "video-drone",
+]);
+
+export const LEGACY_MEDIA_IDS = MEDIA_ITEMS_SOURCE
+  .filter((item) => !item.id.startsWith("gallery-import-"))
+  .map((item) => item.id);
+
+export const MEDIA_ITEMS = MEDIA_ITEMS_SOURCE
+  .filter((item) => item.id.startsWith("gallery-import-") || CURATED_LEGACY_MEDIA_IDS.has(item.id))
+  .map((item) => (item.id === "video-final"
+    ? { ...item, category: "Artificii de noapte", tags: ["Video", "Artificii de noapte"] }
+    : item));
+
+export const MEDIA_CATALOG_VERSION = "fireartro-gallery-2026-v3";
 
 export const PACKAGE_CATEGORIES = [
   "Toate",

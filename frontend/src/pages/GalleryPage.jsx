@@ -11,6 +11,8 @@ import useManagedContent from "@/hooks/useManagedContent";
 import { MEDIA_ITEMS, SITE_DETAILS } from "@/data/businessContent";
 import "@/styles/night-gallery.css";
 
+const GALLERY_CATEGORIES = ["Artificii de zi", "Artificii de noapte", "Drone show"];
+
 const gallerySchema = (items, siteUrl) => ({
   "@context": "https://schema.org",
   "@type": "CollectionPage",
@@ -38,7 +40,9 @@ export default function GalleryPage() {
   );
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const categories = useMemo(
-    () => ["Toate", ...new Set(photos.map((item) => item.category).filter(Boolean))],
+    () => ["Toate", ...GALLERY_CATEGORIES.filter(
+      (category) => photos.some((item) => item.category === category),
+    )],
     [photos],
   );
   const requestedFilter = params.get("filtru") || "Toate";
@@ -150,7 +154,7 @@ export default function GalleryPage() {
               <p>Galerie FireArtRo</p>
               <h1 id="gallery-title">Galerie</h1>
             </div>
-            <p className="nr-gallery-header__intro">Cadre reale din spectacole cu drone, artificii si efecte speciale.</p>
+            <p className="nr-gallery-header__intro">Cadre reale din spectacole cu drone si artificii de zi sau de noapte.</p>
           </header>
 
           <nav className="nr-gallery-filters" data-testid="gallery-filters" aria-label="Filtre galerie">
@@ -180,6 +184,7 @@ export default function GalleryPage() {
                   key={item.id}
                   className="nr-gallery-card"
                   data-testid="gallery-card"
+                  data-media-id={item.id}
                   style={{
                     "--media-ratio": imageRatios[item.id] || item.aspectRatio || (item.featured ? 1.5 : 1.333),
                     "--gallery-index": index,
@@ -195,7 +200,6 @@ export default function GalleryPage() {
                     />
                     <span className="nr-gallery-card__copy">
                       <small>{item.category}</small>
-                      <strong>{item.title}</strong>
                     </span>
                     <span className="nr-gallery-card__expand" aria-hidden="true">
                       <Expand />

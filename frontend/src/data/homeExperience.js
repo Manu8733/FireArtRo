@@ -45,20 +45,20 @@ export const LEGACY_HOME_GALLERY = [
 
 export const HOME_GALLERY = [
   {
-    id: "night-crowd-fireworks",
+    id: "drone-constellation",
     index: "01",
-    title: "Noapte aprins\u0103",
-    type: "Artificii de noapte",
-    image: "/media/gallery/fireartro-artificii-noapte-eveniment-oras.webp",
-    alt: "Artificii FireArtRo de noapte, cu public, in timpul unui eveniment de oras",
+    title: "Cer in miscare",
+    type: "Drone show",
+    image: MEDIA.droneShow2,
+    alt: "Formatie luminoasa de drone intr-un spectacol FireArtRo",
   },
   {
-    id: "wedding-cold-sparks",
+    id: "night-crowd-fireworks",
     index: "02",
-    title: "Scantei pentru doi",
-    type: "Nunt\u0103",
-    image: "/media/gallery/fireartro-nunta-artificii-fantani-reci.webp",
-    alt: "Miri inconjurati de fantani reci FireArtRo la o nunta de seara",
+    title: "Noapte aprinsa",
+    type: "Artificii de noapte",
+    image: "/media/gallery/fireartro-artificii-noapte-spectacol-091.webp",
+    alt: "Artificii FireArtRo de noapte deasupra publicului",
   },
   {
     id: "day-festival-fireworks",

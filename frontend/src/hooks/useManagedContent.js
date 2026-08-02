@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  LEGACY_MEDIA_IDS,
   LEGACY_PACKAGE_IDS,
   MEDIA_CATALOG_VERSION,
   MEDIA_ITEMS,
@@ -30,8 +31,12 @@ const migrateMedia = (content) => {
   if (content.mediaCatalogVersion === MEDIA_CATALOG_VERSION) return content;
 
   const catalogIds = new Set(MEDIA_ITEMS.map((item) => item.id));
+  const legacyIds = new Set(LEGACY_MEDIA_IDS);
   const customMedia = Array.isArray(content.mediaItems)
-    ? content.mediaItems.filter((item) => item?.id && !catalogIds.has(item.id))
+    ? content.mediaItems.filter((item) => item?.id
+      && !catalogIds.has(item.id)
+      && !legacyIds.has(item.id)
+      && !item.id.startsWith("gallery-import-"))
     : [];
 
   return {

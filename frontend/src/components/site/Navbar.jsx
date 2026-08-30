@@ -73,9 +73,10 @@ export const Navbar = () => {
       syncScrollOffset();
       const currentY = Math.max(window.scrollY, 0);
       const delta = currentY - lastScrollY.current;
+      const usesFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
       setScrolled(currentY > 28);
-      if (Date.now() < programmaticScrollUntil.current) {
+      if (!usesFinePointer || Date.now() < programmaticScrollUntil.current) {
         setVisible(true);
       } else if (currentY < 92) {
         setVisible(true);
@@ -165,6 +166,8 @@ export const Navbar = () => {
     };
 
     if (requestedHash) {
+      programmaticScrollUntil.current = Date.now() + 3400;
+      setVisible(true);
       setActive(requestedHash);
       window.requestAnimationFrame(() => scrollToHash(requestedHash, "auto"));
     }
@@ -223,7 +226,7 @@ export const Navbar = () => {
         </div>
 
         <div className="site-navbar-logo">
-          <Logo onClick={goHome} />
+          <Logo onClick={() => goHome("auto")} />
         </div>
 
         <div className="site-navbar-links site-navbar-links-right">

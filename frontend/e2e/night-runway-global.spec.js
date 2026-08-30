@@ -1,11 +1,17 @@
 const { test, expect } = require("@playwright/test");
 
-const routes = ["/", "/pachete", "/galerie", "/intrebari-frecvente", "/contact"];
+const routeDesigns = [
+  ["/", "night-runway"],
+  ["/pachete", "night-runway"],
+  ["/galerie", "editorial-mosaic"],
+  ["/intrebari-frecvente", "night-runway"],
+  ["/contact", "night-runway"],
+];
 
-for (const route of routes) {
+for (const [route, design] of routeDesigns) {
   test(`${route} uses the Night Runway design contract`, async ({ page }) => {
     await page.goto(route, { waitUntil: "domcontentloaded" });
-    await expect(page.locator("main[data-design='night-runway']")).toBeVisible();
+    await expect(page.locator(`main[data-design='${design}']`)).toBeVisible();
 
     const dimensions = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,

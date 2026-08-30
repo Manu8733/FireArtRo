@@ -46,7 +46,7 @@ export const Hero = () => {
         <p className="nr-hero__eyebrow">Drone · artificii · efecte scenice</p>
         <HeroTypingTitle />
         <p className="nr-hero__description">
-          Momente create pentru nunți, festivaluri și evenimente de brand.
+          Momente care rămân.
         </p>
         <div className="nr-hero__actions">
           <NightButton to="/contact" data-testid="hero-primary-cta">Cere oferta</NightButton>

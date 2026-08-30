@@ -27,22 +27,12 @@ export const HERO_POSTER =
 
 export const HERO_VIDEOS = [
   {
-    src: "/media/hero-loop-aerial.mp4",
-    mobileSrc: "/media/hero-loop-aerial-mobile.mp4",
-    label: "Cadru aerian cu oras luminat si artificii la distanta",
-    position: "50% 44%",
-  },
-  {
-    src: "/media/hero-loop-fireworks.mp4",
-    mobileSrc: "/media/hero-loop-fireworks-mobile.mp4",
-    label: "Artificii realiste pentru eveniment de seara",
-    position: "52% 50%",
-  },
-  {
-    src: "/media/hero-loop-show.mp4",
-    mobileSrc: "/media/hero-loop-show-mobile.mp4",
-    label: "Show luminos cu drone si artificii sincronizate",
-    position: "50% 46%",
+    src: "/media/fireart-drone-fireworks-cinematic-desktop.mp4",
+    mobileSrc: "/media/fireart-drone-fireworks-cinematic-mobile.mp4",
+    webpSrc: "/media/fireart-drone-fireworks-cinematic-desktop.webp",
+    mobileWebpSrc: "/media/fireart-drone-fireworks-cinematic-mobile.webp",
+    label: "Trailer cinematic FireArtRo cu drone, artificii și formații luminoase",
+    position: "50% 50%",
   },
 ];
 

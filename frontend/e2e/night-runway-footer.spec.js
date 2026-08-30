@@ -3,39 +3,22 @@ const { test, expect } = require("@playwright/test");
 const routesWithFooter = ["/", "/pachete", "/galerie", "/intrebari-frecvente", "/contact"];
 
 test.describe("Night Runway final CTA and footer", () => {
-  test("builds the home ending around an electric horizon and direct contact actions", async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/", { waitUntil: "domcontentloaded" });
-
-    const cta = page.getByTestId("night-final-cta");
-    await expect(cta).toBeVisible();
-    await expect(cta.getByTestId("night-final-cta-media")).toBeVisible();
-    await expect(cta.getByTestId("night-final-cta-horizon")).toBeVisible();
-
-    const primary = cta.getByRole("button", { name: "Planifică spectacolul" });
-    await expect(primary).toBeVisible();
-    await expect(primary).toHaveCSS("clip-path", /polygon/);
-    expect((await primary.boundingBox()).height).toBeGreaterThanOrEqual(44);
-
-    const whatsapp = cta.getByRole("link", { name: "Continuă pe WhatsApp" });
-    await expect(whatsapp).toHaveAttribute("href", /^https:\/\//);
-    await expect(whatsapp).toHaveAttribute("target", "_blank");
-
-    await primary.click();
-    await expect(page).toHaveURL(/\/contact$/);
-  });
-
-  test("uses an oversized wordmark without losing contact, social or legal destinations", async ({ page }) => {
+  test("keeps the footer as the final contact directory", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const footer = page.getByTestId("night-runway-footer");
     await expect(footer).toBeVisible();
+    await expect(footer.getByRole("link", { name: "Contact" }).first()).toHaveAttribute("href", "/contact");
+    await expect(footer.getByRole("link", { name: "FireArtRo, pagina principală" })).toHaveAttribute("href", "/#acasa");
+  });
 
-    const wordmark = footer.getByTestId("night-footer-wordmark");
-    await expect(wordmark).toContainText("FIREARTRO");
-    const wordmarkSize = await wordmark.evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize));
-    expect(wordmarkSize).toBeGreaterThanOrEqual(120);
+  test("keeps social, legal and consumer-protection destinations available", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const footer = page.getByTestId("night-runway-footer");
+    await expect(footer).toBeVisible();
 
     await expect(footer.getByRole("link", { name: "Contact" }).first()).toHaveAttribute("href", "/contact");
     await expect(footer.getByRole("link", { name: "Instagram" })).toHaveAttribute("href", /^https:\/\//);
@@ -44,7 +27,26 @@ test.describe("Night Runway final CTA and footer", () => {
     await expect(footer.getByRole("link", { name: "Confidențialitate" })).toHaveAttribute("href", "/confidentialitate");
     await expect(footer.getByRole("link", { name: "Termeni și condiții" })).toHaveAttribute("href", "/termeni-si-conditii");
     await expect(footer.getByRole("link", { name: "Cookies" })).toHaveAttribute("href", "/cookies");
+    await expect(footer.getByRole("link", { name: "ANPC" })).toHaveAttribute("href", "https://eservicii.anpc.ro/");
+    await expect(footer.getByRole("link", { name: "SAL" })).toHaveAttribute("href", "https://reclamatiisal.anpc.ro/");
     await expect(footer.getByRole("button", { name: "Setări cookies" })).toBeVisible();
+  });
+
+  test("renders configured phone and WhatsApp actions in the contact directory", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("fireartro-managed-content-v1", JSON.stringify({
+        contactSettings: {
+          phoneDisplay: "0740 000 000",
+          phoneTel: "+40740000000",
+          whatsappNumber: "40740000000",
+        },
+      }));
+    });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const footer = page.getByTestId("night-runway-footer");
+    await expect(footer.getByRole("link", { name: "0740 000 000" })).toHaveAttribute("href", "tel:+40740000000");
+    await expect(footer.getByRole("link", { name: "WhatsApp" })).toHaveAttribute("href", /^https:\/\/wa\.me\/40740000000/);
   });
 
   for (const route of routesWithFooter) {
@@ -94,8 +96,6 @@ test.describe("Night Runway final CTA and footer", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
-    const horizon = page.getByTestId("night-final-cta-horizon");
-    await expect(horizon).toHaveCSS("animation-name", "none");
     await expect(page.getByTestId("night-runway-footer")).toHaveCSS("scroll-behavior", "auto");
   });
 });

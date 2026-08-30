@@ -1,5 +1,6 @@
 import { SOCIAL_LINKS, SITE_DETAILS, TESTIMONIAL_ITEMS } from "@/data/businessContent";
 import useManagedContent from "@/hooks/useManagedContent";
+import "@/styles/night-reviews.css";
 
 const normalizeSource = (value) => String(value || "").trim().toLowerCase();
 
@@ -8,12 +9,12 @@ function ReviewRail({ provider, direction, reviews, href, linkLabel }) {
 
   return (
     <div
-      className="fa-home-reviews__lane"
+      className="fa-page-reviews__lane"
       data-review-provider={provider}
       data-direction={direction}
     >
-      <div className="fa-home-reviews__viewport">
-        <div className="fa-home-reviews__track">
+      <div className="fa-page-reviews__viewport">
+        <div className="fa-page-reviews__track">
           {reviews.map((review) => (
             <blockquote data-review-card key={review.id}>
               <p>{review.quote}</p>
@@ -50,8 +51,7 @@ export default function HomeReviews() {
 
   return (
     <section
-      className="fa-home-reviews"
-      data-home-scene="reviews"
+      className="fa-page-reviews"
       data-testid="home-reviews"
       aria-label="Recenzii publice"
     >

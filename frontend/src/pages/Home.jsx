@@ -1,6 +1,6 @@
 import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
-import Footer from "@/components/site/Footer";
+import PageEnd from "@/components/site/PageEnd";
 import SocialDock from "@/components/site/SocialDock";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import HomeRunway from "@/components/night/HomeRunway";
@@ -57,7 +57,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <HomeRunway />
-      <Footer />
+      <PageEnd showBlog />
       <SocialDock />
     </main>
   );

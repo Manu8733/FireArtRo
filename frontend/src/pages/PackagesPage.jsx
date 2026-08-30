@@ -1,7 +1,7 @@
 import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import Packages from "@/components/site/Packages";
-import Footer from "@/components/site/Footer";
+import PageEnd from "@/components/site/PageEnd";
 import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
 import { PACKAGE_ITEMS, SITE_DETAILS } from "@/data/businessContent";
@@ -39,7 +39,7 @@ export default function PackagesPage() {
       <ScrollProgress />
       <Navbar />
       <Packages items={packages} />
-      <Footer />
+      <PageEnd />
     </main>
   );
 }

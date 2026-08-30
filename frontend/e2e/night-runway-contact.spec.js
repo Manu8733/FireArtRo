@@ -7,21 +7,23 @@ async function completeRequiredFields(page) {
   await page.getByLabel("Data evenimentului").fill(EVENT_DATE);
   await page.getByLabel("Localitatea").fill("Cluj-Napoca");
   await page.getByLabel("Spectacol dorit").selectOption({ label: "Show drone" });
-  await page.getByLabel("Nume").fill("Popescu");
-  await page.getByLabel("Prenume").fill("Ana");
-  await page.getByLabel("Telefon").fill("0722000000");
-  await page.getByLabel("Email").fill("ana@example.com");
+  await page.locator("#quote-first-name").fill("Popescu");
+  await page.locator("#quote-last-name").fill("Ana");
+  await page.locator("#quote-phone").fill("0722000000");
+  await page.locator("#quote-email").fill("ana@example.com");
   await page.getByLabel(/Sunt de acord cu prelucrarea datelor/i).check();
 }
 
-test("contactul este un singur formular compact, fără hero, progres sau recapitulare", async ({ page }) => {
+test("contactul este un brief compact, grupat, fără animații ambientale", async ({ page }) => {
   await page.goto("/contact", { waitUntil: "domcontentloaded" });
 
-  await expect(page.getByRole("heading", { level: 1, name: "Spune-ne despre eveniment." })).toBeVisible();
-  await expect(page.getByText("Data, locul și tipul de spectacol sunt suficiente pentru început.")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Ai data. Construim restul." })).toBeVisible();
   await expect(page.getByTestId("quote-form")).toBeVisible();
   await expect(page.getByLabel("Tip eveniment")).toBeVisible();
   await expect(page.getByRole("button", { name: "Trimite cererea" })).toBeVisible();
+  await expect(page.getByTestId("contact-form-rail")).toBeVisible();
+  await expect(page.locator("[data-contact-form-group]")).toHaveCount(2);
+  await expect(page.getByTestId("ambient-threads")).toHaveCount(0);
 
   await expect(page.locator(".nr-contact-hero")).toHaveCount(0);
   await expect(page.locator(".nr-contact-progress")).toHaveCount(0);
@@ -97,14 +99,19 @@ test("detaliile opționale și pachetul preselectat ajung în payload", async ({
   await completeRequiredFields(page);
   await page.getByText("Adaugă detalii", { exact: true }).click();
   await page.getByLabel("Locația exactă").fill("Piața Unirii");
-  await page.getByLabel("Pachet selectat").selectOption("hybrid-signature");
+  const packageSelect = page.getByLabel("Pachet selectat");
+  const packageOption = await packageSelect.locator("option").nth(1).evaluate((option) => ({
+    id: option.value,
+    title: option.textContent,
+  }));
+  await packageSelect.selectOption(packageOption.id);
   await page.getByLabel("Mesaj").fill("Acces tehnic dinspre strada principală.");
   await page.getByRole("button", { name: "Trimite cererea" }).click();
 
   expect(submittedPayload).toMatchObject({
     event_location: "Piața Unirii",
-    package_id: "hybrid-signature",
-    package_title: "Hybrid Signature",
+    package_id: packageOption.id,
+    package_title: packageOption.title,
     message: "Acces tehnic dinspre strada principală.",
   });
 });
@@ -116,13 +123,14 @@ test("eroarea API păstrează datele și mesajul 429 rămâne explicit", async (
   await page.getByRole("button", { name: "Trimite cererea" }).click();
 
   await expect(page.getByTestId("quote-error")).toContainText("Ai trimis mai multe solicitări");
-  await expect(page.getByLabel("Email")).toHaveValue("ana@example.com");
+  await expect(page.locator("#quote-email")).toHaveValue("ana@example.com");
   await expect(page.getByLabel("Spectacol dorit")).toHaveValue("Show drone");
 });
 
 test("pe mobil primul câmp și contactul direct sunt în primul viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/contact", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#quote-event-type")).toBeVisible();
 
   const metrics = await page.evaluate(() => {
     const firstField = document.querySelector("#quote-event-type").getBoundingClientRect();
@@ -130,7 +138,7 @@ test("pe mobil primul câmp și contactul direct sunt în primul viewport", asyn
     return {
       pageWidth: document.documentElement.scrollWidth,
       viewportWidth: document.documentElement.clientWidth,
-      pageHeight: document.documentElement.scrollHeight,
+      contactHeight: document.querySelector(".nr-contact-main").getBoundingClientRect().height,
       firstFieldTop: firstField.top,
       firstFieldHeight: firstField.height,
       h1Size: Number.parseFloat(h1.fontSize),
@@ -141,6 +149,6 @@ test("pe mobil primul câmp și contactul direct sunt în primul viewport", asyn
   expect(metrics.firstFieldTop).toBeLessThan(844);
   expect(metrics.firstFieldHeight).toBeGreaterThanOrEqual(44);
   expect(metrics.h1Size).toBeLessThanOrEqual(46);
-  expect(metrics.pageHeight).toBeLessThan(2200);
+  expect(metrics.contactHeight).toBeLessThan(1300);
   await expect(page.locator("a[href^='mailto:']").first()).toBeVisible();
 });

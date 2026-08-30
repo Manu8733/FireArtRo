@@ -3,15 +3,21 @@ import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Navbar from "@/components/site/Navbar";
-import Footer from "@/components/site/Footer";
+import PageEnd from "@/components/site/PageEnd";
 import ScrollProgress from "@/components/site/ScrollProgress";
-import GalleryThreadsCanvas from "@/components/night/GalleryThreadsCanvas";
 import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
 import { MEDIA_ITEMS, SITE_DETAILS } from "@/data/businessContent";
 import "@/styles/night-gallery.css";
 
 const GALLERY_CATEGORIES = ["Artificii de zi", "Artificii de noapte", "Drone show"];
+
+const getGalleryFrameRatio = (ratio) => {
+  if (!Number.isFinite(ratio) || ratio <= 0) return 4 / 3;
+  if (ratio < 0.6) return 3 / 4;
+  if (ratio > 2) return 16 / 10;
+  return ratio;
+};
 
 const interleaveByCategory = (items) => {
   const queues = GALLERY_CATEGORIES
@@ -114,9 +120,10 @@ export default function GalleryPage() {
     }
 
     const updatePreviewFrame = () => {
-      const gutter = window.innerWidth <= 640 ? 16 : 32;
-      const maxWidth = window.innerWidth - gutter;
-      const maxHeight = window.innerHeight - gutter;
+      const gutter = window.innerWidth <= 640 ? 8 : 16;
+      const controlRail = window.innerWidth <= 640 ? 110 : 160;
+      const maxWidth = window.innerWidth - gutter - controlRail;
+      const maxHeight = window.innerHeight - (gutter * 2);
       const width = Math.min(maxWidth, maxHeight * previewRatio);
 
       setPreviewFrame({
@@ -179,7 +186,6 @@ export default function GalleryPage() {
 
   return (
     <main className="nr-gallery-page" data-design="editorial-mosaic">
-      <GalleryThreadsCanvas />
       <ScrollProgress />
       <Navbar />
 
@@ -224,6 +230,9 @@ export default function GalleryPage() {
                   data-category={item.category}
                   style={{
                     "--media-ratio": imageRatios[item.id] || item.aspectRatio || (item.featured ? 1.5 : 1.333),
+                    "--gallery-frame-ratio": getGalleryFrameRatio(
+                      imageRatios[item.id] || item.aspectRatio || (item.featured ? 1.5 : 1.333),
+                    ),
                     "--gallery-index": index,
                   }}
                 >
@@ -231,7 +240,7 @@ export default function GalleryPage() {
                     <img
                       src={item.thumbnail || item.src}
                       alt={item.alt}
-                      loading={index < 4 ? "eager" : "lazy"}
+                      loading="eager"
                       decoding="async"
                       onLoad={(event) => rememberRatio(item.id, event)}
                     />
@@ -251,19 +260,33 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      <Footer />
+      <PageEnd />
 
       <Dialog open={expandedIndex >= 0} onOpenChange={(open) => !open && closePhoto()}>
         <DialogContent
           className="nr-gallery-lightbox"
+          overlayClassName="nr-gallery-lightbox__overlay"
           aria-label={expandedItem ? `Previzualizare imagine: ${expandedItem.title}` : "Previzualizare imagine"}
           aria-describedby={undefined}
-          style={{ "--preview-ratio": previewRatio, ...previewFrame }}
         >
           {expandedItem && (
-            <div className="nr-gallery-lightbox__layout">
-              <div className="nr-gallery-lightbox__media">
-                <img src={expandedItem.src} alt={expandedItem.alt} loading="eager" decoding="async" />
+            <div className="nr-gallery-lightbox__stage">
+              <div
+                className="nr-gallery-lightbox__frame"
+                style={{ "--preview-ratio": previewRatio, ...previewFrame }}
+              >
+                <div className="nr-gallery-lightbox__layout">
+                  <div className="nr-gallery-lightbox__media">
+                    <img
+                      src={expandedItem.src}
+                      alt={expandedItem.alt}
+                      loading="eager"
+                      decoding="async"
+                      onLoad={(event) => rememberRatio(expandedItem.id, event)}
+                    />
+                  </div>
+                  <DialogTitle className="sr-only">{expandedItem.title}</DialogTitle>
+                </div>
               </div>
               <button
                 className="nr-gallery-lightbox__nav nr-gallery-lightbox__nav--previous"
@@ -281,7 +304,6 @@ export default function GalleryPage() {
               >
                 <ChevronRight aria-hidden="true" />
               </button>
-              <DialogTitle className="sr-only">{expandedItem.title}</DialogTitle>
             </div>
           )}
         </DialogContent>

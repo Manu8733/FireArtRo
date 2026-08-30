@@ -1,22 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import { HERO_POSTER, HERO_VIDEOS } from "@/data/content";
-import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useIsMobile, useMediaQuery } from "@/hooks/useMediaQuery";
 
-const HERO_LOOP_SECONDS = 7.85;
+const HERO_LOOP_SECONDS = 20;
 
 export const HeroVideo = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const switchingRef = useRef(false);
   const mobile = useIsMobile();
+  const portraitTablet = useMediaQuery("(min-width: 768px) and (max-width: 1199px) and (orientation: portrait)");
+  const usePortraitVideo = mobile || portraitTablet;
   const [enabled, setEnabled] = useState(true);
-  const [ready, setReady] = useState(false);
+  const [videoStatus, setVideoStatus] = useState("loading");
+  const [webpStatus, setWebpStatus] = useState("idle");
   const [active, setActive] = useState(0);
   const item = HERO_VIDEOS[active];
-  const source = mobile ? item.mobileSrc : item.src;
+  const source = usePortraitVideo ? item.mobileSrc : item.src;
+  const webpSource = usePortraitVideo ? item.mobileWebpSrc : item.webpSrc;
+  const fallbackActive = videoStatus === "failed";
 
   useEffect(() => {
     switchingRef.current = false;
+    setVideoStatus("loading");
   }, [source]);
 
   useEffect(() => {
@@ -26,22 +32,22 @@ export const HeroVideo = () => {
   }, []);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || HERO_VIDEOS.length < 2) return;
     const next = HERO_VIDEOS[(active + 1) % HERO_VIDEOS.length];
     const preload = document.createElement("video");
     preload.preload = "metadata";
     preload.muted = true;
-    preload.src = mobile ? next.mobileSrc : next.src;
+    preload.src = usePortraitVideo ? next.mobileSrc : next.src;
     return () => {
       preload.removeAttribute("src");
       preload.load();
     };
-  }, [active, enabled, mobile]);
+  }, [active, enabled, usePortraitVideo]);
 
   useEffect(() => {
     const video = videoRef.current;
     const container = containerRef.current;
-    if (!video || !container || !enabled) return;
+    if (!video || !container || !enabled || fallbackActive) return;
 
     let visible = true;
     const syncPlayback = () => {
@@ -67,12 +73,13 @@ export const HeroVideo = () => {
       observer.disconnect();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [active, enabled, source]);
+  }, [active, enabled, source, fallbackActive]);
 
   const queueNext = () => {
+    if (HERO_VIDEOS.length < 2) return;
     if (switchingRef.current) return;
     switchingRef.current = true;
-    setReady(false);
+    setVideoStatus("loading");
     setActive((current) => (current + 1) % HERO_VIDEOS.length);
   };
 
@@ -88,29 +95,59 @@ export const HeroVideo = () => {
         decoding="async"
       />
 
+      {enabled && fallbackActive && webpSource && (
+        <div
+          key={webpSource}
+          className="hero-media-picture absolute inset-0 block h-full w-full"
+          aria-hidden="true"
+        >
+          <img
+            src={webpSource}
+            alt=""
+            width={usePortraitVideo ? "2160" : "3840"}
+            height={usePortraitVideo ? "3840" : "2160"}
+            className="hero-media-surface hero-media-webp absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
+            style={{ opacity: webpStatus === "ready" ? 1 : 0, objectPosition: item.position || "52% center" }}
+            fetchPriority="high"
+            decoding="async"
+            loading="eager"
+            onLoad={() => setWebpStatus("ready")}
+            onError={() => {
+              setWebpStatus("failed");
+            }}
+          />
+        </div>
+      )}
+
       {enabled && (
         <video
           key={source}
           ref={videoRef}
           className="hero-media-surface hero-media-video absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
-          style={{ opacity: ready ? 1 : 0, objectPosition: item.position || "52% center" }}
+          style={{ opacity: videoStatus === "ready" ? 1 : 0, objectPosition: item.position || "52% center" }}
           poster={HERO_POSTER}
-          autoPlay
+          autoPlay={!fallbackActive}
           muted
-          loop={false}
+          loop={HERO_VIDEOS.length === 1}
           playsInline
-          preload={active === 0 ? "auto" : "metadata"}
+          preload={fallbackActive ? "none" : "metadata"}
           disablePictureInPicture
           disableRemotePlayback
           controlsList="nodownload noplaybackrate nofullscreen"
-          onCanPlay={() => setReady(true)}
-          onPlaying={() => setReady(true)}
+          onCanPlay={() => setVideoStatus("ready")}
+          onPlaying={() => setVideoStatus("ready")}
+          onError={() => {
+            setVideoStatus("failed");
+            setWebpStatus("loading");
+          }}
           onTimeUpdate={(event) => {
             const video = event.currentTarget;
             const mediaDuration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : HERO_LOOP_SECONDS;
             const clipDuration = Math.min(mediaDuration, HERO_LOOP_SECONDS);
-            if (clipDuration - video.currentTime < 0.45) setReady(false);
-            if (video.currentTime >= clipDuration) queueNext();
+            if (HERO_VIDEOS.length > 1) {
+              if (clipDuration - video.currentTime < 0.45) setVideoStatus("loading");
+              if (video.currentTime >= clipDuration) queueNext();
+            }
           }}
           onEnded={queueNext}
           aria-label={`Fundal video: ${item.label}`}
@@ -119,11 +156,11 @@ export const HeroVideo = () => {
         </video>
       )}
 
-      <div className="absolute inset-0 bg-black/30" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_56%_30%,_rgba(23, 107, 255,0.2),_transparent_62%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050308]/46 via-transparent to-[#050308]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#050308]/94 via-[#050308]/24 to-transparent" />
-      <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_130px_34px_rgba(5,3,8,0.72)]" />
+      <div className="hero-video-overlay hero-video-overlay--base" />
+      <div className="hero-video-overlay hero-video-overlay--glow" />
+      <div className="hero-video-overlay hero-video-overlay--vertical" />
+      <div className="hero-video-overlay hero-video-overlay--horizontal" />
+      <div className="hero-video-overlay hero-video-overlay--vignette" />
     </div>
   );
 };

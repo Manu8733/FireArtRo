@@ -14,7 +14,7 @@ test.describe("FireArt scroll canvas landing", () => {
     const hero = page.getByTestId("hero-section");
     await expect(hero).toBeVisible();
     await expect(hero.locator("video")).toHaveCount(1);
-    await expect(hero.locator("source")).toHaveAttribute("src", /hero-loop-(aerial|fireworks|show)\.mp4/);
+    await expect(hero.locator("source")).toHaveAttribute("src", /fireart-drone-fireworks-cinematic-desktop\.mp4/);
     await expect(page.getByTestId("hero-primary-cta")).toHaveAttribute("href", /contact/);
     await expect(page.getByTestId("hero-secondary-cta")).toHaveAttribute("href", "/galerie");
   });
@@ -192,17 +192,19 @@ test.describe("FireArt scroll canvas landing", () => {
     expect(leadingRuleContent).toBe("none");
   });
 
-  test("uses the approved gallery to packages to team to partners to brief order", async ({ page }) => {
+  test("uses the approved gallery to packages to anonymous about to partners to brief order", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const order = await page.locator("[data-home-scene]").evaluateAll((nodes) =>
       nodes.map((node) => node.getAttribute("data-home-scene")),
     );
 
-    expect(order).toEqual(["gallery", "packages", "team", "partners", "brief"]);
+    expect(order).toEqual(["gallery", "packages", "about", "partners", "brief"]);
     await expect(page.getByTestId("home-gallery").locator("[data-gallery-item]")).toHaveCount(3);
     await expect(page.getByTestId("home-packages").locator("[data-package-slab]")).toHaveCount(3);
-    await expect(page.getByTestId("home-team").locator("[data-team-person]")).toHaveCount(4);
+    await expect(page.getByTestId("home-about")).toHaveAttribute("id", "intro");
+    await expect(page.getByTestId("home-about").locator("[data-team-person], [data-team-cutout]")).toHaveCount(0);
+    await expect(page.getByTestId("home-team")).toHaveCount(0);
     await expect(page.getByTestId("home-partners")).toBeVisible();
     await expect(page.getByTestId("home-brief")).toBeVisible();
 
@@ -278,64 +280,15 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(packageVideos.nth(0).getByText("Vezi clipul")).toBeAttached();
   });
 
-  test("reveals positioned team copy on desktop hover without opening a dialog", async ({ page }) => {
+  test("keeps the about section anonymous without team portraits or member interaction", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    test.skip(
-      !(await page.evaluate(() => window.matchMedia("(hover: hover) and (pointer: fine)").matches)),
-      "Touch behavior is covered by night-runway-team-touch.spec.js",
-    );
-    const team = page.getByTestId("home-team");
-    const people = team.locator("[data-team-person]");
-    const person = people.first();
+    const about = page.getByTestId("home-about");
 
-    await expect(team.getByRole("heading", { level: 2 })).toHaveText("Oamenii din spatele luminii.");
-    await expect(people).toHaveCount(4);
-    const portraitSources = await team.locator("[data-team-cutout]").evaluateAll((images) => images.map((image) => image.getAttribute("src")));
-    expect(new Set(portraitSources).size).toBe(4);
-    expect(portraitSources.every((source) => source.includes("team-photo-person"))).toBe(true);
-    await expect(team.locator(".fa-team__base")).toHaveCount(1);
-    await expect(team.locator(".fa-team__base")).toHaveAttribute("src", /fireart-team-placeholder\.webp/);
-    await expect(team.locator(".fa-team__spotlight")).toHaveCount(0);
-    await expect(team.locator(".fa-team__person-label")).toHaveCount(0);
-    await expect(team.locator("[data-team-copy]")).toHaveCount(1);
-    await expect(people.nth(0)).toHaveAttribute("data-copy-side", "right");
-    await expect(people.nth(1)).toHaveAttribute("data-copy-side", "right");
-    await expect(people.nth(2)).toHaveAttribute("data-copy-side", "left");
-    await expect(people.nth(3)).toHaveAttribute("data-copy-side", "left");
-
-    await person.hover();
-    expect(await team.getAttribute("data-active-person")).toBeNull();
-    await expect(person).toHaveAttribute("data-active", "true");
-    await expect(team).toHaveAttribute("data-active-person", "production");
-    const copy = team.locator("[data-team-copy]");
-    await expect(copy).toHaveAttribute("data-side", "right");
-    await expect(copy.locator("[data-team-name]")).toBeVisible();
-    await expect(copy.locator("[data-team-name]")).toHaveCSS("font-family", /Cormorant Garamond/);
-    await expect(copy.locator("[data-team-role]")).toHaveText("Echipa FireArtRo");
-    await expect(copy).not.toContainText(/\b0[1-4]\b/);
-    await expect(copy.locator("p")).toContainText(/brief/i);
-    const copyLines = copy.locator("[data-team-copy-line]");
-    await expect(copyLines).toHaveCount(2);
-    const typedCharacters = copy.locator("[data-team-typed-char]");
-    expect(await typedCharacters.count()).toBeGreaterThan(20);
-    const lineStartDelays = await copyLines.evaluateAll((lines) => lines.map((line) => {
-      const firstCharacter = line.querySelector("[data-team-typed-char]");
-      return firstCharacter ? getComputedStyle(firstCharacter).animationDelay : null;
-    }));
-    expect(lineStartDelays[0]).not.toBe(lineStartDelays[1]);
-    const hitArea = await person.evaluate((node) => getComputedStyle(node).clipPath);
-    expect(hitArea).toContain("polygon");
-
-    const personBox = await person.boundingBox();
-    await page.mouse.move(personBox.x + 2, personBox.y + 2);
-    await expect(team).not.toHaveAttribute("data-active-person", /.+/);
-    await page.waitForTimeout(350);
-    await expect(copy).toHaveCSS("opacity", "0");
-
-    await person.click();
-    const dialog = page.getByRole("dialog", { name: /echipa/i });
-    await expect(dialog).toBeHidden();
+    await expect(about.getByRole("heading", { level: 2 })).toContainText("Un moment reușit");
+    await expect(about.locator("img")).toHaveCount(1);
+    await expect(about.locator("[data-team-person], [data-team-cutout], button")).toHaveCount(0);
+    await expect(page.getByTestId("home-team")).toHaveCount(0);
   });
 
   test("does not render review UI before a provider connection supplies verified content", async ({ page }) => {

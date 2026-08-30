@@ -3,6 +3,7 @@ const { test, expect } = require("@playwright/test");
 const managedReviews = {
   siteDetails: {
     name: "FireArtRo",
+    siteUrl: "https://www.fireartro.ro",
     email: "contact@fireart.ro",
     googleReviewsUrl: "https://www.google.com/maps/place/FireArtRo",
     legalName: "1A BEST EVENTS SRL",
@@ -68,10 +69,23 @@ test.describe("FireArt homepage structural refactor", () => {
     await expect(reviews.getByRole("link", { name: /Facebook/i })).toBeVisible();
     await expect(reviews.getByRole("link", { name: /Google/i })).toBeVisible();
 
-    const scenes = await page.locator("[data-home-scene]").evaluateAll((nodes) =>
-      nodes.map((node) => node.getAttribute("data-home-scene")),
-    );
-    expect(scenes.indexOf("reviews")).toBeLessThan(scenes.indexOf("brief"));
+    await expect(reviews).toHaveClass(/fa-page-reviews/);
+    await expect(reviews.locator("xpath=ancestor::footer[contains(@class, 'fa-footer')]")).toHaveCount(0);
+    await expect(reviews.locator("xpath=following-sibling::footer[1]")).toHaveCount(1);
+  });
+
+  test("places connected reviews immediately before the footer on every public page", async ({ page }) => {
+    await page.addInitScript((content) => {
+      window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify(content));
+    }, managedReviews);
+
+    for (const route of ["/", "/galerie", "/pachete", "/intrebari-frecvente", "/contact", "/confidentialitate"]) {
+      await page.goto(route, { waitUntil: "domcontentloaded" });
+      const reviews = page.getByTestId("home-reviews");
+      await expect(reviews).toBeVisible();
+      await expect(reviews.locator("xpath=following-sibling::footer[1]")).toHaveCount(1);
+      await expect(reviews.locator("xpath=ancestor::footer[contains(@class, 'fa-footer')]")).toHaveCount(0);
+    }
   });
 
   test("centers the package statement and uses responsive media-led package cards", async ({ page }) => {
@@ -125,6 +139,6 @@ test.describe("FireArt homepage structural refactor", () => {
     await expect(footer.locator(".fa-footer__lead")).toHaveCount(0);
     await expect(footer.getByRole("navigation", { name: "Explorează" })).toBeVisible();
     await expect(footer.getByRole("navigation", { name: "Urmărește" })).toBeVisible();
-    await expect(footer.getByText("Scriem noaptea în lumină.")).toBeVisible();
+    await expect(footer.getByText("Drone show, artificii și efecte construite pentru momentul potrivit.")).toBeVisible();
   });
 });

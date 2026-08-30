@@ -9,21 +9,90 @@ const responsiveViewports = [
 
 test.describe("Night Runway package stage", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fireartro-cookie-consent-v1", JSON.stringify({
+        necessary: true,
+        analytics: false,
+        marketing: false,
+        savedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + (180 * 86_400_000)).toISOString(),
+      }));
+    });
     await page.goto("/pachete", { waitUntil: "domcontentloaded" });
   });
 
-  test("uses one comparator stage instead of the old hero and comparison table", async ({ page }) => {
+  test("uses one compact studio reel instead of a framed configurator", async ({ page }) => {
     await expect(page.locator("main[data-design='night-runway']")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Pachete" })).toBeVisible();
     await expect(page.getByTestId("package-comparator")).toBeVisible();
     await expect(page.getByTestId("package-stage")).toBeVisible();
-    await expect(page.getByTestId("package-transition-band")).toHaveCount(5);
+    await expect(page.getByTestId("package-media")).toBeVisible();
+    await expect(page.getByTestId("package-variant-strip")).toBeVisible();
+    await expect(page.getByTestId("package-transition-band")).toHaveCount(0);
+    await expect(page.locator("[data-variant-tile]")).not.toHaveCount(0);
 
     await expect(page.getByTestId("packages-hero")).toHaveCount(0);
     await expect(page.getByTestId("packages-flight-plan")).toHaveCount(0);
     await expect(page.getByTestId("packages-comparison")).toHaveCount(0);
     await expect(page.locator(".package-editorial-grid, .package-editorial-card")).toHaveCount(0);
     await expect(page.locator("body")).not.toContainText(/plan de zbor|flight|telemetrie/i);
+  });
+
+  test("keeps selectable package previews directly above the selected package", async ({ page }) => {
+    const rail = page.getByTestId("package-variant-strip");
+    const media = page.getByTestId("package-media");
+    const railBox = await rail.boundingBox();
+    const mediaBox = await media.boundingBox();
+
+    expect(railBox?.y).toBeLessThan(mediaBox?.y || 0);
+    expect((mediaBox?.y || 0) - ((railBox?.y || 0) + (railBox?.height || 0))).toBeLessThan(40);
+  });
+
+  test("opens the selected package preview in an expanded video dialog", async ({ page }) => {
+    await page.getByTestId("package-media").getByRole("button").click();
+
+    const dialog = page.getByTestId("package-video-dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator("iframe")).toHaveAttribute("src", /youtube-nocookie/);
+  });
+
+  test("offers a dedicated custom quote path for Drone show", async ({ page }) => {
+    const categories = page.getByRole("tablist", { name: "Categorii de spectacol" });
+    await categories.getByRole("tab", { name: "Show drone" }).click();
+
+    const droneQuote = page.getByTestId("drone-show-quote");
+    await expect(droneQuote).toBeVisible();
+    await expect(droneQuote).toContainText("Ofertă personalizată");
+
+    await page.route("**/contact", (route) => route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: "<!doctype html><html><body>Contact test</body></html>",
+    }));
+    await Promise.all([
+      page.waitForURL("**/contact", { waitUntil: "domcontentloaded" }),
+      page.getByTestId("drone-show-quote-cta").click(),
+    ]);
+
+    const selection = await page.evaluate(() => (
+      JSON.parse(window.sessionStorage.getItem("fireartro-contact-prefill") || "{}")
+    ));
+    expect(selection).toEqual({ services: ["Show drone"] });
+  });
+
+  test("keeps the active video in a true widescreen editorial frame", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+
+    const media = page.getByTestId("package-media");
+    const box = await media.boundingBox();
+    const ratio = box.width / box.height;
+    expect(ratio).toBeGreaterThan(1.7);
+    expect(ratio).toBeLessThan(1.82);
+    expect(box.height).toBeLessThan(560);
+
+    const headingBox = await page.getByRole("heading", { level: 1, name: "Pachete" }).boundingBox();
+    expect(headingBox.height).toBeLessThan(70);
   });
 
   test("uses the matching YouTube thumbnail before a package video is opened", async ({ page }) => {
@@ -74,31 +143,34 @@ test.describe("Night Runway package stage", () => {
 
   test("compares categories and variants with keyboard-safe controls", async ({ page }) => {
     const categories = page.getByRole("tablist", { name: "Categorii de spectacol" });
-    await expect(categories.getByRole("tab")).toHaveCount(6);
-    await expect(categories.getByRole("tab", { name: "Drone + artificii" })).toHaveAttribute("aria-selected", "true");
+    await expect(categories.getByRole("tab")).toHaveCount(4);
+    await expect(categories.getByRole("tab", { name: "Artificii de zi" })).toHaveAttribute("aria-selected", "true");
 
-    const variants = page.getByRole("tablist", { name: "Variante pentru Drone + artificii" });
-    await expect(variants.getByRole("tab")).toHaveCount(2);
-    await expect(page.getByTestId("packages-active-title")).toHaveText("Hybrid Signature");
+    await categories.getByRole("tab", { name: "Artificii de noapte" }).click();
+    const variants = page.getByRole("tablist", { name: "Variante pentru Artificii de noapte" });
+    await expect(variants.getByRole("tab")).toHaveCount(6);
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Bronze");
 
-    const firstVariant = variants.getByRole("tab", { name: /Hybrid Signature/ });
+    const firstVariant = variants.getByRole("tab", { name: /Bronze/ });
     await firstVariant.focus();
     await page.keyboard.press("ArrowRight");
-    await expect(variants.getByRole("tab", { name: /Hybrid Grand/ })).toBeFocused();
-    await expect(page.getByTestId("packages-active-title")).toHaveText("Hybrid Grand");
+    await expect(variants.getByRole("tab", { name: /Silver/ })).toBeFocused();
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Silver");
 
-    await categories.getByRole("tab", { name: "Show drone" }).click();
-    await expect(page.getByRole("tablist", { name: "Variante pentru Show drone" }).getByRole("tab")).toHaveCount(3);
-    await expect(page.getByTestId("packages-active-title")).toHaveText("Drone Story 60");
+    await categories.getByRole("tab", { name: "Efecte speciale" }).click();
+    await expect(page.getByRole("tablist", { name: "Variante pentru Efecte speciale" }).getByRole("tab")).toHaveCount(1);
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Mix");
   });
 
-  test("runs a local five-band transition when the active variant changes", async ({ page }) => {
+  test("runs a short media-only transition when the active variant changes", async ({ page }) => {
     const stage = page.getByTestId("package-stage");
-    const grand = page.getByRole("tab", { name: /Hybrid Grand/ });
+    await page.getByRole("tab", { name: "Artificii de noapte" }).click();
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Bronze");
+    const silver = page.getByRole("tab", { name: /Silver/ });
 
-    await grand.click();
-    await expect(stage).toHaveAttribute("data-transition-state", "cover");
-    await expect(page.getByTestId("packages-active-title")).toHaveText("Hybrid Grand");
+    await silver.click();
+    await expect(stage).toHaveAttribute("data-transition-state", "swap");
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Silver");
     await expect(stage).toHaveAttribute("data-transition-state", "idle");
   });
 
@@ -106,28 +178,48 @@ test.describe("Night Runway package stage", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload({ waitUntil: "domcontentloaded" });
 
-    await page.getByRole("tab", { name: /Hybrid Grand/ }).click();
-    await expect(page.getByTestId("packages-active-title")).toHaveText("Hybrid Grand");
+    await page.getByRole("tab", { name: "Artificii de noapte" }).click();
+    await page.getByRole("tab", { name: /Silver/ }).click();
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Silver");
     await expect(page.getByTestId("package-stage")).toHaveAttribute("data-transition-state", "idle");
   });
 
   test("keeps the selected package contract when opening contact", async ({ page }) => {
-    await page.getByRole("tab", { name: /Hybrid Grand/ }).click();
-    await expect(page.getByTestId("packages-active-title")).toHaveText("Hybrid Grand");
+    await page.getByRole("tab", { name: "Artificii de noapte" }).click();
+    await page.getByRole("tab", { name: /Silver/ }).click();
+    await expect(page.getByTestId("packages-active-title")).toHaveText("Silver");
 
-    await page.route("**/contact", (route) => route.abort());
-    const request = page.waitForRequest((candidate) => new URL(candidate.url()).pathname === "/contact");
-    await page.getByTestId("packages-direct-cta").click();
-    await request;
+    await page.route("**/contact", (route) => route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: "<!doctype html><html><body>Contact test</body></html>",
+    }));
+    await Promise.all([
+      page.waitForURL("**/contact", { waitUntil: "domcontentloaded" }),
+      page.getByTestId("packages-direct-cta").click(),
+    ]);
 
     const selection = await page.evaluate(() => (
       JSON.parse(window.sessionStorage.getItem("fireartro-contact-prefill") || "{}")
     ));
     expect(selection).toEqual({
-      package_id: "hybrid-grand",
-      package_title: "Hybrid Grand",
-      services: ["Drone + artificii"],
+      package_id: "fireworks-silver-2026",
+      package_title: "Silver",
+      services: ["Artificii de noapte"],
     });
+  });
+
+  test("fits the complete package reel inside a common laptop viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 1211, height: 1041 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+
+    const headerBox = await page.locator(".nr-package-comparator__header").boundingBox();
+    const mediaBox = await page.getByTestId("package-media").boundingBox();
+    const variantsBox = await page.getByTestId("package-variant-strip").boundingBox();
+
+    expect(headerBox?.y).toBeLessThanOrEqual(150);
+    expect(mediaBox?.height).toBeLessThanOrEqual(350);
+    expect((variantsBox?.y || 0) + (variantsBox?.height || 0)).toBeLessThanOrEqual(1041);
   });
 
   for (const viewport of responsiveViewports) {
@@ -142,7 +234,7 @@ test.describe("Night Runway package stage", () => {
       expect(dimensions.document, `${viewport.width}x${viewport.height}`).toBeLessThanOrEqual(dimensions.viewport + 1);
 
       const categoryTab = page.getByRole("tablist", { name: "Categorii de spectacol" }).getByRole("tab").first();
-      const variantTab = page.getByRole("tablist", { name: "Variante pentru Drone + artificii" }).getByRole("tab").first();
+      const variantTab = page.getByRole("tablist", { name: "Variante pentru Artificii de zi" }).getByRole("tab").first();
       const directCta = page.getByTestId("packages-direct-cta");
 
       for (const control of [categoryTab, variantTab, directCta]) {
@@ -151,7 +243,14 @@ test.describe("Night Runway package stage", () => {
       }
 
       await expect(page.getByTestId("package-stage")).toBeVisible();
+      await expect(page.getByTestId("package-media")).toBeVisible();
+      await expect(page.getByTestId("package-variant-strip")).toBeVisible();
       await expect(directCta).toBeVisible();
+
+      const mediaBox = await page.getByTestId("package-media").boundingBox();
+      const mediaRatio = mediaBox.width / mediaBox.height;
+      expect(mediaRatio, `${viewport.width}x${viewport.height}`).toBeGreaterThan(1.68);
+      expect(mediaRatio, `${viewport.width}x${viewport.height}`).toBeLessThan(1.84);
     });
   }
 });

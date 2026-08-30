@@ -1,7 +1,7 @@
 import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import QuoteForm from "@/components/site/QuoteForm";
-import Footer from "@/components/site/Footer";
+import PageEnd from "@/components/site/PageEnd";
 import usePageMeta from "@/hooks/usePageMeta";
 import "@/styles/night-contact.css";
 
@@ -18,7 +18,7 @@ export default function ContactPage() {
       <ScrollProgress />
       <Navbar />
       <QuoteForm />
-      <Footer />
+      <PageEnd />
     </main>
   );
 }

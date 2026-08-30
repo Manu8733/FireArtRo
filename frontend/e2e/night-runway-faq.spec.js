@@ -8,7 +8,8 @@ const openFaqPage = async (page) => {
     window.history.pushState({}, "", path);
     window.dispatchEvent(new PopStateEvent("popstate"));
   }, FAQ_PATH);
-  await expect(page.getByRole("main")).toBeVisible();
+  await expect(page.locator(".nr-faq-page")).toBeVisible();
+  await expect(page.locator("h1")).toHaveText("Întrebări.");
 };
 
 test.describe("Editorial FAQ", () => {
@@ -17,8 +18,8 @@ test.describe("Editorial FAQ", () => {
   });
 
   test("presents one concise editorial introduction and one question list", async ({ page }) => {
-    await expect(page.getByRole("heading", { level: 1, name: "Întrebări frecvente" })).toHaveCount(1);
-    await expect(page.getByText("Rezervare, vreme, autorizații și detaliile care influențează oferta.")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Întrebări." })).toHaveCount(1);
+    await expect(page.getByText("Ce contează înainte de rezervare.")).toBeVisible();
 
     const questions = page.getByTestId("faq-question");
     await expect(questions).toHaveCount(10);
@@ -40,7 +41,7 @@ test.describe("Editorial FAQ", () => {
     await expect(first).toHaveAttribute("aria-expanded", "true");
 
     const firstPanelId = await first.getAttribute("aria-controls");
-    await expect(page.locator(`#${firstPanelId}`)).toBeVisible();
+    await expect(page.locator(`[id="${firstPanelId}"]`)).toBeVisible();
 
     await page.keyboard.press("ArrowDown");
     await expect(second).toBeFocused();
@@ -85,6 +86,7 @@ test.describe("Editorial FAQ", () => {
     ]) {
       await page.setViewportSize(viewport);
       await page.reload();
+      await expect(page.locator("h1")).toBeVisible();
 
       const metrics = await page.evaluate(() => {
         const heading = document.querySelector("h1");

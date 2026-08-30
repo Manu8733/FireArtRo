@@ -21,9 +21,9 @@ export const BUSINESS_HOURS = {
 };
 
 export const CONTACT_SETTINGS_DEFAULT = {
-  phoneDisplay: process.env.REACT_APP_PHONE_DISPLAY || "",
-  phoneTel: process.env.REACT_APP_PHONE_TEL || "",
-  whatsappNumber: process.env.REACT_APP_WHATSAPP_NUMBER || "",
+  phoneDisplay: process.env.REACT_APP_PHONE_DISPLAY || "+40 0787 602 144",
+  phoneTel: process.env.REACT_APP_PHONE_TEL || "+40787602144",
+  whatsappNumber: process.env.REACT_APP_WHATSAPP_NUMBER || "40787602144",
 };
 
 export const SOCIAL_LINKS = [
@@ -310,7 +310,7 @@ export const MEDIA_ITEMS = MEDIA_ITEMS_SOURCE
     ? { ...item, category: "Artificii de noapte", tags: ["Video", "Artificii de noapte"] }
     : item));
 
-export const MEDIA_CATALOG_VERSION = "fireartro-gallery-2026-v4";
+export const MEDIA_CATALOG_VERSION = "fireartro-gallery-2026-v5";
 
 export const PACKAGE_CATEGORIES = [
   "Toate",

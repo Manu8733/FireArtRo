@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   Menu,
   MessageSquareQuote,
+  Newspaper,
   Package,
   Plus,
   RotateCcw,
@@ -42,6 +43,7 @@ import {
   MODULE_ORDER,
   makeAdminItem,
 } from "@/admin/adminConfig";
+import AdminBlogPanel from "@/admin/AdminBlogPanel";
 import { prepareAdminImage } from "@/admin/imageUtils";
 import "@/admin.css";
 
@@ -52,6 +54,7 @@ const MODULE_ICONS = {
   socialLinks: Share2,
   promoSlides: SlidersHorizontal,
   mediaItems: GalleryHorizontalEnd,
+  blog: Newspaper,
   packages: Package,
   faqs: CircleHelp,
   testimonials: MessageSquareQuote,
@@ -249,6 +252,7 @@ export default function AdminPage() {
   const importInputRef = useRef(null);
   const dirty = serialize(draft) !== savedSnapshot;
   const activeModule = active === "overview" ? null : ADMIN_MODULES[active];
+  const isRemoteModule = activeModule?.kind === "remote";
   const activeValue = activeModule ? draft[active] : null;
   const activeItems = useMemo(
     () => (activeModule?.kind === "collection" && Array.isArray(activeValue) ? activeValue : []),
@@ -266,9 +270,9 @@ export default function AdminPage() {
   });
 
   useEffect(() => {
-    if (!activeModule) return;
+    if (!activeModule || isRemoteModule) return;
     setRawText(JSON.stringify(draft[active], null, 2));
-  }, [active, activeModule, draft]);
+  }, [active, activeModule, draft, isRemoteModule]);
 
   useEffect(() => {
     if (!autoSave || !dirty) return undefined;
@@ -452,17 +456,23 @@ export default function AdminPage() {
           <span>Administrare</span>
         </div>
         <div className="admin-appbar-actions">
-          <label className="admin-autosave">
-            <input type="checkbox" checked={autoSave} onChange={(event) => setAutoSave(event.target.checked)} />
-            <span aria-hidden="true" />
-            Salvare automată
-          </label>
-          <span className={`admin-save-state ${dirty ? "is-dirty" : "is-saved"}`}>
-            {dirty ? "Modificări nesalvate" : "Salvat local"}
-          </span>
-          <button type="button" className="admin-button is-primary" onClick={saveAll} disabled={!dirty}>
-            <Save aria-hidden="true" /> Salvează
-          </button>
+          {isRemoteModule ? (
+            <span className="admin-save-state is-saved">Conținut online</span>
+          ) : (
+            <>
+              <label className="admin-autosave">
+                <input type="checkbox" checked={autoSave} onChange={(event) => setAutoSave(event.target.checked)} />
+                <span aria-hidden="true" />
+                Salvare automată
+              </label>
+              <span className={`admin-save-state ${dirty ? "is-dirty" : "is-saved"}`}>
+                {dirty ? "Modificări nesalvate" : "Salvat local"}
+              </span>
+              <button type="button" className="admin-button is-primary" onClick={saveAll} disabled={!dirty}>
+                <Save aria-hidden="true" /> Salvează
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -500,8 +510,8 @@ export default function AdminPage() {
             );
           })}
           <div className="admin-sidebar-note">
-            <strong>Conținut local</strong>
-            <p>Exportă periodic un backup. Publicarea globală va necesita ulterior un CMS cu autentificare.</p>
+            <strong>Conținut și publicare</strong>
+            <p>Blogul se publică online. Restul modulelor se păstrează local în acest browser.</p>
           </div>
         </aside>
 
@@ -552,6 +562,8 @@ export default function AdminPage() {
                 </div>
               </section>
             </div>
+          ) : isRemoteModule ? (
+            <AdminBlogPanel />
           ) : (
             <div className="admin-module-view">
               <header className="admin-page-heading admin-module-heading">
@@ -662,11 +674,13 @@ export default function AdminPage() {
         </section>
       </div>
 
-      <footer className="admin-footerbar">
-        <button type="button" onClick={revertUnsaved} disabled={!dirty}><ArrowLeft /> Anulează modificările</button>
-        <span>{dirty ? "Draft nesalvat" : "Toate modificările sunt salvate"}</span>
-        <button type="button" onClick={saveAll} disabled={!dirty}><Save /> Salvează</button>
-      </footer>
+      {!isRemoteModule && (
+        <footer className="admin-footerbar">
+          <button type="button" onClick={revertUnsaved} disabled={!dirty}><ArrowLeft /> Anulează modificările</button>
+          <span>{dirty ? "Draft nesalvat" : "Toate modificările sunt salvate"}</span>
+          <button type="button" onClick={saveAll} disabled={!dirty}><Save /> Salvează</button>
+        </footer>
+      )}
     </main>
   );
 }

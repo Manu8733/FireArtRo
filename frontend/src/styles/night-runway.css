@@ -48,6 +48,14 @@ body:has(main[data-design="night-runway"]) .site-navbar-links > a > span {
   background: var(--nr-electric);
 }
 
+body:has(main[data-design="night-runway"]) .site-navbar-links > a,
+body:has(main[data-design="night-runway"]) .mobile-nav-links a {
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-synthesis: none;
+}
+
 body:has(main[data-design="night-runway"]) :where(.menu-button, .mobile-nav-head > button) {
   border-radius: 0;
   background: rgba(3, 5, 10, 0.82);

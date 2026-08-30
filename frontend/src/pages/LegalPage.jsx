@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ExternalLink, Mail } from "lucide-react";
 import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
-import Footer from "@/components/site/Footer";
+import PageEnd from "@/components/site/PageEnd";
 import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
 import { EMAIL } from "@/lib/constants";
@@ -305,7 +305,7 @@ export default function LegalPage({ type = "confidentialitate" }) {
         </article>
       </div>
 
-      <Footer />
+      <PageEnd />
     </main>
   );
 }

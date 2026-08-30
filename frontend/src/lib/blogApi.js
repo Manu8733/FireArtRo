@@ -10,7 +10,17 @@ export class BlogApiError extends Error {
 }
 
 async function readJson(response) {
-  const payload = await response.json().catch(() => ({}));
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    throw new BlogApiError(
+      response.ok
+        ? "Răspunsul Blogului nu este valid."
+        : "Conținutul nu a putut fi încărcat.",
+      response.status,
+    );
+  }
   if (!response.ok) {
     throw new BlogApiError(
       payload.detail || "Conținutul nu a putut fi încărcat.",

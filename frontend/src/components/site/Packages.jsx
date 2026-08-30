@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { ExternalLink, Play, X } from "lucide-react";
-import NightButton from "@/components/night/NightButton";
+import { ArrowUpRight, ExternalLink, Play } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { PACKAGE_CATEGORIES, PACKAGE_ITEMS } from "@/data/businessContent";
 import { MEDIA } from "@/data/content";
 import useManagedContent from "@/hooks/useManagedContent";
@@ -15,6 +15,8 @@ const visualByCategory = {
   "Efecte speciale": MEDIA.coldSparks,
   "Corporate / Festival": MEDIA.crowd,
 };
+
+const DRONE_REQUEST_CATEGORY = "Show drone";
 
 const packageConfiguration = (item) => {
   if (item.droneCount && item.effectsCount) return `${item.droneCount} drone + ${item.effectsCount} grupe de efecte`;
@@ -53,12 +55,22 @@ const getYouTubeThumbnailUrl = (value) => {
   return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
 };
 
+const getPackageVisual = (item) => (
+  getYouTubeThumbnailUrl(item?.videoUrl?.trim())
+  || item?.image
+  || visualByCategory[item?.category]
+  || MEDIA.fireworksSky
+);
+
 export const Packages = ({ items }) => {
   const managedPackages = useManagedContent("packages", PACKAGE_ITEMS);
   const packages = Array.isArray(items) ? items : managedPackages;
   const categories = useMemo(
     () => PACKAGE_CATEGORIES.filter(
-      (category) => category !== "Toate" && packages.some((item) => item.category === category),
+      (category) => (
+        category !== "Toate"
+        && (category === DRONE_REQUEST_CATEGORY || packages.some((item) => item.category === category))
+      ),
     ),
     [packages],
   );
@@ -77,13 +89,12 @@ export const Packages = ({ items }) => {
     () => packages.filter((item) => item.category === category),
     [category, packages],
   );
+  const isDroneShowCategory = category === DRONE_REQUEST_CATEGORY;
+  const hasPackageVariants = variants.length > 0;
   const activePackage = packages.find((item) => item.id === displayedId) || variants[0] || packages[0];
   const primaryVideoUrl = activePackage?.videoUrl?.trim() || "";
   const videoEmbedUrl = getYouTubeEmbedUrl(primaryVideoUrl);
-  const packageThumbnail = getYouTubeThumbnailUrl(primaryVideoUrl)
-    || activePackage?.image
-    || visualByCategory[activePackage?.category]
-    || MEDIA.fireworksSky;
+  const packageThumbnail = getPackageVisual(activePackage);
   const additionalVideos = Array.isArray(activePackage?.moreVideoUrls)
     ? activePackage.moreVideoUrls.filter(Boolean)
     : [];
@@ -104,9 +115,9 @@ export const Packages = ({ items }) => {
       return;
     }
 
-    setTransitionState("cover");
-    timersRef.current.push(window.setTimeout(() => setDisplayedId(nextPackage.id), 310));
-    timersRef.current.push(window.setTimeout(() => setTransitionState("idle"), 860));
+    setTransitionState("swap");
+    timersRef.current.push(window.setTimeout(() => setDisplayedId(nextPackage.id), 150));
+    timersRef.current.push(window.setTimeout(() => setTransitionState("idle"), 430));
   };
 
   const changeCategory = (nextCategory) => {
@@ -146,7 +157,11 @@ export const Packages = ({ items }) => {
     });
   };
 
-  if (!activePackage) return null;
+  const requestDroneQuote = () => {
+    goToContact({ services: [DRONE_REQUEST_CATEGORY] });
+  };
+
+  if (!activePackage && !isDroneShowCategory) return null;
 
   return (
     <section className="nr-package-comparator" data-testid="package-comparator" aria-labelledby="packages-title">
@@ -156,144 +171,186 @@ export const Packages = ({ items }) => {
             <p>Formate FireArtRo</p>
             <h1 id="packages-title">Pachete</h1>
           </div>
-          <p>Alege direcția. Configurația finală se stabilește după locație și brief.</p>
+          <p>Alege o direcție. Configurația finală se construiește după spațiu, ritm și brief.</p>
         </header>
 
-        <div className="nr-package-workspace">
-          <nav className="nr-package-categories" role="tablist" aria-label="Categorii de spectacol">
-            {categories.map((item, index) => (
-              <button
-                key={item}
-                type="button"
-                role="tab"
-                aria-selected={category === item}
-                className={category === item ? "is-active" : ""}
-                onClick={() => changeCategory(item)}
-              >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                {item}
-              </button>
-            ))}
-          </nav>
+        <nav className="nr-package-categories" role="tablist" aria-label="Categorii de spectacol">
+          {categories.map((item) => (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={category === item}
+              className={category === item ? "is-active" : ""}
+              onClick={() => changeCategory(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </nav>
 
-          <article
-            className="nr-package-stage"
-            data-testid="package-stage"
-            data-transition-state={transitionState}
-            aria-live="polite"
-          >
-            <figure className="nr-package-stage__media">
-              {isVideoOpen ? (
-                <div className="nr-package-video" data-testid="package-inline-video">
-                  {videoEmbedUrl ? (
-                    <iframe
-                      src={videoEmbedUrl}
-                      title={`Video demonstrativ pentru pachetul ${activePackage.title}`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video src={primaryVideoUrl} controls autoPlay playsInline preload="metadata" />
-                  )}
-                  <button
-                    type="button"
-                    className="nr-package-video__close"
-                    onClick={() => setVideoPackageId("")}
-                    aria-label={`Închide videoclipul pentru ${activePackage.title}`}
-                  >
-                    <X aria-hidden="true" />
-                  </button>
-                </div>
-              ) : (
-                <img
-                  key={activePackage.id}
-                  src={packageThumbnail}
-                  alt={`Atmosferă vizuală pentru ${activePackage.title}`}
-                  loading="eager"
-                  decoding="async"
-                />
-              )}
-              {primaryVideoUrl && !isVideoOpen && (
+        {hasPackageVariants && (
+          <>
+            <div
+              className="nr-package-variant-strip"
+              data-testid="package-variant-strip"
+              role="tablist"
+              aria-label={`Variante pentru ${category}`}
+            >
+              {variants.map((item, index) => (
                 <button
+                  key={item.id}
+                  ref={(node) => { variantRefs.current[index] = node; }}
                   type="button"
-                  className="nr-package-video-trigger"
-                  onClick={() => setVideoPackageId(activePackage.id)}
-                  aria-label={`Redă videoclipul pachetului ${activePackage.title}`}
+                  role="tab"
+                  data-variant-tile
+                  aria-selected={item.id === selectedId}
+                  tabIndex={item.id === selectedId ? 0 : -1}
+                  className={item.id === selectedId ? "is-active" : ""}
+                  onClick={() => chooseVariant(index)}
+                  onKeyDown={(event) => handleVariantKeyDown(event, index)}
                 >
-                  <Play aria-hidden="true" fill="currentColor" />
-                  <span>Vezi video</span>
+                  <span className="nr-package-variant-strip__media">
+                    <img src={getPackageVisual(item)} alt="" loading="lazy" decoding="async" />
+                    {item.videoUrl && <Play aria-hidden="true" fill="currentColor" />}
+                  </span>
+                  <span className="nr-package-variant-strip__copy">
+                    <small>{item.category}</small>
+                    <strong>{item.title}</strong>
+                  </span>
                 </button>
-              )}
-              <figcaption>{activePackage.category}</figcaption>
-            </figure>
-
-            <div className="nr-package-stage__fragments" aria-hidden="true">
-              {Array.from({ length: 5 }, (_, index) => (
-                <i key={index} data-testid="package-transition-band" style={{ "--fragment-index": 4 - index }} />
               ))}
             </div>
 
-            <div className="nr-package-stage__content">
-              <div className="nr-package-variants" role="tablist" aria-label={`Variante pentru ${category}`}>
-                {variants.map((item, index) => (
-                  <button
-                    key={item.id}
-                    ref={(node) => { variantRefs.current[index] = node; }}
-                    type="button"
-                    role="tab"
-                    aria-selected={item.id === selectedId}
-                    tabIndex={item.id === selectedId ? 0 : -1}
-                    className={item.id === selectedId ? "is-active" : ""}
-                    onClick={() => chooseVariant(index)}
-                    onKeyDown={(event) => handleVariantKeyDown(event, index)}
-                  >
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    {item.title}
-                  </button>
-                ))}
+            <article
+              className="nr-package-stage"
+              data-testid="package-stage"
+              data-transition-state={transitionState}
+              aria-live="polite"
+            >
+              <div className="nr-package-stage__main">
+                <figure className="nr-package-stage__media" data-testid="package-media">
+                  <img
+                    key={activePackage.id}
+                    src={packageThumbnail}
+                    alt={`Previzualizare pentru ${activePackage.title}`}
+                    loading="eager"
+                    decoding="async"
+                  />
+                  {primaryVideoUrl && (
+                    <button
+                      type="button"
+                      className="nr-package-video-trigger"
+                      onClick={() => setVideoPackageId(activePackage.id)}
+                      aria-label={`Vezi videoclipul pachetului ${activePackage.title}`}
+                    >
+                      <Play aria-hidden="true" fill="currentColor" />
+                      <span>Vezi clipul</span>
+                    </button>
+                  )}
+                  <figcaption>{activePackage.category}</figcaption>
+                </figure>
+
+                <div className="nr-package-stage__content">
+                  <div className="nr-package-stage__copy">
+                    <p>{activePackage.badge || activePackage.visualImpact}</p>
+                    <h2 data-testid="packages-active-title">{activePackage.title}</h2>
+                    <span>{activePackage.shortDescription}</span>
+                    {Array.isArray(activePackage.highlights) && activePackage.highlights.length > 0 && (
+                      <ul className="nr-package-highlights" aria-label="Caracteristici incluse">
+                        {activePackage.highlights.slice(0, 3).map((item) => <li key={item}>{item}</li>)}
+                      </ul>
+                    )}
+                  </div>
+
+                  <div className="nr-package-stage__decision">
+                    <dl className="nr-package-stage__facts">
+                      <div><dt>Pentru</dt><dd>{activePackage.bestFor}</dd></div>
+                      <div><dt>Durată</dt><dd>{activePackage.duration || "După brief"}</dd></div>
+                      <div><dt>Format</dt><dd>{packageConfiguration(activePackage)}</dd></div>
+                    </dl>
+
+                    {activePackage.bonus && <p className="nr-package-bonus"><strong>Inclus:</strong> {activePackage.bonus}</p>}
+                    {activePackage.videoNote && <p className="nr-package-video-note">{activePackage.videoNote}</p>}
+
+                    {additionalVideos.length > 0 && (
+                      <details className="nr-package-more-videos">
+                        <summary>Alte videoclipuri ({additionalVideos.length})</summary>
+                        <div>
+                          {additionalVideos.map((url, index) => (
+                            <a key={`${url}-${index}`} href={url} target="_blank" rel="noopener noreferrer">
+                              Video {index + 2} <ExternalLink aria-hidden="true" />
+                            </a>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+
+                    <button
+                      type="button"
+                      className="nr-package-request"
+                      data-testid="packages-direct-cta"
+                      onClick={requestPackage}
+                    >
+                      Cere o configurație <ArrowUpRight aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
               </div>
+            </article>
+          </>
+        )}
 
-              <div className="nr-package-stage__copy">
-                <p>{activePackage.badge || activePackage.visualImpact}</p>
-                <h2 data-testid="packages-active-title">{activePackage.title}</h2>
-                <span>{activePackage.shortDescription}</span>
-                {Array.isArray(activePackage.highlights) && activePackage.highlights.length > 0 && (
-                  <ul className="nr-package-highlights" aria-label="Caracteristici incluse">
-                    {activePackage.highlights.slice(0, 5).map((item) => <li key={item}>{item}</li>)}
-                  </ul>
-                )}
-              </div>
-
-              <div className="nr-package-stage__decision">
-                <dl className="nr-package-stage__facts">
-                  <div><dt>Pentru</dt><dd>{activePackage.bestFor}</dd></div>
-                  <div><dt>Durată</dt><dd>{activePackage.duration || "După brief"}</dd></div>
-                  <div><dt>Format</dt><dd>{packageConfiguration(activePackage)}</dd></div>
-                </dl>
-
-                {activePackage.bonus && <p className="nr-package-bonus"><strong>Inclus:</strong> {activePackage.bonus}</p>}
-                {activePackage.videoNote && <p className="nr-package-video-note">{activePackage.videoNote}</p>}
-
-                {additionalVideos.length > 0 && (
-                  <details className="nr-package-more-videos">
-                    <summary>Vezi și alte videoclipuri ({additionalVideos.length})</summary>
-                    <div>
-                      {additionalVideos.map((url, index) => (
-                        <a key={`${url}-${index}`} href={url} target="_blank" rel="noopener noreferrer">
-                          Video {index + 2} <ExternalLink aria-hidden="true" />
-                        </a>
-                      ))}
-                    </div>
-                  </details>
-                )}
-
-                <NightButton data-testid="packages-direct-cta" onClick={requestPackage}>
-                  Cere configurația
-                </NightButton>
-              </div>
+        {isDroneShowCategory && (
+          <section className="nr-package-drone-request" data-testid="drone-show-quote" aria-labelledby="drone-show-quote-title">
+            <figure>
+              <img
+                src={getPackageVisual({ category: DRONE_REQUEST_CATEGORY })}
+                alt="Spectacol cu drone FireArtRo"
+                loading="eager"
+                decoding="async"
+              />
+            </figure>
+            <div>
+              <p>Drone show</p>
+              <h2 id="drone-show-quote-title">Ofertă personalizată pentru un show cu drone.</h2>
+              <span>Trimite data, locația și direcția dorită, iar propunerea se construiește după brief.</span>
+              <button type="button" data-testid="drone-show-quote-cta" onClick={requestDroneQuote}>
+                Solicită ofertă personalizată <ArrowUpRight aria-hidden="true" />
+              </button>
             </div>
-          </article>
-        </div>
+          </section>
+        )}
+
+        {activePackage && hasPackageVariants && (
+          <Dialog
+            open={isVideoOpen}
+            onOpenChange={(open) => setVideoPackageId(open ? activePackage.id : "")}
+          >
+            <DialogContent
+              className="nr-package-video-dialog"
+              overlayClassName="nr-package-video-dialog__overlay"
+              data-testid="package-video-dialog"
+              aria-describedby={undefined}
+            >
+              <DialogTitle className="sr-only">
+                Videoclip pentru {activePackage.title}
+              </DialogTitle>
+              {videoEmbedUrl ? (
+                <iframe
+                  key={activePackage.id}
+                  src={videoEmbedUrl}
+                  title={`Video demonstrativ pentru pachetul ${activePackage.title}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              ) : (
+                <video key={activePackage.id} src={primaryVideoUrl} controls autoPlay playsInline preload="metadata" />
+              )}
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </section>
   );

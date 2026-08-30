@@ -68,6 +68,24 @@ test("failed requests expose status and Romanian detail", async () => {
   );
 });
 
+test("successful HTML fallback is rejected instead of crashing the Blog route", async () => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => {
+      throw new SyntaxError("Unexpected token '<'");
+    },
+  });
+
+  await expect(listPublishedPosts()).rejects.toEqual(
+    expect.objectContaining({
+      name: "BlogApiError",
+      status: 200,
+      message: "Răspunsul Blogului nu este valid.",
+    }),
+  );
+});
+
 test("body splitting preserves text and separates blank-line paragraphs", () => {
   expect(splitBlogBody(
     "Paragraf unu.\nLinia doi.\n\n<script>alert(1)</script>",

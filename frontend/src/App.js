@@ -13,6 +13,8 @@ const FaqPage = lazy(() => import("@/pages/FaqPage"));
 const ContactPage = lazy(() => import("@/pages/ContactPage"));
 const LegalPage = lazy(() => import("@/pages/LegalPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
+const BlogPage = lazy(() => import("@/pages/BlogPage"));
+const BlogArticlePage = lazy(() => import("@/pages/BlogArticlePage"));
 
 function RouteScrollManager() {
   const location = useLocation();
@@ -52,6 +54,8 @@ function AppRoutes() {
           <Route path="/pachete" element={<PackagesPage />} />
           <Route path="/intrebari-frecvente" element={<FaqPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogArticlePage />} />
           <Route path="/confidentialitate" element={<LegalPage type="confidentialitate" />} />
           <Route path="/termeni-si-conditii" element={<LegalPage type="termeni" />} />
           <Route path="/cookies" element={<LegalPage type="cookies" />} />

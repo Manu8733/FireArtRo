@@ -61,7 +61,7 @@ test.describe("FireArt animation frame matrix", () => {
     const hero = page.getByTestId("hero-section");
     const gallery = page.getByTestId("home-gallery");
     const packages = page.getByTestId("home-packages");
-    const team = page.getByTestId("home-team");
+    const about = page.getByTestId("home-about");
     const partners = page.getByTestId("home-partners");
     const brief = page.getByTestId("home-brief");
 
@@ -86,20 +86,10 @@ test.describe("FireArt animation frame matrix", () => {
     const handoffFinalTransform = await handoff.evaluate((element) => getComputedStyle(element).transform);
     expect(handoffFinalTransform).not.toBe(handoffInitialTransform);
 
-    await team.scrollIntoViewIfNeeded();
+    await about.scrollIntoViewIfNeeded();
     await settleFrame(page);
-    await page.screenshot({ path: testInfo.outputPath("team-idle.png"), fullPage: false });
-    const portrait = team.locator("[data-team-person]").first();
-    if (testInfo.project.name.startsWith("mobile-") || testInfo.project.name === "tablet-webkit") {
-      await portrait.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 1, isPrimary: true });
-      await page.waitForTimeout(260);
-    } else {
-      await portrait.hover();
-      await page.waitForTimeout(260);
-    }
-    await expect(team).toHaveAttribute("data-active-person", "production");
-    await page.screenshot({ path: testInfo.outputPath("team-active.png"), fullPage: false });
-    await portrait.dispatchEvent("pointerup", { pointerType: "touch", pointerId: 1, isPrimary: true });
+    await expect(about.locator("[data-team-person], [data-team-cutout]")).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath("about.png"), fullPage: false });
 
     await captureScrollFrames(page, partners, ".fa-partners__sticky", "partners", testInfo);
     await captureScrollFrames(page, brief, ".fa-brief", "brief", testInfo);

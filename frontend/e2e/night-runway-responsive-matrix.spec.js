@@ -43,7 +43,7 @@ test.describe("FireArt home responsive matrix", () => {
 
       const sections = [
         ["showcase", page.getByTestId("home-showcase")],
-        ["team", page.getByTestId("home-team")],
+        ["about", page.getByTestId("home-about")],
         ["partners", page.getByTestId("home-partners")],
         ["brief", page.getByTestId("home-brief")],
       ];

@@ -1,7 +1,7 @@
 import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import Faq from "@/components/site/Faq";
-import Footer from "@/components/site/Footer";
+import PageEnd from "@/components/site/PageEnd";
 import usePageMeta from "@/hooks/usePageMeta";
 import "@/styles/night-faq.css";
 
@@ -34,7 +34,7 @@ export default function FaqPage() {
         <Faq />
       </main>
 
-      <Footer />
+      <PageEnd />
     </div>
   );
 }

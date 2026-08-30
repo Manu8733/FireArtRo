@@ -460,6 +460,73 @@
 }
 
 /* Team portrait: the image is the interface, not a grid of profile cards. */
+.fa-about {
+  position: relative;
+  min-height: min(43rem, 78svh);
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  padding: clamp(4.5rem, 8vw, 8rem) 0;
+  background: #05080d;
+}
+
+.fa-about__image,
+.fa-about__shade {
+  position: absolute;
+  inset: 0;
+}
+
+.fa-about__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.55) contrast(1.05) brightness(0.42);
+}
+
+.fa-about__shade {
+  background: rgba(2, 5, 9, 0.72);
+}
+
+.fa-about__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.42fr) minmax(0, 1.12fr);
+  gap: clamp(1.25rem, 4vw, 4.5rem);
+  align-items: start;
+}
+
+.fa-about__copy {
+  max-width: 49rem;
+}
+
+.fa-about__copy h2 {
+  max-width: 13ch;
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(2.55rem, 4.9vw, 5.15rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.fa-about__copy h2 em {
+  color: #8dc4ff;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.15em;
+  font-weight: 500;
+}
+
+.fa-about__copy p {
+  max-width: 34rem;
+  margin: 1.35rem 0 0;
+  color: #b5c0ce;
+  font-size: clamp(0.95rem, 1.25vw, 1.12rem);
+  line-height: 1.6;
+}
+
 .fa-team {
   position: relative;
   padding-block: clamp(4.25rem, 7vw, 7rem) 0;
@@ -757,70 +824,6 @@
   white-space: nowrap;
 }
 
-/* Provider-backed review rails stay absent until verified data is connected. */
-.fa-home-reviews {
-  position: relative;
-  display: grid;
-  gap: clamp(2.4rem, 4vw, 4rem);
-  overflow: hidden;
-  padding-block: clamp(5rem, 9vw, 9rem);
-  color: var(--fa-white);
-  background: #03070c;
-}
-
-.fa-home-reviews > .fa-kicker {
-  width: min(100% - (2 * var(--nr-gutter)), 86rem);
-  margin: 0 auto;
-  color: #8ebeff;
-}
-
-.fa-home-reviews__lane { display: grid; gap: 1.4rem; }
-.fa-home-reviews__viewport { overflow: hidden; }
-
-.fa-home-reviews__track {
-  display: flex;
-  width: max-content;
-  gap: 1rem;
-  padding-inline: 0.5rem;
-  will-change: transform;
-}
-
-.fa-home-reviews__lane[data-direction="right-to-left"] .fa-home-reviews__track {
-  animation: reviewRailLeft 28s linear infinite;
-}
-
-.fa-home-reviews__lane[data-direction="left-to-right"] .fa-home-reviews__track {
-  animation: reviewRailRight 28s linear infinite;
-}
-
-.fa-home-reviews__track blockquote {
-  width: clamp(17rem, 30vw, 28rem);
-  min-height: 10rem;
-  margin: 0;
-  padding: clamp(1.4rem, 2vw, 2rem);
-  border-top: 1px solid rgba(132, 186, 255, 0.34);
-  color: rgba(244, 247, 251, 0.86);
-  background: linear-gradient(135deg, rgba(24, 59, 102, 0.2), rgba(3, 7, 12, 0.56));
-}
-
-.fa-home-reviews__track blockquote p { margin: 0; font-size: clamp(0.95rem, 1.35vw, 1.2rem); line-height: 1.55; }
-.fa-home-reviews__track cite { display: block; margin-top: 1.4rem; color: #8ebeff; font-size: 0.7rem; font-style: normal; }
-
-.fa-home-reviews__lane > a {
-  justify-self: center;
-  min-height: 44px;
-  color: rgba(244, 247, 251, 0.58);
-  font-size: 0.68rem;
-  text-decoration: underline;
-  text-underline-offset: 0.35rem;
-}
-
-@keyframes reviewRailLeft { to { transform: translateX(calc(-50% - 0.5rem)); } }
-@keyframes reviewRailRight {
-  from { transform: translateX(calc(-50% - 0.5rem)); }
-  to { transform: translateX(0); }
-}
-
 /* Full-bleed brief close. */
 .fa-brief {
   position: relative;
@@ -1030,7 +1033,8 @@
   }
 
   .fa-packages__copy,
-  .fa-team__heading {
+  .fa-team__heading,
+  .fa-about__inner {
     grid-template-columns: 1fr;
     gap: 0.85rem;
   }
@@ -1038,6 +1042,14 @@
   .fa-packages__copy h2,
   .fa-team__heading h2 {
     font-size: clamp(2.3rem, 8.6vw, 3.5rem);
+  }
+
+  .fa-about {
+    min-height: min(42rem, 74svh);
+  }
+
+  .fa-about__copy h2 {
+    font-size: clamp(2.5rem, 8.6vw, 3.8rem);
   }
 
   .fa-packages__lineup {

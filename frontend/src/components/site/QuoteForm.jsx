@@ -216,8 +216,9 @@ export const QuoteForm = () => {
     <section className="nr-contact-main" data-testid="contact-section" aria-labelledby="contact-title">
       <div className="nr-shell nr-contact-layout">
         <header className="nr-contact-intro">
-          <p className="nr-contact-kicker">Ofertă</p>
-          <h1 id="contact-title">Ai data și locul?</h1>
+          <p className="nr-contact-kicker">Brief FireArtRo</p>
+          <h1 id="contact-title">Ai data. Construim restul.</h1>
+          <p className="nr-contact-lead">Spune-ne reperele evenimentului, iar noi pregătim direcția potrivită.</p>
 
           <div className="nr-contact-direct" aria-label="Contact direct">
             {phoneDisplay && (
@@ -241,6 +242,7 @@ export const QuoteForm = () => {
         </header>
 
         <div className="nr-contact-form-wrap">
+          <span className="nr-contact-main__rail" data-testid="contact-form-rail" aria-hidden="true" />
           {done ? (
             <div className="nr-contact-success" data-testid="quote-success" role="status">
               <CheckCircle2 aria-hidden="true" />
@@ -250,9 +252,15 @@ export const QuoteForm = () => {
             </div>
           ) : (
             <form onSubmit={submit} data-testid="quote-form" aria-busy={loading} noValidate>
+              <div className="nr-contact-form-heading">
+                <p>Planificare eveniment</p>
+                <span>Câmpurile marcate sunt obligatorii.</span>
+              </div>
               <p className="nr-contact-announcement" role="alert" aria-live="polite">{announcement}</p>
 
-              <div className="nr-contact-fields">
+              <fieldset className="nr-contact-form-group" data-contact-form-group>
+                <legend>Eveniment</legend>
+                <div className="nr-contact-fields">
                 <div className="nr-contact-field">
                   <label htmlFor="quote-event-type">Tip eveniment *</label>
                   <select id="quote-event-type" value={form.event_type} onChange={(event) => update("event_type", event.target.value)} aria-invalid={Boolean(errors.event_type)} aria-describedby={errors.event_type ? "quote-event_type-error" : undefined}>
@@ -282,7 +290,12 @@ export const QuoteForm = () => {
                   </select>
                   {errors.services && <small className="nr-contact-error" id="quote-services-error">{errors.services}</small>}
                 </div>
+                </div>
+              </fieldset>
 
+              <fieldset className="nr-contact-form-group" data-contact-form-group>
+                <legend>Date de contact</legend>
+                <div className="nr-contact-fields">
                 <div className="nr-contact-field">
                   <label htmlFor="quote-first-name">Nume *</label>
                   <input id="quote-first-name" autoComplete="family-name" maxLength={80} value={form.first_name} onChange={(event) => update("first_name", event.target.value)} aria-invalid={Boolean(errors.first_name)} aria-describedby={errors.first_name ? "quote-first_name-error" : undefined} />
@@ -306,7 +319,8 @@ export const QuoteForm = () => {
                   <input id="quote-email" type="email" autoComplete="email" maxLength={160} value={form.email} onChange={(event) => update("email", event.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "quote-email-error" : undefined} />
                   {fieldError("email")}
                 </div>
-              </div>
+                </div>
+              </fieldset>
 
               <details className="nr-contact-optional" data-testid="quote-optional-details">
                 <summary>

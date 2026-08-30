@@ -79,6 +79,11 @@ export const ADMIN_MODULES = {
       checkbox("placeholder", "Este doar placeholder"),
     ],
   },
+  blog: {
+    label: "Blog",
+    description: "Articole, coperte și publicare",
+    kind: "remote",
+  },
   promoSlides: {
     label: "Slider homepage",
     description: "Cadrele promovate pe prima pagină",
@@ -282,6 +287,7 @@ export const MODULE_ORDER = [
   "businessHours",
   "socialLinks",
   "mediaItems",
+  "blog",
   "packages",
   "faqs",
   "testimonials",

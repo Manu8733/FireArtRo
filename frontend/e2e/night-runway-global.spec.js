@@ -26,7 +26,8 @@ for (const [route, design] of routeDesigns) {
 
 test("landing preserves the existing hero media and social controls", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("[data-testid='hero-section'] video")).toHaveCount(1);
+  await expect(page.locator("[data-testid='hero-section'] video"), "Hero uses the WebP media path without loading a video").toHaveCount(0);
+  await expect(page.locator("[data-testid='hero-section'] .hero-media-webp")).toBeVisible();
   await expect(page.locator("[data-testid='hero-primary-cta']")).toBeVisible();
   await expect(page.locator("[data-testid='hero-primary-cta']")).toHaveCSS("min-height", /4[4-9]px|[5-9]\dpx/);
   await expect(page.locator("[data-testid='social-dock'], .social-dock").first()).toBeAttached();

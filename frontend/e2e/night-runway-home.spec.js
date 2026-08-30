@@ -13,8 +13,8 @@ test.describe("FireArt scroll canvas landing", () => {
 
     const hero = page.getByTestId("hero-section");
     await expect(hero).toBeVisible();
-    await expect(hero.locator("video")).toHaveCount(1);
-    await expect(hero.locator("source")).toHaveAttribute("src", /fireart-drone-fireworks-cinematic-desktop\.mp4/);
+    await expect(hero.locator("video, source")).toHaveCount(0);
+    await expect(hero.locator(".hero-media-webp")).toHaveAttribute("src", /fireart-drone-fireworks-cinematic-desktop\.webp/);
     await expect(page.getByTestId("hero-primary-cta")).toHaveAttribute("href", /contact/);
     await expect(page.getByTestId("hero-secondary-cta")).toHaveAttribute("href", "/galerie");
   });
@@ -108,21 +108,21 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(socialLinks.first()).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   });
 
-  test("keeps the looping hero video full bleed on wide desktop screens", async ({ page }) => {
+  test("keeps the static hero WebP full bleed on wide desktop screens", async ({ page }) => {
     await page.setViewportSize({ width: 1914, height: 905 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const heroBox = await page.getByTestId("hero-section").boundingBox();
     const stageBox = await page.locator(".hero-video-stage").boundingBox();
-    const videoBox = await page.locator(".hero-media-video").boundingBox();
+    const heroMediaBox = await page.locator(".hero-media-webp").boundingBox();
 
     expect(stageBox?.x).toBeLessThanOrEqual((heroBox?.x || 0) + 1);
     expect(stageBox?.y).toBeLessThanOrEqual((heroBox?.y || 0) + 1);
     expect((stageBox?.x || 0) + (stageBox?.width || 0)).toBeGreaterThanOrEqual((heroBox?.x || 0) + (heroBox?.width || 0) - 1);
     expect((stageBox?.y || 0) + (stageBox?.height || 0)).toBeGreaterThanOrEqual((heroBox?.y || 0) + (heroBox?.height || 0) - 1);
-    expect(videoBox?.x).toBeLessThanOrEqual((heroBox?.x || 0) + 1);
-    expect((videoBox?.x || 0) + (videoBox?.width || 0)).toBeGreaterThanOrEqual((heroBox?.x || 0) + (heroBox?.width || 0) - 1);
-    await expect(page.locator(".hero-media-video")).toHaveCSS("object-fit", "cover");
+    expect(heroMediaBox?.x).toBeLessThanOrEqual((heroBox?.x || 0) + 1);
+    expect((heroMediaBox?.x || 0) + (heroMediaBox?.width || 0)).toBeGreaterThanOrEqual((heroBox?.x || 0) + (heroBox?.width || 0) - 1);
+    await expect(page.locator(".hero-media-webp")).toHaveCSS("object-fit", "cover");
   });
 
   test("uses a larger right-shifted desktop title without moving the mobile gutter", async ({ page }) => {

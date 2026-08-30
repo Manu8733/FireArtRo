@@ -24,13 +24,26 @@ for (const [route, design] of routeDesigns) {
   });
 }
 
-test("landing preserves the existing hero media and social controls", async ({ page }) => {
+test("landing plays the responsive cinematic hero media and social controls", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("[data-testid='hero-section'] video"), "Hero uses the WebP media path without loading a video").toHaveCount(0);
-  await expect(page.locator("[data-testid='hero-section'] .hero-media-webp")).toBeVisible();
+  const heroVideo = page.locator("[data-testid='hero-section'] video");
+  await expect(heroVideo).toHaveCount(1);
+  await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-desktop\.mp4/);
   await expect(page.locator("[data-testid='hero-primary-cta']")).toBeVisible();
   await expect(page.locator("[data-testid='hero-primary-cta']")).toHaveCSS("min-height", /4[4-9]px|[5-9]\dpx/);
   await expect(page.locator("[data-testid='social-dock'], .social-dock").first()).toBeAttached();
+});
+
+test("switches hero video source when a tablet rotates", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 1366 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  const heroVideo = page.locator("[data-testid='hero-section'] video");
+  await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-mobile\.mp4/);
+
+  await page.setViewportSize({ width: 1366, height: 1024 });
+  await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-desktop\.mp4/);
 });
 
 test("keyboard users receive a visible focus treatment", async ({ page }) => {

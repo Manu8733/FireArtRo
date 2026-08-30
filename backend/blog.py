@@ -2,9 +2,11 @@
 
 import re
 import unicodedata
+import uuid
+from datetime import datetime, timezone
 from typing import Literal, Optional, Protocol
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
@@ -16,6 +18,10 @@ def slugify_ro(value):
     }))
     ascii_value = unicodedata.normalize("NFKD", translated).encode("ascii", "ignore").decode("ascii")
     return re.sub(r"[^a-z0-9]+", "-", ascii_value.lower()).strip("-") or "articol"
+
+
+def utc_now():
+    return datetime.now(timezone.utc).isoformat()
 
 
 class BlogArticleBase(BaseModel):
@@ -165,6 +171,61 @@ class BlogService:
             raise HTTPException(status_code=404, detail="Articolul nu a fost găsit.")
         return item
 
+    async def _unique_slug(self, title):
+        base = slugify_ro(title)
+        candidate = base
+        suffix = 2
+        while await self.repository.slug_exists(candidate):
+            candidate = f"{base}-{suffix}"
+            suffix += 1
+        return candidate
+
+    async def list_admin(self):
+        return await self.repository.list_all()
+
+    async def create_article(self, payload):
+        now = utc_now()
+        document = {
+            **payload.model_dump(),
+            "id": str(uuid.uuid4()),
+            "slug": await self._unique_slug(payload.title),
+            "status": "draft",
+            "created_at": now,
+            "updated_at": now,
+            "published_at": None,
+        }
+        return await self.repository.insert(document)
+
+    async def update_article(self, article_id, payload):
+        current = await self.repository.get_by_id(article_id)
+        if not current:
+            raise HTTPException(status_code=404, detail="Articolul nu a fost găsit.")
+
+        published_at = current.get("published_at")
+        if payload.status == "published" and not published_at:
+            published_at = utc_now()
+        updated = {
+            **payload.model_dump(),
+            "id": current["id"],
+            "slug": current["slug"],
+            "created_at": current["created_at"],
+            "updated_at": utc_now(),
+            "published_at": published_at,
+        }
+        saved = await self.repository.replace(article_id, updated)
+
+        old_cover = current.get("cover_media_id")
+        if saved and old_cover and old_cover != updated.get("cover_media_id"):
+            await self.media_store.delete(old_cover)
+        return saved
+
+    async def delete_article(self, article_id):
+        deleted = await self.repository.delete(article_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Articolul nu a fost găsit.")
+        if deleted.get("cover_media_id"):
+            await self.media_store.delete(deleted["cover_media_id"])
+
 
 def create_blog_router(service, admin_key):
     router = APIRouter(prefix="/api")
@@ -176,5 +237,39 @@ def create_blog_router(service, admin_key):
     @router.get("/blog/posts/{slug}", response_model=BlogArticleResponse)
     async def get_public_post(slug: str):
         return await service.get_public(slugify_ro(slug))
+
+    def require_admin_key(x_admin_key: Optional[str] = Header(default=None)):
+        if not admin_key or x_admin_key != admin_key:
+            raise HTTPException(status_code=401, detail="Acces neautorizat.")
+
+    @router.get("/admin/blog/posts", response_model=list[BlogArticleResponse])
+    async def list_admin_posts(_: None = Depends(require_admin_key)):
+        return await service.list_admin()
+
+    @router.post(
+        "/admin/blog/posts",
+        response_model=BlogArticleResponse,
+        status_code=201,
+    )
+    async def create_admin_post(
+        payload: BlogArticleCreate,
+        _: None = Depends(require_admin_key),
+    ):
+        return await service.create_article(payload)
+
+    @router.put("/admin/blog/posts/{article_id}", response_model=BlogArticleResponse)
+    async def update_admin_post(
+        article_id: uuid.UUID,
+        payload: BlogArticleUpdate,
+        _: None = Depends(require_admin_key),
+    ):
+        return await service.update_article(str(article_id), payload)
+
+    @router.delete("/admin/blog/posts/{article_id}", status_code=204)
+    async def delete_admin_post(
+        article_id: uuid.UUID,
+        _: None = Depends(require_admin_key),
+    ):
+        await service.delete_article(str(article_id))
 
     return router

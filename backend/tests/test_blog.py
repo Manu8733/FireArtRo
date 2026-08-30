@@ -97,6 +97,28 @@ def public_client(posts):
     return TestClient(app)
 
 
+def admin_client(posts=None):
+    repository = FakeBlogRepository(posts)
+    media_store = FakeMediaStore()
+    service = BlogService(repository, media_store)
+    app = FastAPI()
+    app.include_router(create_blog_router(service, "test-admin-key"))
+    return TestClient(app), repository, media_store
+
+
+def valid_create(**overrides):
+    payload = {
+        "title": "Știri din culise",
+        "excerpt": "Un rezumat administrat.",
+        "body": "Primul paragraf.\n\nAl doilea paragraf.",
+        "category": "Noutăți",
+        "cover_media_id": "",
+        "cover_alt": "",
+    }
+    payload.update(overrides)
+    return payload
+
+
 def test_slugify_ro_normalizes_diacritics_and_symbols():
     assert slugify_ro("Știri: Artificii în Țară") == "stiri-artificii-in-tara"
 
@@ -128,5 +150,104 @@ def test_public_detail_hides_drafts_as_not_found():
 
 def test_public_list_rejects_out_of_range_limit():
     response = public_client([]).get("/api/blog/posts?limit=101")
+
+    assert response.status_code == 422
+
+
+def test_admin_routes_reject_missing_or_wrong_key():
+    client, _, _ = admin_client()
+
+    assert client.get("/api/admin/blog/posts").status_code == 401
+    assert client.get(
+        "/api/admin/blog/posts",
+        headers={"X-Admin-Key": "wrong"},
+    ).status_code == 401
+
+
+def test_create_always_starts_as_draft_and_duplicate_title_gets_unique_slug():
+    client, _, _ = admin_client()
+    headers = {"X-Admin-Key": "test-admin-key"}
+
+    first = client.post("/api/admin/blog/posts", json=valid_create(), headers=headers)
+    second = client.post("/api/admin/blog/posts", json=valid_create(), headers=headers)
+
+    assert first.status_code == 201
+    assert first.json()["status"] == "draft"
+    assert first.json()["published_at"] is None
+    assert first.json()["slug"] == "stiri-din-culise"
+    assert second.status_code == 201
+    assert second.json()["slug"] == "stiri-din-culise-2"
+
+
+def test_publish_sets_date_once_and_title_edit_keeps_slug_and_publication_date():
+    client, _, _ = admin_client()
+    headers = {"X-Admin-Key": "test-admin-key"}
+    created = client.post(
+        "/api/admin/blog/posts",
+        json=valid_create(),
+        headers=headers,
+    ).json()
+    publish_payload = {**valid_create(), "status": "published"}
+
+    published = client.put(
+        f"/api/admin/blog/posts/{created['id']}",
+        json=publish_payload,
+        headers=headers,
+    )
+    edited = client.put(
+        f"/api/admin/blog/posts/{created['id']}",
+        json={**publish_payload, "title": "Titlu schimbat"},
+        headers=headers,
+    )
+
+    assert published.status_code == 200
+    assert published.json()["published_at"]
+    assert edited.status_code == 200
+    assert edited.json()["slug"] == created["slug"]
+    assert edited.json()["published_at"] == published.json()["published_at"]
+
+
+def test_delete_removes_article_from_admin_and_public_lists():
+    client, _, _ = admin_client()
+    headers = {"X-Admin-Key": "test-admin-key"}
+    created = client.post(
+        "/api/admin/blog/posts",
+        json=valid_create(),
+        headers=headers,
+    ).json()
+
+    response = client.delete(
+        f"/api/admin/blog/posts/{created['id']}",
+        headers=headers,
+    )
+
+    assert response.status_code == 204
+    assert client.get("/api/admin/blog/posts", headers=headers).json() == []
+    assert client.get("/api/blog/posts").json() == []
+
+
+def test_article_rejects_malformed_cover_identifier():
+    client, _, _ = admin_client()
+
+    response = client.post(
+        "/api/admin/blog/posts",
+        json=valid_create(
+            cover_media_id="not-an-object-id",
+            cover_alt="Copertă",
+        ),
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_admin_update_rejects_malformed_article_identifier():
+    client, _, _ = admin_client()
+
+    response = client.put(
+        "/api/admin/blog/posts/not-a-uuid",
+        json={**valid_create(), "status": "draft"},
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
 
     assert response.status_code == 422

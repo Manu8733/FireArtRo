@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter, Header, HTTPException, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 import os
 import logging
 from pathlib import Path
@@ -12,6 +12,14 @@ import uuid
 from datetime import datetime, timezone
 from collections import defaultdict, deque
 from time import monotonic
+
+from blog import (
+    BlogService,
+    GridFsBlogMediaStore,
+    MongoBlogRepository,
+    create_blog_router,
+    request_size_limit,
+)
 
 
 ROOT_DIR = Path(__file__).parent
@@ -135,6 +143,15 @@ async def get_quotes(x_admin_key: Optional[str] = Header(default=None)):
 # Include the router in the main app
 app.include_router(api_router)
 
+blog_repository = MongoBlogRepository(db.blog_posts)
+blog_media_store = GridFsBlogMediaStore(
+    AsyncIOMotorGridFSBucket(db, bucket_name="blog_media")
+)
+blog_service = BlogService(blog_repository, blog_media_store)
+app.include_router(
+    create_blog_router(blog_service, os.environ.get("ADMIN_API_KEY", ""))
+)
+
 rate_windows = defaultdict(deque)
 RATE_LIMIT = 5
 RATE_WINDOW_SECONDS = 600
@@ -153,10 +170,11 @@ def enforce_rate_limit(request: Request):
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
+    max_request_bytes = request_size_limit(request.url.path, request.method)
     content_length = request.headers.get("content-length")
     if content_length:
         try:
-            if int(content_length) > 32_768:
+            if int(content_length) > max_request_bytes:
                 return JSONResponse(status_code=413, content={"detail": "Cererea este prea mare."})
         except ValueError:
             return JSONResponse(status_code=400, content={"detail": "Content-Length invalid."})
@@ -164,7 +182,8 @@ async def security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["Cache-Control"] = "no-store"
+    if not request.url.path.startswith("/api/blog/media/"):
+        response.headers["Cache-Control"] = "no-store"
     return response
 
 
@@ -178,7 +197,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=allowed_origins,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "X-Admin-Key"],
 )
 
@@ -188,6 +207,12 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+@app.on_event("startup")
+async def ensure_blog_indexes():
+    await db.blog_posts.create_index("slug", unique=True)
+    await db.blog_posts.create_index([("status", 1), ("published_at", -1)])
 
 
 @app.on_event("shutdown")

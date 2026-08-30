@@ -5,7 +5,12 @@ from copy import deepcopy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from blog import BlogService, create_blog_router, slugify_ro
+from blog import (
+    BlogService,
+    create_blog_router,
+    request_size_limit,
+    slugify_ro,
+)
 
 
 def article(article_id, slug, status, published_at, title):
@@ -251,3 +256,78 @@ def test_admin_update_rejects_malformed_article_identifier():
     )
 
     assert response.status_code == 422
+
+
+def test_media_upload_requires_admin_and_public_read_returns_exact_bytes():
+    client, _, _ = admin_client()
+    webp_bytes = b"RIFF\x04\x00\x00\x00WEBP"
+    files = {"file": ("coperta.webp", webp_bytes, "image/webp")}
+
+    assert client.post("/api/admin/blog/media", files=files).status_code == 401
+    uploaded = client.post(
+        "/api/admin/blog/media",
+        files=files,
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+
+    assert uploaded.status_code == 201
+    media_id = uploaded.json()["id"]
+    public = client.get(f"/api/blog/media/{media_id}")
+    assert public.status_code == 200
+    assert public.content == webp_bytes
+    assert public.headers["content-type"].startswith("image/webp")
+    assert public.headers["cache-control"] == "public, max-age=86400, stale-while-revalidate=604800"
+
+
+def test_media_upload_rejects_non_image_and_false_image_types():
+    client, _, _ = admin_client()
+    headers = {"X-Admin-Key": "test-admin-key"}
+
+    text_response = client.post(
+        "/api/admin/blog/media",
+        files={"file": ("payload.txt", b"not-an-image", "text/plain")},
+        headers=headers,
+    )
+    false_webp_response = client.post(
+        "/api/admin/blog/media",
+        files={"file": ("payload.webp", b"not-an-image", "image/webp")},
+        headers=headers,
+    )
+
+    assert text_response.status_code == 415
+    assert false_webp_response.status_code == 415
+
+
+def test_replacing_cover_deletes_old_media_only_after_article_save():
+    old_cover = "507f1f77bcf86cd799439012"
+    article_id = "6f69e970-5d5d-46fc-8593-62c00bf46101"
+    posts = [
+        article(article_id, "articol", "draft", None, "Articol")
+        | {"cover_media_id": old_cover, "cover_alt": "Copertă veche"}
+    ]
+    client, _, media_store = admin_client(posts)
+
+    response = client.put(
+        f"/api/admin/blog/posts/{article_id}",
+        json={
+            **valid_create(),
+            "status": "draft",
+            "cover_media_id": "507f1f77bcf86cd799439013",
+            "cover_alt": "Copertă nouă",
+        },
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+
+    assert response.status_code == 200
+    assert media_store.deleted == [old_cover]
+
+
+def test_request_limits_are_scoped_to_blog_writes_and_media_only():
+    assert request_size_limit("/api/quotes", "POST") == 32_768
+    assert request_size_limit("/api/admin/blog/posts", "POST") == 128 * 1024
+    assert request_size_limit(
+        "/api/admin/blog/posts/6f69e970-5d5d-46fc-8593-62c00bf46101",
+        "PUT",
+    ) == 128 * 1024
+    assert request_size_limit("/api/admin/blog/media", "POST") == 6 * 1024 * 1024
+    assert request_size_limit("/api/blog/posts", "GET") == 32_768

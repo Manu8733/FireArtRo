@@ -6,8 +6,16 @@ import uuid
 from datetime import datetime, timezone
 from typing import Literal, Optional, Protocol
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from bson import ObjectId
+from bson.errors import InvalidId
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, UploadFile
+from fastapi.responses import Response
+from gridfs.errors import NoFile
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+
+ALLOWED_BLOG_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/avif"}
+MAX_BLOG_MEDIA_BYTES = 6 * 1024 * 1024
 
 
 def slugify_ro(value):
@@ -22,6 +30,24 @@ def slugify_ro(value):
 
 def utc_now():
     return datetime.now(timezone.utc).isoformat()
+
+
+def request_size_limit(path, method):
+    if path == "/api/admin/blog/media":
+        return 6 * 1024 * 1024
+    if path.startswith("/api/admin/blog/posts") and method.upper() in {"POST", "PUT"}:
+        return 128 * 1024
+    return 32_768
+
+
+def image_signature_matches(content_type, data):
+    signatures = {
+        "image/jpeg": data.startswith(b"\xff\xd8\xff"),
+        "image/png": data.startswith(b"\x89PNG\r\n\x1a\n"),
+        "image/webp": len(data) >= 12 and data[:4] == b"RIFF" and data[8:12] == b"WEBP",
+        "image/avif": len(data) >= 12 and data[4:12] in {b"ftypavif", b"ftypavis"},
+    }
+    return signatures.get(content_type, False)
 
 
 class BlogArticleBase(BaseModel):
@@ -157,6 +183,39 @@ class MongoBlogRepository:
         return existing
 
 
+class GridFsBlogMediaStore:
+    def __init__(self, bucket):
+        self.bucket = bucket
+
+    async def save(self, filename, content_type, data):
+        media_id = await self.bucket.upload_from_stream(
+            filename,
+            data,
+            metadata={"content_type": content_type},
+        )
+        return str(media_id)
+
+    async def open(self, media_id):
+        try:
+            stream = await self.bucket.open_download_stream(ObjectId(media_id))
+        except (InvalidId, NoFile):
+            return None
+        return {
+            "filename": stream.filename,
+            "content_type": (stream.metadata or {}).get(
+                "content_type",
+                "application/octet-stream",
+            ),
+            "data": await stream.read(),
+        }
+
+    async def delete(self, media_id):
+        try:
+            await self.bucket.delete(ObjectId(media_id))
+        except (InvalidId, NoFile):
+            return
+
+
 class BlogService:
     def __init__(self, repository, media_store):
         self.repository = repository
@@ -238,6 +297,19 @@ def create_blog_router(service, admin_key):
     async def get_public_post(slug: str):
         return await service.get_public(slugify_ro(slug))
 
+    @router.get("/blog/media/{media_id}")
+    async def read_blog_media(media_id: str):
+        media = await service.media_store.open(media_id)
+        if not media:
+            raise HTTPException(status_code=404, detail="Imaginea nu a fost găsită.")
+        return Response(
+            content=media["data"],
+            media_type=media["content_type"],
+            headers={
+                "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+            },
+        )
+
     def require_admin_key(x_admin_key: Optional[str] = Header(default=None)):
         if not admin_key or x_admin_key != admin_key:
             raise HTTPException(status_code=401, detail="Acces neautorizat.")
@@ -271,5 +343,33 @@ def create_blog_router(service, admin_key):
         _: None = Depends(require_admin_key),
     ):
         await service.delete_article(str(article_id))
+
+    @router.post("/admin/blog/media", status_code=201)
+    async def upload_blog_media(
+        file: UploadFile,
+        _: None = Depends(require_admin_key),
+    ):
+        if file.content_type not in ALLOWED_BLOG_IMAGE_TYPES:
+            raise HTTPException(
+                status_code=415,
+                detail="Fișierul trebuie să fie o imagine JPG, PNG, WebP sau AVIF.",
+            )
+        data = await file.read(MAX_BLOG_MEDIA_BYTES + 1)
+        if len(data) > MAX_BLOG_MEDIA_BYTES:
+            raise HTTPException(status_code=413, detail="Imaginea depășește 6 MB.")
+        if not image_signature_matches(file.content_type, data):
+            raise HTTPException(
+                status_code=415,
+                detail="Conținutul fișierului nu corespunde formatului imaginii.",
+            )
+        media_id = await service.media_store.save(
+            file.filename or "coperta.webp",
+            file.content_type,
+            data,
+        )
+        return {
+            "id": media_id,
+            "url": f"/api/blog/media/{media_id}",
+        }
 
     return router

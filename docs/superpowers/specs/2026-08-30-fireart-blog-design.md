@@ -67,7 +67,7 @@ Admin endpoints:
 
 Every Admin endpoint requires the existing `X-Admin-Key` header. The key is entered in a password field, held only in React memory for the current page session, and never embedded in a `REACT_APP_*` variable, URL, article document, or local storage.
 
-The existing 32 KB request limit remains in place for normal API requests. The protected media endpoint has a separate 6 MB request limit. Images are validated and optimized in the browser before upload, then stored in MongoDB GridFS so article documents do not contain large data URLs.
+The existing 32 KB request limit remains in place for normal API requests. Protected Blog article create/update requests have a 128 KB limit so the validated 50,000-character body and JSON envelope can be saved without contradiction. The protected media endpoint has a separate 6 MB request limit. Images are validated and optimized in the browser before upload, then stored in MongoDB GridFS so article documents do not contain large data URLs.
 
 Backend CORS configuration adds the required `PUT` and `DELETE` methods while preserving the existing origin allowlist and `X-Admin-Key` restriction. Replacing or deleting an article removes its no-longer-referenced cover from GridFS only after the article mutation succeeds. A failed article save never deletes the previously published cover.
 

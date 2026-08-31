@@ -928,12 +928,13 @@
   }
 
   .fa-work__intro {
-    width: min(82vw, 28rem);
-    min-width: min(82vw, 28rem);
+    width: 100vw;
+    min-width: 100vw;
     min-height: 0;
     height: 100%;
     justify-content: center;
-    padding: 2rem 2.5rem 2rem 0;
+    box-sizing: border-box;
+    padding: 2rem var(--nr-gutter);
   }
 
   .fa-work__intro h2 {
@@ -941,9 +942,10 @@
   }
 
   .fa-work__card {
-    width: min(84vw, 32rem);
-    min-width: min(84vw, 32rem);
-    padding: 0 0.55rem;
+    width: 100vw;
+    min-width: 100vw;
+    box-sizing: border-box;
+    padding: 0 var(--nr-gutter);
   }
 
   .fa-work__card figure {
@@ -957,12 +959,13 @@
   }
 
   .fa-work__outro {
-    width: min(82vw, 28rem);
-    min-width: min(82vw, 28rem);
+    width: 100vw;
+    min-width: 100vw;
     min-height: 0;
     height: 100%;
     justify-content: center;
-    padding: 2rem;
+    box-sizing: border-box;
+    padding: 2rem var(--nr-gutter);
   }
 
   .fa-work__outro h3 {
@@ -988,14 +991,17 @@
 
   .fa-packages__handoff {
     display: flex;
+    right: auto;
+    width: 200vw;
   }
 
   .fa-packages__handoff-card,
   .fa-packages__handoff-outro {
-    width: 50vw;
-    min-width: 50vw;
-    flex: 0 0 50vw;
-    padding-inline: clamp(0.35rem, 1.2vw, 0.7rem);
+    width: 100vw;
+    min-width: 100vw;
+    flex: 0 0 100vw;
+    box-sizing: border-box;
+    padding-inline: var(--nr-gutter);
   }
 
   .fa-packages__handoff-card figure {
@@ -1169,15 +1175,16 @@
 
 @media (max-width: 520px) {
   .fa-work__card {
-    width: 82vw;
-    min-width: 82vw;
+    width: 100vw;
+    min-width: 100vw;
+    padding-inline: var(--nr-gutter);
   }
 
   .fa-packages__handoff > .fa-packages__handoff-card,
   .fa-packages__handoff > .fa-packages__handoff-outro {
-    width: 50vw;
-    min-width: 50vw;
-    flex: 0 0 50vw;
+    width: 100vw;
+    min-width: 100vw;
+    flex: 0 0 100vw;
   }
 
   .fa-work__card figure {

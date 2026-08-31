@@ -58,6 +58,11 @@ export default function HomePackages() {
       const panelDuration = 1.24;
       const panelStagger = 0.56;
       const linkStart = 5.1;
+      const handoffExitPercent = () => (
+        window.matchMedia("(max-width: 899px), (hover: none) and (pointer: coarse)").matches
+          ? -50
+          : -100
+      );
 
       const timeline = gsap.timeline({
         defaults: { ease: "power3.out" },
@@ -76,7 +81,7 @@ export default function HomePackages() {
       });
 
       timeline.to(handoff, {
-        xPercent: -100,
+        xPercent: handoffExitPercent,
         duration: handoffDuration,
         ease: "sine.inOut",
       }, 0);

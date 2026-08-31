@@ -2,6 +2,11 @@ const { test, expect, devices } = require("@playwright/test");
 
 test.use({ ...devices["iPhone 14"] });
 
+const scrollPage = async (page, amount) => {
+  await page.evaluate((delta) => window.scrollBy(0, delta), amount);
+  await page.waitForTimeout(300);
+};
+
 test.describe("FireArt touch motion", () => {
   test("uses the desktop GSAP timelines instead of a static fallback", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -14,11 +19,11 @@ test.describe("FireArt touch motion", () => {
     await expect(page.locator(".pin-spacer").first()).toBeAttached();
 
     await gallery.scrollIntoViewIfNeeded();
-    await page.mouse.wheel(0, 420);
+    await scrollPage(page, 420);
     await expect(gallery.locator(".fa-work__track")).not.toHaveCSS("transform", "none");
 
     await packages.scrollIntoViewIfNeeded();
-    await page.mouse.wheel(0, 420);
+    await scrollPage(page, 420);
     await expect(packages.locator("[data-gallery-handoff]")).not.toHaveCSS("transform", "none");
   });
 });

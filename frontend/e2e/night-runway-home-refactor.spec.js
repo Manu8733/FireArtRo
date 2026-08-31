@@ -54,6 +54,13 @@ test.describe("FireArt homepage structural refactor", () => {
     await expect(page.locator(".fa-footer__lead")).toHaveCount(0);
   });
 
+  test("uses a catalog drone image for the first home gallery card", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    await expect(page.getByTestId("home-gallery").locator("[data-gallery-item] img").first())
+      .toHaveAttribute("src", /fireartro-drone-show-focsani-dji-0768-enhanced-nr\.webp/);
+  });
+
   test("renders compact opposite-direction review rails only for verified provider data", async ({ page }) => {
     await page.addInitScript((content) => {
       window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify(content));
@@ -108,7 +115,7 @@ test.describe("FireArt homepage structural refactor", () => {
     }
   });
 
-  test("keeps the gallery handoff balanced on phone and tablet viewports", async ({ page }) => {
+  test("keeps the gallery handoff in full-width frames on phone and tablet viewports", async ({ page }) => {
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 834, height: 1194 },
@@ -122,9 +129,51 @@ test.describe("FireArt homepage structural refactor", () => {
       const cardBox = await card.boundingBox();
       const outroBox = await outro.boundingBox();
 
-      expect(Math.abs(cardBox.width - viewport.width / 2)).toBeLessThanOrEqual(2);
-      expect(Math.abs(outroBox.width - viewport.width / 2)).toBeLessThanOrEqual(2);
+      expect(Math.abs(cardBox.width - viewport.width)).toBeLessThanOrEqual(2);
+      expect(Math.abs(outroBox.width - viewport.width)).toBeLessThanOrEqual(2);
+      expect(Math.abs(outroBox.x - cardBox.x - viewport.width)).toBeLessThanOrEqual(2);
       await expect(outro.locator(".fa-work__outro-inner")).toHaveCSS("text-align", "center");
+    }
+  });
+
+  test("keeps every mobile gallery panel readable at full viewport width", async ({ page }) => {
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 834, height: 1194 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/", { waitUntil: "domcontentloaded" });
+
+      const panels = page.getByTestId("home-gallery").locator("[data-gallery-panel]");
+      await expect(panels).toHaveCount(4);
+      for (const panel of await panels.all()) {
+        const box = await panel.boundingBox();
+        expect(Math.abs(box.width - viewport.width)).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+
+  test("keeps the gallery handoff full-width on touch landscape tablets", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "Touch landscape behavior is covered by the mobile/tablet device profiles.");
+    const viewport = { width: 1194, height: 834 };
+    await page.setViewportSize(viewport);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const handoff = page.getByTestId("gallery-package-handoff");
+    const card = handoff.locator(".fa-packages__handoff-card");
+    const outro = handoff.locator(".fa-packages__handoff-outro");
+    const cardBox = await card.boundingBox();
+    const outroBox = await outro.boundingBox();
+
+    expect(Math.abs(cardBox.width - viewport.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(outroBox.width - viewport.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(outroBox.x - cardBox.x - viewport.width)).toBeLessThanOrEqual(2);
+
+    const galleryPanels = page.getByTestId("home-gallery").locator("[data-gallery-panel]");
+    await expect(galleryPanels).toHaveCount(4);
+    for (const panel of await galleryPanels.all()) {
+      const box = await panel.boundingBox();
+      expect(Math.abs(box.width - viewport.width)).toBeLessThanOrEqual(2);
     }
   });
 

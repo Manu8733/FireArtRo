@@ -49,8 +49,8 @@ export const HOME_GALLERY = [
     index: "01",
     title: "Cer in miscare",
     type: "Drone show",
-    image: MEDIA.droneShow2,
-    alt: "Formatie luminoasa de drone intr-un spectacol FireArtRo",
+    image: "/media/gallery/fireartro-drone-show-focsani-dji-0768-enhanced-nr.webp",
+    alt: "Formație de drone cu inimă luminoasă deasupra orașului",
   },
   {
     id: "night-crowd-fireworks",

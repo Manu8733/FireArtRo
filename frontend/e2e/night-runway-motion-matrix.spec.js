@@ -8,7 +8,7 @@ test.describe("FireArt motion matrix", () => {
     const packages = page.getByTestId("home-packages");
 
     await expect(gallery).toHaveAttribute("data-motion", "scroll");
-    await expect(packages).toHaveAttribute("data-motion", "scroll");
-    await expect(page.locator(".pin-spacer").first()).toBeAttached();
+    await expect(packages).toHaveAttribute("data-motion", "reveal");
+    await expect(packages.locator(".pin-spacer")).toHaveCount(0);
   });
 });

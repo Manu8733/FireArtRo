@@ -38,104 +38,26 @@ export default function HomePackages() {
     if (!section || reduceMotion) return undefined;
 
     const context = gsap.context(() => {
-      const panels = gsap.utils.toArray("[data-package-slab]", section);
-      const sticky = section.querySelector(".fa-packages__sticky");
-      const link = section.querySelector(".fa-packages__link");
-      const handoff = section.querySelector("[data-gallery-handoff]");
-      const revealCopy = section.querySelector("[data-package-reveal-copy]");
-      if (!panels.length || !sticky || !handoff || !revealCopy) return;
-
-      const viewportWidth = () => sticky.clientWidth || window.innerWidth;
-      const isCompactHandoff = () => window.innerWidth <= 899;
-      const compactHandoff = isCompactHandoff();
-      const handoffStartX = () => (isCompactHandoff() ? -viewportWidth() : 0);
-      const measureSceneWidth = () => {
-        section.style.setProperty("--nr-scene-width", `${viewportWidth()}px`);
-      };
-
-      gsap.set(sticky, { opacity: 0, pointerEvents: "none" });
-      gsap.set(panels, {
-        y: () => Math.min(720, window.innerHeight * 0.9),
-        x: (index) => (index - 1) * window.innerWidth * 0.09,
-        scale: 0.9,
-        autoAlpha: 0,
-        force3D: true,
-      });
-      gsap.set(handoff, { x: handoffStartX, xPercent: 0, autoAlpha: 1, force3D: true });
-      gsap.set(revealCopy, { y: 18, opacity: 0 });
-      gsap.set(link, { y: 24, opacity: 0 });
-
-      const handoffDuration = compactHandoff ? 1.52 : 1.82;
-      const handoffFadeStart = handoffDuration + (compactHandoff ? 0.06 : 0.12);
-      const handoffFadeDuration = compactHandoff ? 0.18 : 0.24;
-      const revealCopyInStart = handoffFadeStart + handoffFadeDuration;
-      const panelsStart = 2.47;
-      const panelDuration = 1.24;
-      const panelStagger = 0.56;
-      const linkStart = 5.1;
-      const timeline = gsap.timeline({
-        defaults: { ease: "power3.out" },
-        scrollTrigger: {
-          id: "fireart-package-dock",
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.18,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onEnter: () => gsap.set(sticky, { opacity: 1, pointerEvents: "auto" }),
-          onEnterBack: () => gsap.set(sticky, { opacity: 1, pointerEvents: "auto" }),
-          onLeaveBack: () => gsap.set(sticky, { opacity: 0, pointerEvents: "none" }),
-          onRefresh: measureSceneWidth,
-        },
-      });
-
-      measureSceneWidth();
-      timeline.to(handoff, {
-        x: () => -viewportWidth(),
-        duration: handoffDuration,
-        ease: "sine.inOut",
-      }, 0);
-
-      timeline.to(handoff, {
-        autoAlpha: 0,
-        duration: handoffFadeDuration,
-        ease: "sine.inOut",
-      }, handoffFadeStart);
-
-      timeline.to(revealCopy, {
-        y: 0,
-        opacity: 1,
-        duration: 0.2,
-        ease: "sine.out",
-      }, revealCopyInStart);
-
-      timeline.to(revealCopy, {
-        y: -24,
-        opacity: 0,
-        duration: 0.24,
-        ease: "sine.inOut",
-      }, panelsStart);
-
-      panels.forEach((panel, index) => {
-        timeline.to(panel, {
+      gsap.fromTo(
+        "[data-package-panel]",
+        { y: 42, opacity: 0 },
+        {
           y: 0,
-          x: () => (window.innerWidth <= 520 ? (index - 1) * Math.min(window.innerWidth * 0.17, 68) : 0),
-          rotation: () => (window.innerWidth <= 520 ? (index - 1) * 3.5 : 0),
-          scale: () => (window.innerWidth <= 520 && index !== 1 ? 0.94 : 1),
-          autoAlpha: 1,
-          duration: panelDuration,
-        }, panelsStart + index * panelStagger);
-      });
-
-      timeline.to(link, { y: 0, opacity: 1, duration: 0.3 }, linkStart);
+          opacity: 1,
+          duration: 0.72,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 72%",
+            once: true,
+          },
+        },
+      );
     }, section);
 
-    return () => {
-      section.style.removeProperty("--nr-scene-width");
-      context.revert();
-    };
-  }, [reduceMotion]);
+    return () => context.revert();
+  }, [featuredPackages.length, reduceMotion]);
 
   return (
     <section

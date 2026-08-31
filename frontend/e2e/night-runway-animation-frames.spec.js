@@ -67,7 +67,7 @@ test.describe("FireArt animation frame matrix", () => {
 
     await expect(hero).toBeVisible();
     await expect(gallery).toHaveAttribute("data-motion", "scroll");
-    await expect(packages).toHaveAttribute("data-motion", "scroll");
+    await expect(packages).toHaveAttribute("data-motion", "reveal");
 
     for (const [index, delay] of [0, 350, 900, 1_700].entries()) {
       if (delay) await page.waitForTimeout(delay - [0, 350, 900, 1_700][index - 1]);
@@ -80,11 +80,10 @@ test.describe("FireArt animation frame matrix", () => {
     const galleryFinalTransform = await galleryTrack.evaluate((element) => getComputedStyle(element).transform);
     expect(galleryFinalTransform).not.toBe(galleryInitialTransform);
 
-    const handoff = packages.getByTestId("gallery-package-handoff");
-    const handoffInitialTransform = await handoff.evaluate((element) => getComputedStyle(element).transform);
-    await captureScrollFrames(page, packages, ".fa-packages__sticky", "packages", testInfo);
-    const handoffFinalTransform = await handoff.evaluate((element) => getComputedStyle(element).transform);
-    expect(handoffFinalTransform).not.toBe(handoffInitialTransform);
+    await packages.scrollIntoViewIfNeeded();
+    await settleFrame(page);
+    await page.screenshot({ path: testInfo.outputPath("packages-triptych.png"), fullPage: false });
+    await expect(packages.locator("[data-package-panel]")).toHaveCount(3);
 
     await about.scrollIntoViewIfNeeded();
     await settleFrame(page);

@@ -27,6 +27,14 @@ const managedReviews = {
   ],
 };
 
+const necessaryConsent = {
+  necessary: true,
+  analytics: false,
+  marketing: false,
+  savedAt: "2026-08-31T00:00:00.000Z",
+  expiresAt: "2099-08-31T00:00:00.000Z",
+};
+
 test.describe("FireArt homepage structural refactor", () => {
   test("routes homepage anchors from gallery and keeps the active indicator consistent", async ({ page }) => {
     await page.goto("/galerie", { waitUntil: "domcontentloaded" });
@@ -95,44 +103,107 @@ test.describe("FireArt homepage structural refactor", () => {
     }
   });
 
-  test("centers the package statement and uses responsive media-led package cards", async ({ page }) => {
-    await page.setViewportSize({ width: 834, height: 1194 });
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+  test("lays out the text-only package triptych without viewport overflow", async ({ page }) => {
+    await page.addInitScript((consent) => {
+      window.localStorage.setItem("fireartro-cookie-consent-v1", JSON.stringify(consent));
+    }, necessaryConsent);
 
-    const packages = page.getByTestId("home-packages");
-    const reveal = page.getByTestId("package-reveal-copy");
-    await expect(reveal).toContainText(/Trei moduri de a\s*aprinde noaptea\./);
-    await expect(reveal).toHaveCSS("text-align", "center");
-    await expect(packages.locator("[data-package-slab]")).toHaveCount(3);
-
-    const cards = packages.locator("[data-package-slab]");
-    for (const card of await cards.all()) {
-      const box = await card.boundingBox();
-      expect(box.width).toBeGreaterThanOrEqual(220);
-      const radius = Number.parseFloat(await card.evaluate((element) => getComputedStyle(element).borderTopLeftRadius));
-      expect(radius).toBeGreaterThanOrEqual(14);
-      await expect(card.locator("[data-package-play]")).toBeAttached();
-    }
-  });
-
-  test("keeps the gallery handoff in full-width frames on phone and tablet viewports", async ({ page }) => {
     for (const viewport of [
-      { width: 390, height: 844 },
-      { width: 834, height: 1194 },
+      { width: 1440, height: 900, columns: true },
+      { width: 1024, height: 768, columns: true },
+      { width: 834, height: 1194, columns: false },
+      { width: 430, height: 932, columns: false },
+      { width: 390, height: 844, columns: false },
+      { width: 844, height: 390, columns: false },
+      { width: 568, height: 320, columns: false },
     ]) {
       await page.setViewportSize(viewport);
       await page.goto("/", { waitUntil: "domcontentloaded" });
 
-      const handoff = page.getByTestId("gallery-package-handoff");
-      const card = handoff.locator(".fa-packages__handoff-card");
-      const outro = handoff.locator(".fa-packages__handoff-outro");
-      const cardBox = await card.boundingBox();
-      const outroBox = await outro.boundingBox();
+      const packages = page.getByTestId("home-packages");
+      const boxes = await packages.locator("[data-package-panel]").evaluateAll((nodes) =>
+        nodes.map((node) => {
+          const rect = node.getBoundingClientRect();
+          return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+        }),
+      );
+      expect(boxes).toHaveLength(3);
 
-      expect(Math.abs(cardBox.width - viewport.width)).toBeLessThanOrEqual(2);
-      expect(Math.abs(outroBox.width - viewport.width)).toBeLessThanOrEqual(2);
-      expect(Math.abs(outroBox.x - cardBox.x - viewport.width)).toBeLessThanOrEqual(2);
-      await expect(outro.locator(".fa-work__outro-inner")).toHaveCSS("text-align", "center");
+      if (viewport.columns) {
+        expect(Math.max(...boxes.map((box) => box.y)) - Math.min(...boxes.map((box) => box.y))).toBeLessThan(4);
+      } else {
+        expect(boxes[1].y).toBeGreaterThan(boxes[0].y + boxes[0].height - 2);
+        expect(boxes[2].y).toBeGreaterThan(boxes[1].y + boxes[1].height - 2);
+      }
+
+      const width = await page.evaluate(() => ({
+        client: document.documentElement.clientWidth,
+        scroll: document.documentElement.scrollWidth,
+      }));
+      expect(width.scroll).toBeLessThanOrEqual(width.client + 1);
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+
+    const packages = page.getByTestId("home-packages");
+    const panels = packages.locator("[data-package-panel]");
+    await expect(panels).toHaveCount(3);
+    await packages.scrollIntoViewIfNeeded();
+
+    for (const panel of await panels.all()) {
+      const box = await panel.boundingBox();
+      expect(box.x).toBeGreaterThanOrEqual(-1);
+      expect(box.x + box.width).toBeLessThanOrEqual(391);
+      await expect(panel.getByRole("button", { name: /cere ofertă/i })).toBeVisible();
+    }
+    const zoomWidth = await page.evaluate(() => ({
+      client: document.documentElement.clientWidth,
+      scroll: document.documentElement.scrollWidth,
+    }));
+    expect(zoomWidth.scroll).toBeLessThanOrEqual(zoomWidth.client + 1);
+  });
+
+  test("keeps the desktop package triptych header and scene compact", async ({ page }) => {
+    const viewport = { width: 1138, height: 872 };
+    await page.setViewportSize(viewport);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const metrics = await page.getByTestId("home-packages").evaluate((section) => {
+      const sectionRect = section.getBoundingClientRect();
+      const header = section.querySelector(".fa-packages__header").getBoundingClientRect();
+      const heading = section.querySelector("h2").getBoundingClientRect();
+      const triptych = section.querySelector("[data-package-triptych]").getBoundingClientRect();
+      const panelHeights = Array.from(section.querySelectorAll("[data-package-panel]"), (panel) => (
+        panel.getBoundingClientRect().height
+      ));
+      const targetSizes = Array.from(section.querySelectorAll("a[href], button:not([disabled])"), (target) => {
+        const rect = target.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      });
+
+      return {
+        sectionHeight: sectionRect.height,
+        paddingTop: Number.parseFloat(getComputedStyle(section).paddingTop),
+        headingFontSize: Number.parseFloat(getComputedStyle(section.querySelector("h2")).fontSize),
+        headerHeight: header.height,
+        triptychTopOffset: triptych.top - sectionRect.top,
+        tallestPanel: Math.max(...panelHeights),
+        targetSizes,
+      };
+    });
+
+    expect(metrics.paddingTop).toBeLessThanOrEqual(84);
+    expect(metrics.headingFontSize).toBeLessThanOrEqual(56);
+    expect(metrics.headerHeight).toBeLessThanOrEqual(viewport.height * 0.24);
+    expect(metrics.triptychTopOffset).toBeLessThanOrEqual(viewport.height * 0.36);
+    expect(metrics.tallestPanel).toBeLessThanOrEqual(viewport.height * 0.66);
+    expect(metrics.sectionHeight).toBeLessThanOrEqual(viewport.height * 1.25);
+    expect(metrics.targetSizes).toHaveLength(4);
+    for (const target of metrics.targetSizes) {
+      expect(target.width).toBeGreaterThanOrEqual(44);
+      expect(target.height).toBeGreaterThanOrEqual(44);
     }
   });
 
@@ -150,30 +221,6 @@ test.describe("FireArt homepage structural refactor", () => {
         const box = await panel.boundingBox();
         expect(Math.abs(box.width - viewport.width)).toBeLessThanOrEqual(2);
       }
-    }
-  });
-
-  test("keeps the gallery handoff full-width on touch landscape tablets", async ({ page, isMobile }) => {
-    test.skip(!isMobile, "Touch landscape behavior is covered by the mobile/tablet device profiles.");
-    const viewport = { width: 1194, height: 834 };
-    await page.setViewportSize(viewport);
-    await page.goto("/", { waitUntil: "domcontentloaded" });
-
-    const handoff = page.getByTestId("gallery-package-handoff");
-    const card = handoff.locator(".fa-packages__handoff-card");
-    const outro = handoff.locator(".fa-packages__handoff-outro");
-    const cardBox = await card.boundingBox();
-    const outroBox = await outro.boundingBox();
-
-    expect(Math.abs(cardBox.width - viewport.width)).toBeLessThanOrEqual(2);
-    expect(Math.abs(outroBox.width - viewport.width)).toBeLessThanOrEqual(2);
-    expect(Math.abs(outroBox.x - cardBox.x - viewport.width)).toBeLessThanOrEqual(2);
-
-    const galleryPanels = page.getByTestId("home-gallery").locator("[data-gallery-panel]");
-    await expect(galleryPanels).toHaveCount(4);
-    for (const panel of await galleryPanels.all()) {
-      const box = await panel.boundingBox();
-      expect(Math.abs(box.width - viewport.width)).toBeLessThanOrEqual(2);
     }
   });
 

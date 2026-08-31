@@ -40,7 +40,7 @@ test("switches hero video source when a tablet rotates", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
 
   const heroVideo = page.locator("[data-testid='hero-section'] video");
-  await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-mobile\.mp4/);
+  await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-mobile-web\.mp4/);
 
   await page.setViewportSize({ width: 1366, height: 1024 });
   await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-desktop\.mp4/);

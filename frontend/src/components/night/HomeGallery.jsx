@@ -33,9 +33,10 @@ export default function HomeGallery() {
       const setLiftY = lifts.map((lift) => gsap.quickSetter(lift, "y", "px"));
 
       const measure = () => {
-        travelDistance = Math.max(0, track.scrollWidth - window.innerWidth);
         liftDistance = Math.min(550, window.innerHeight * 0.61);
         viewportWidth = viewport.clientWidth || window.innerWidth;
+        section.style.setProperty("--nr-scene-width", `${viewportWidth}px`);
+        travelDistance = Math.max(0, track.scrollWidth - viewportWidth);
         panelMetrics = panels.map((panel) => ({
           left: panel.offsetLeft,
           width: panel.offsetWidth,
@@ -79,7 +80,7 @@ export default function HomeGallery() {
           start: "top top",
           end: () => {
             measure();
-            return `+=${Math.max(window.innerWidth * 1.392, travelDistance * 0.686)}`;
+            return `+=${Math.max(viewportWidth * 1.392, travelDistance * 0.686)}`;
           },
           pin: ".fa-work__sticky",
           scrub: 0.18,
@@ -99,7 +100,10 @@ export default function HomeGallery() {
         onUpdate: renderMotion,
       });
 
-      return () => timeline.kill();
+      return () => {
+        timeline.kill();
+        section.style.removeProperty("--nr-scene-width");
+      };
     }, section);
 
     return () => context.revert();

@@ -44,7 +44,7 @@ test.describe("hero video lifecycle", () => {
 
     const video = page.locator("[data-testid='hero-section'] video");
     await expect.poll(() => video.evaluate((node) => node.currentSrc)).toMatch(
-      /fireart-drone-fireworks-cinematic-mobile\.mp4/,
+      /fireart-drone-fireworks-cinematic-mobile-web\.mp4/,
     );
     await expectPlaying(video);
 
@@ -80,6 +80,23 @@ test.describe("hero video lifecycle", () => {
     await expectPlaying(returnedVideo);
 
     await expectProgress(returnedVideo);
+  });
+
+  test("releases the hero video offscreen and restores it when returning", async ({ page }) => {
+    await page.setViewportSize({ width: 430, height: 932 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const video = page.locator("[data-testid='hero-section'] video");
+    await expectPlaying(video);
+    await page.evaluate(() => window.scrollTo(0, document.querySelector("[data-testid='hero-section']").offsetHeight + 120));
+
+    await expect.poll(() => video.evaluate((node) => ({
+      paused: node.paused,
+      source: node.getAttribute("src"),
+    }))).toEqual({ paused: true, source: null });
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expectPlaying(video);
   });
 
   test("restarts playback after the page is shown again", async ({ page }) => {

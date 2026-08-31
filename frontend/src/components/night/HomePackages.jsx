@@ -40,6 +40,11 @@ export default function HomePackages() {
       const revealCopy = section.querySelector("[data-package-reveal-copy]");
       if (!panels.length || !sticky || !handoff || !revealCopy) return;
 
+      const viewportWidth = () => sticky.clientWidth || window.innerWidth;
+      const measureSceneWidth = () => {
+        section.style.setProperty("--nr-scene-width", `${viewportWidth()}px`);
+      };
+
       gsap.set(sticky, { opacity: 0, pointerEvents: "none" });
       gsap.set(panels, {
         y: () => Math.min(720, window.innerHeight * 0.9),
@@ -48,7 +53,7 @@ export default function HomePackages() {
         autoAlpha: 0,
         force3D: true,
       });
-      gsap.set(handoff, { xPercent: 0, force3D: true });
+      gsap.set(handoff, { x: 0, xPercent: 0, force3D: true });
       gsap.set(revealCopy, { y: 0, opacity: 1 });
       gsap.set(link, { y: 24, opacity: 0 });
 
@@ -58,12 +63,6 @@ export default function HomePackages() {
       const panelDuration = 1.24;
       const panelStagger = 0.56;
       const linkStart = 5.1;
-      const handoffExitPercent = () => (
-        window.matchMedia("(max-width: 899px), (hover: none) and (pointer: coarse)").matches
-          ? -50
-          : -100
-      );
-
       const timeline = gsap.timeline({
         defaults: { ease: "power3.out" },
         scrollTrigger: {
@@ -77,11 +76,13 @@ export default function HomePackages() {
           onEnter: () => gsap.set(sticky, { opacity: 1, pointerEvents: "auto" }),
           onEnterBack: () => gsap.set(sticky, { opacity: 1, pointerEvents: "auto" }),
           onLeaveBack: () => gsap.set(sticky, { opacity: 0, pointerEvents: "none" }),
+          onRefresh: measureSceneWidth,
         },
       });
 
+      measureSceneWidth();
       timeline.to(handoff, {
-        xPercent: handoffExitPercent,
+        x: () => -viewportWidth(),
         duration: handoffDuration,
         ease: "sine.inOut",
       }, 0);
@@ -107,7 +108,10 @@ export default function HomePackages() {
       timeline.to(link, { y: 0, opacity: 1, duration: 0.3 }, linkStart);
     }, section);
 
-    return () => context.revert();
+    return () => {
+      section.style.removeProperty("--nr-scene-width");
+      context.revert();
+    };
   }, [reduceMotion]);
 
   return (

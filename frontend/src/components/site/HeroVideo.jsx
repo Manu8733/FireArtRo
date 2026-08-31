@@ -22,10 +22,12 @@ export const HeroVideo = () => {
     if (!video) return undefined;
     let disposed = false;
     let lifecycleHidden = false;
+    let mediaVisible = true;
     let retryTimer;
     let errorAttempts = 0;
     let playbackWatchdog;
     const lifecycleTimers = new Set();
+    let visibilityObserver;
 
     const clearRetry = () => {
       if (retryTimer) window.clearTimeout(retryTimer);
@@ -33,7 +35,7 @@ export const HeroVideo = () => {
     };
 
     const attemptPlayback = (force = false) => {
-      if (disposed || lifecycleHidden || (!force && document.visibilityState === "hidden")) return;
+      if (disposed || lifecycleHidden || !mediaVisible || (!force && document.visibilityState === "hidden")) return;
       const promise = video.play();
       promise?.catch(() => {
         if (disposed) return;
@@ -43,11 +45,28 @@ export const HeroVideo = () => {
     };
 
     const recoverPlayback = (force = false) => {
-      if (disposed || lifecycleHidden || (!force && document.visibilityState === "hidden")) return;
+      if (disposed || lifecycleHidden || !mediaVisible || (!force && document.visibilityState === "hidden")) return;
       if (video.readyState < 2 || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
         video.load();
       }
       attemptPlayback(force);
+    };
+
+    const releasePlayback = () => {
+      clearRetry();
+      video.pause();
+      if (video.getAttribute("src")) {
+        video.removeAttribute("src");
+        video.load();
+      }
+    };
+
+    const restorePlayback = () => {
+      if (!video.getAttribute("src")) {
+        video.setAttribute("src", source);
+        video.load();
+      }
+      recoverPlayback();
     };
 
     playbackWatchdog = window.setInterval(() => {
@@ -101,6 +120,17 @@ export const HeroVideo = () => {
     const onCanPlay = () => attemptPlayback();
     const onStalled = () => recoverPlayback();
 
+    if (typeof IntersectionObserver !== "undefined") {
+      visibilityObserver = new IntersectionObserver(([entry]) => {
+        const nextVisible = entry.isIntersecting && entry.intersectionRatio > 0;
+        if (nextVisible === mediaVisible) return;
+        mediaVisible = nextVisible;
+        if (mediaVisible) restorePlayback();
+        else releasePlayback();
+      }, { threshold: [0, 0.01] });
+      visibilityObserver.observe(video);
+    }
+
     video.addEventListener("loadedmetadata", onLoadedMetadata);
     video.addEventListener("loadeddata", onLoadedData);
     video.addEventListener("canplay", onCanPlay);
@@ -117,6 +147,8 @@ export const HeroVideo = () => {
     scheduleLifecycleRecovery();
     return () => {
       disposed = true;
+      visibilityObserver?.disconnect();
+      releasePlayback();
       window.clearInterval(playbackWatchdog);
       clearRetry();
       lifecycleTimers.forEach((timer) => window.clearTimeout(timer));
@@ -141,8 +173,8 @@ export const HeroVideo = () => {
         <img
           src={poster || HERO_POSTER}
           alt="Spectacol de drone și artificii FireArtRo"
-          width={mediaVariant === "mobile" ? "2160" : "1920"}
-          height={mediaVariant === "mobile" ? "3840" : "1080"}
+          width={mediaVariant === "mobile" ? "1080" : "1920"}
+          height={mediaVariant === "mobile" ? "1920" : "1080"}
           className="hero-media-surface hero-media-webp absolute inset-0 h-full w-full object-cover"
           style={{ objectPosition: HERO_MEDIA.position || "52% center" }}
           fetchPriority="high"
@@ -151,6 +183,7 @@ export const HeroVideo = () => {
         />
       ) : (
         <video
+          key={source}
           ref={videoRef}
           src={source}
           poster={poster || HERO_POSTER}

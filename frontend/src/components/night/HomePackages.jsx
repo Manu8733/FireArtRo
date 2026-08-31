@@ -1,32 +1,37 @@
-import { useLayoutEffect, useRef } from "react";
-import { ArrowUpRight, Play } from "lucide-react";
+import { useLayoutEffect, useMemo, useRef } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HOME_GALLERY, HOME_PACKAGES } from "@/data/homeExperience";
+import useManagedContent from "@/hooks/useManagedContent";
+import { PACKAGE_ITEMS } from "@/data/businessContent";
+import { goToContact } from "@/lib/contactNavigation";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const featuredPackageIds = ["night-signature", "drone-story-100", "hybrid-signature"];
-const featuredPackages = featuredPackageIds
-  .map((id) => HOME_PACKAGES.find((item) => item.id === id))
-  .filter(Boolean);
-const handoffGalleryItem = HOME_GALLERY[2];
-
-const getYoutubePoster = (url, fallback) => {
-  const match = String(url || "").match(/(?:youtu\.be\/|v=)([^?&/]+)/);
-  return match?.[1]
-    ? {
-      primary: `https://i.ytimg.com/vi/${match[1]}/hqdefault.jpg`,
-      fallback,
-    }
-    : { primary: fallback, fallback };
-};
+const FEATURED_PACKAGE_IDS = [
+  "fireworks-multicolor-2026",
+  "fireworks-gold-2026",
+  "fireworks-diamond-piromusical-2026",
+];
 
 export default function HomePackages() {
   const sectionRef = useRef(null);
   const reduceMotion = useReducedMotion();
+  const managedPackages = useManagedContent("packages", PACKAGE_ITEMS);
+  const featuredPackages = useMemo(
+    () => FEATURED_PACKAGE_IDS
+      .map((id) => managedPackages.find((item) => item.id === id))
+      .filter(Boolean),
+    [managedPackages],
+  );
+
+  const requestPackage = (item) => goToContact({
+    package_id: item.id,
+    package_title: item.title,
+    services: [item.category],
+  });
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -138,101 +143,42 @@ export default function HomePackages() {
       className="fa-packages"
       data-home-scene="packages"
       data-testid="home-packages"
-      data-motion={reduceMotion ? "static" : "scroll"}
+      data-motion={reduceMotion ? "static" : "reveal"}
       aria-labelledby="fa-packages-title"
     >
-      <div className="fa-packages__sticky">
-        <div
-          className="fa-packages__handoff"
-          data-gallery-handoff
-          data-testid="gallery-package-handoff"
-          data-direction="exit-left"
-          aria-hidden="true"
-        >
-          <article className="fa-work__card fa-packages__handoff-card">
-            <div className="fa-work__card-inner">
-              <figure>
-                <img
-                  data-handoff-gallery-image
-                  src={handoffGalleryItem.image}
-                  alt=""
-                  loading="eager"
-                  decoding="async"
-                />
-              </figure>
-              <div className="fa-work__meta">
-                <p>{handoffGalleryItem.type}</p>
-                <h3>{handoffGalleryItem.title}</h3>
-              </div>
-            </div>
-          </article>
-
-          <aside className="fa-work__outro fa-packages__handoff-outro">
-            <div className="fa-work__outro-inner">
-              <p className="fa-kicker">Dincolo de cadru</p>
-              <h3>Spectacolul continuă.</h3>
-              <div className="fa-line-link">
-                <span>Intră în galerie</span>
-                <ArrowUpRight aria-hidden="true" />
-              </div>
-            </div>
-          </aside>
-        </div>
-
-        <header
-          className="fa-packages__reveal-copy"
-          data-package-reveal-copy
-          data-testid="package-reveal-copy"
-          data-sequence="before-packages"
-        >
+      <div className="fa-packages__inner nr-shell">
+        <header className="fa-packages__header">
           <p className="fa-kicker">Pachete FireArtRo</p>
-          <h2 id="fa-packages-title">Trei moduri de a<br />aprinde noaptea.</h2>
+          <h2 id="fa-packages-title">Trei moduri de a aprinde noaptea.</h2>
+          <p>Alege un punct de plecare. Configurația finală se adaptează locului, ritmului și momentului.</p>
         </header>
 
-        <div className="fa-packages__lineup nr-shell" data-package-dock>
-          {featuredPackages.map((item) => (
-            (() => {
-              const poster = getYoutubePoster(item.youtubeUrl, item.image);
-              return (
-                <a
-                  className="fa-package-slab"
-                  data-package-slab
-                  data-package-youtube
-                  href={item.youtubeUrl}
-                  key={item.id}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    data-package-media="poster"
-                    src={poster.primary}
-                    alt={item.alt}
-                    loading="lazy"
-                    decoding="async"
-                    onError={(event) => {
-                      if (event.currentTarget.src !== poster.fallback) {
-                        event.currentTarget.src = poster.fallback;
-                      }
-                    }}
-                  />
-                  <div className="fa-package-slab__veil" />
-                  <span className="fa-package-slab__play" data-package-play aria-hidden="true"><Play fill="currentColor" /></span>
-                  <div className="fa-package-slab__copy">
-                    <p data-package-type>{item.type}</p>
-                    <h3>{item.title}</h3>
-                    <p className="fa-package-slab__description" data-package-description>{item.description}</p>
-                    <small data-package-detail>{item.detail}</small>
-                    <span className="fa-package-slab__link">Vezi clipul <ArrowUpRight aria-hidden="true" /></span>
-                  </div>
-                </a>
-              );
-            })()
+        <div className="fa-packages__triptych" data-package-triptych>
+          {featuredPackages.map((item, index) => (
+            <article data-package-panel data-package-id={item.id} className="fa-package-panel" key={item.id}>
+              <div className="fa-package-panel__topline">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <span>{item.category}</span>
+              </div>
+              <div className="fa-package-panel__body">
+                {item.badge && <p className="fa-package-panel__badge">{item.badge}</p>}
+                <h3>{item.title}</h3>
+                <p>{item.shortDescription}</p>
+                <dl>
+                  <div><dt>Durată</dt><dd>{item.duration}</dd></div>
+                  <div><dt>Potrivit pentru</dt><dd>{item.bestFor}</dd></div>
+                </dl>
+                <ul>{item.highlights.slice(0, 3).map((value) => <li key={value}>{value}</li>)}</ul>
+              </div>
+              <button type="button" data-package-request onClick={() => requestPackage(item)}>
+                <span>Cere ofertă</span><ArrowUpRight aria-hidden="true" />
+              </button>
+            </article>
           ))}
         </div>
 
-        <Link className="fa-line-link fa-packages__link" to="/pachete">
-          <span>Explorează toate pachetele</span>
-          <ArrowUpRight aria-hidden="true" />
+        <Link className="fa-line-link fa-packages__all" to="/pachete">
+          <span>Vezi toate pachetele</span><ArrowUpRight aria-hidden="true" />
         </Link>
       </div>
     </section>

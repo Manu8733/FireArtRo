@@ -214,7 +214,7 @@ test.describe("FireArt scroll canvas landing", () => {
 
     expect(order).toEqual(["gallery", "packages", "about", "partners", "brief"]);
     await expect(page.getByTestId("home-gallery").locator("[data-gallery-item]")).toHaveCount(3);
-    await expect(page.getByTestId("home-packages").locator("[data-package-slab]")).toHaveCount(3);
+    await expect(page.getByTestId("home-packages").locator("[data-package-panel]")).toHaveCount(3);
     await expect(page.getByTestId("home-about")).toHaveAttribute("id", "intro");
     await expect(page.getByTestId("home-about").locator("[data-team-person], [data-team-cutout]")).toHaveCount(0);
     await expect(page.getByTestId("home-team")).toHaveCount(0);
@@ -229,12 +229,11 @@ test.describe("FireArt scroll canvas landing", () => {
       .toHaveAttribute("href", "/contact");
   });
 
-  test("uses the approved editorial gallery and three-package runway", async ({ page }) => {
+  test("uses the approved editorial gallery", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const gallery = page.getByTestId("home-gallery");
-    const packages = page.getByTestId("home-packages");
 
     await expect(gallery.locator("[data-gallery-item]")).toHaveCount(3);
     await expect(gallery.locator(".fa-work__meta span")).toHaveCount(0);
@@ -248,26 +247,75 @@ test.describe("FireArt scroll canvas landing", () => {
     for (const frame of await gallery.locator("[data-gallery-item] figure").all()) {
       await expect(frame).toHaveCSS("border-radius", "0px");
     }
+  });
 
-    await expect(packages.locator("[data-package-slab]")).toHaveCount(3);
-    await expect(packages.locator("[data-package-transition-band]")).toHaveCount(0);
-    await expect(packages.locator(".fa-packages__copy")).toHaveCount(0);
-    await expect(packages.locator("[data-package-play]")).toHaveCount(3);
-    await expect(packages.locator(".fa-package-slab [data-package-type]")).toHaveText([
-      "Artificii de noapte",
-      "Show cu drone",
-      "Drone + artificii",
+  test("uses three real managed packages without homepage media cards", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const packages = page.getByTestId("home-packages");
+    const panels = packages.locator("[data-package-panel]");
+
+    await expect(panels).toHaveCount(3);
+    expect(await panels.evaluateAll((nodes) => nodes.map((node) => node.dataset.packageId))).toEqual([
+      "fireworks-multicolor-2026",
+      "fireworks-gold-2026",
+      "fireworks-diamond-piromusical-2026",
     ]);
+    await expect(panels.locator("h3")).toHaveText([
+      "Multicolor",
+      "Gold",
+      "Diamond + Piromuzical",
+    ]);
+    await expect(packages.locator("img, video, [data-package-play], [data-package-youtube]")).toHaveCount(0);
+    await expect(page.getByTestId("gallery-package-handoff")).toHaveCount(0);
+  });
 
-    const packageVideos = packages.locator("[data-package-youtube]");
-    await expect(packageVideos).toHaveCount(3);
-    for (const packageVideo of await packageVideos.all()) {
-      await expect(packageVideo).toHaveAttribute("target", "_blank");
-      await expect(packageVideo).toHaveAttribute("href", /youtube\.com|youtu\.be/);
-      await expect(packageVideo.locator("[data-package-description]")).toBeAttached();
-      await expect(packageVideo.locator("[data-package-detail]")).toBeAttached();
-      await expect(packageVideo.getByText("Vezi clipul")).toBeAttached();
-    }
+  test("prefills the quote with the selected real homepage package", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const gold = page.locator('[data-package-panel][data-package-id="fireworks-gold-2026"]');
+    await gold.getByRole("button", { name: /cere ofertă/i }).click();
+
+    await expect(page).toHaveURL(/\/contact$/);
+    await expect(page.locator("#quote-package")).toHaveValue("fireworks-gold-2026");
+    await expect(page.locator("#quote-package option:checked")).toHaveText("Gold");
+  });
+
+  test("omits a missing featured package without inventing a replacement", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify({
+        packageCatalogVersion: "fireworks-2026-v3",
+        packages: [
+          {
+            id: "fireworks-multicolor-2026",
+            title: "Multicolor",
+            category: "Artificii de zi",
+            duration: "Adaptată momentului",
+            bestFor: "Festivități",
+            shortDescription: "Efecte vizibile ziua.",
+            highlights: ["Culori personalizabile"],
+          },
+          {
+            id: "fireworks-diamond-piromusical-2026",
+            title: "Diamond + Piromuzical",
+            category: "Artificii de noapte",
+            duration: "4 minute",
+            bestFor: "Evenimente premium",
+            shortDescription: "Spectacol sincronizat pe muzică.",
+            highlights: ["Construcție piromuzicală"],
+          },
+        ],
+      }));
+    });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const ids = await page.locator("[data-package-panel]").evaluateAll((nodes) =>
+      nodes.map((node) => node.dataset.packageId),
+    );
+    expect(ids).toEqual([
+      "fireworks-multicolor-2026",
+      "fireworks-diamond-piromusical-2026",
+    ]);
   });
 
   test("shortens the gallery runway before the package handoff", async ({ page }) => {
@@ -281,16 +329,6 @@ test.describe("FireArt scroll canvas landing", () => {
 
     expect(galleryPinHeight).toBeGreaterThan(2700);
     expect(galleryPinHeight).toBeLessThan(3100);
-  });
-
-  test("makes every homepage package a real video destination", async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/", { waitUntil: "domcontentloaded" });
-
-    const packageVideos = page.getByTestId("home-packages").locator("[data-package-youtube]");
-    await expect(packageVideos).toHaveCount(3);
-    await expect(packageVideos.nth(0)).toHaveAttribute("href", /youtube\.com|youtu\.be/);
-    await expect(packageVideos.nth(0).getByText("Vezi clipul")).toBeAttached();
   });
 
   test("keeps the about section anonymous without team portraits or member interaction", async ({ page }) => {

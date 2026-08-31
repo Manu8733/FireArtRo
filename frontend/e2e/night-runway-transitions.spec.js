@@ -165,7 +165,11 @@ test.describe("FireArt scroll-directed motion", () => {
     const packages = page.getByTestId("home-packages");
     const packageTop = await packages.evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
 
-    await page.evaluate((top) => window.scrollTo(0, top + 1_800), packageTop);
+    const packageScrollRange = await packages.evaluate((node) => node.offsetHeight - window.innerHeight);
+    await page.evaluate(
+      ({ top, scrollRange }) => window.scrollTo(0, top + Math.max(1_800, scrollRange * 0.6)),
+      { top: packageTop, scrollRange: packageScrollRange },
+    );
     await page.waitForTimeout(1_100);
 
     const state = await packages.evaluate((node) => ({
@@ -202,6 +206,27 @@ test.describe("FireArt scroll-directed motion", () => {
     expect(beforeIntro[1], "the package intro must wait for the continuation sheet").toBeLessThan(0.05);
     expect(duringIntro[0], "the continuation sheet must be gone before the package intro").toBeLessThan(0.05);
     expect(duringIntro[1], "the package intro should enter as its own scene").toBeGreaterThan(0.2);
+  });
+
+  test("keeps the final gallery photo moving smoothly into the continuation on touch", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const gallery = page.getByTestId("home-gallery");
+    const finalPhoto = gallery.locator("[data-gallery-item]").last();
+    const galleryTop = await gallery.evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
+
+    await page.evaluate((top) => window.scrollTo(0, top + 1_200), galleryTop);
+    await page.waitForTimeout(1_100);
+    const beforeSettle = await finalPhoto.boundingBox();
+
+    await page.evaluate((top) => window.scrollTo(0, top + 1_450), galleryTop);
+    await page.waitForTimeout(1_100);
+    const afterSettle = await finalPhoto.boundingBox();
+
+    expect(beforeSettle.x + beforeSettle.width, "the final photo should still be leaving during the handoff").toBeGreaterThan(24);
+    expect(afterSettle.x + afterSettle.width, "the final photo should be fully clear after the handoff").toBeLessThanOrEqual(4);
   });
 
   test("uses a longer scroll runway for the gallery continuation sheet", async ({ page }) => {

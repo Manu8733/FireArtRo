@@ -80,7 +80,8 @@ export default function HomeGallery() {
           start: "top top",
           end: () => {
             measure();
-            return `+=${Math.max(viewportWidth * 1.392, travelDistance * 0.686)}`;
+            const scrollRunwayMultiplier = window.innerWidth <= 899 ? 0.93 : 0.686;
+            return `+=${Math.max(viewportWidth * 1.392, travelDistance * scrollRunwayMultiplier)}`;
           },
           pin: ".fa-work__sticky",
           scrub: 0.18,

@@ -15,10 +15,15 @@ async function expectPlaying(video) {
     timeout: 25_000,
     message: "hero video should load metadata",
   }).toBeGreaterThanOrEqual(2);
-  await expect.poll(() => video.evaluate((node) => node.paused), {
-    timeout: 25_000,
-    message: "hero video should not remain paused",
-  }).toBe(false);
+  try {
+    await expect.poll(() => video.evaluate((node) => node.paused), {
+      timeout: 25_000,
+      message: "hero video should not remain paused",
+    }).toBe(false);
+  } catch (error) {
+    console.log("hero video final state", await video.evaluate(heroVideoState));
+    throw error;
+  }
 }
 
 async function expectProgress(video) {
@@ -125,5 +130,40 @@ test.describe("hero video lifecycle", () => {
     );
     await expect(video).toHaveAttribute("data-media-variant", "landscape");
     await expectPlaying(video);
+  });
+
+  test("keeps the complete hero copy inside every supported viewport", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const viewports = [
+      [320, 568],
+      [375, 667],
+      [430, 932],
+      [768, 1024],
+      [1024, 768],
+      [932, 430],
+      [1366, 768],
+      [1366, 1024],
+    ];
+
+    for (const [width, height] of viewports) {
+      await page.setViewportSize({ width, height });
+      const overflow = await page.locator("[data-testid='hero-section']").evaluate((hero) => {
+        const viewportWidth = document.documentElement.clientWidth;
+        const nodes = hero.querySelectorAll(
+          ".nr-hero__eyebrow, .nr-hero__title, .nr-hero__title-line, "
+            + ".nr-hero__keyword-sizer, .nr-hero__keyword-active, "
+            + ".nr-hero__description, .nr-hero__actions",
+        );
+
+        return [...nodes]
+          .map((node) => {
+            const rect = node.getBoundingClientRect();
+            return { selector: node.className, left: rect.left, right: rect.right };
+          })
+          .filter(({ left, right }) => left < -1 || right > viewportWidth + 1);
+      });
+
+      expect(overflow, `hero copy overflow at ${width}x${height}`).toEqual([]);
+    }
   });
 });

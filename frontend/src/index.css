@@ -790,7 +790,6 @@ section[id] {
 
 @media (min-width: 901px) and (max-height: 820px) {
     #acasa .max-w-3xl { max-width: 43rem; }
-    #acasa h1 { font-size: clamp(2.2rem, 3.45vw, 3.15rem); }
     #acasa .hero-trust-badges { margin-top: 1rem; }
     #acasa .hero-trust-badges li { padding-block: .38rem; }
 }

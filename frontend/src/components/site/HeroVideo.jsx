@@ -24,6 +24,7 @@ export const HeroVideo = () => {
     let lifecycleHidden = false;
     let retryTimer;
     let errorAttempts = 0;
+    let playbackWatchdog;
     const lifecycleTimers = new Set();
 
     const clearRetry = () => {
@@ -32,7 +33,7 @@ export const HeroVideo = () => {
     };
 
     const attemptPlayback = (force = false) => {
-      if (disposed || (!force && document.visibilityState === "hidden")) return;
+      if (disposed || lifecycleHidden || (!force && document.visibilityState === "hidden")) return;
       const promise = video.play();
       promise?.catch(() => {
         if (disposed) return;
@@ -42,15 +43,21 @@ export const HeroVideo = () => {
     };
 
     const recoverPlayback = (force = false) => {
-      if (disposed || (!force && document.visibilityState === "hidden")) return;
+      if (disposed || lifecycleHidden || (!force && document.visibilityState === "hidden")) return;
       if (video.readyState < 2 || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
         video.load();
       }
       attemptPlayback(force);
     };
 
+    playbackWatchdog = window.setInterval(() => {
+      if (disposed || lifecycleHidden || !video.paused) return;
+      if (video.readyState >= 2) attemptPlayback(true);
+      else if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) recoverPlayback(true);
+    }, 1_200);
+
     const scheduleLifecycleRecovery = () => {
-      [120, 650].forEach((delay) => {
+      [120, 650, 1400, 2600, 5000].forEach((delay) => {
         const timer = window.setTimeout(() => {
           lifecycleTimers.delete(timer);
           recoverPlayback(true);
@@ -107,8 +114,10 @@ export const HeroVideo = () => {
     window.addEventListener("online", onOnline);
 
     recoverPlayback();
+    scheduleLifecycleRecovery();
     return () => {
       disposed = true;
+      window.clearInterval(playbackWatchdog);
       clearRetry();
       lifecycleTimers.forEach((timer) => window.clearTimeout(timer));
       lifecycleTimers.clear();

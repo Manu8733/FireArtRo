@@ -12,6 +12,8 @@ export default function RouteShutter({ children }) {
   const overlayRef = useRef(null);
   const bandRefs = useRef([]);
   const timelineRef = useRef(null);
+  const navigationFallbackRef = useRef(null);
+  const navigationIssuedRef = useRef(false);
   const runningRef = useRef(false);
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
@@ -19,10 +21,32 @@ export default function RouteShutter({ children }) {
   const reduceMotion = useReducedMotion();
 
   const finishTransition = useCallback(() => {
+    if (navigationFallbackRef.current) {
+      window.clearTimeout(navigationFallbackRef.current);
+      navigationFallbackRef.current = null;
+    }
     runningRef.current = false;
+    if (overlayRef.current) {
+      gsap.set(overlayRef.current, { visibility: "hidden", pointerEvents: "none" });
+    }
+    const bands = bandRefs.current.filter(Boolean);
+    if (bands.length) gsap.set(bands, { scaleY: 0 });
     setActive(false);
     document.documentElement.style.removeProperty("overflow");
   }, []);
+
+  const resetTransition = useCallback(() => {
+    timelineRef.current?.kill();
+    timelineRef.current = null;
+    navigationIssuedRef.current = true;
+
+    if (overlayRef.current) {
+      gsap.set(overlayRef.current, { visibility: "hidden", pointerEvents: "none" });
+    }
+    const bands = bandRefs.current.filter(Boolean);
+    if (bands.length) gsap.set(bands, { scaleY: 0 });
+    finishTransition();
+  }, [finishTransition]);
 
   const navigateWithShutter = useCallback((target) => {
     if (!target || runningRef.current) return;
@@ -40,11 +64,12 @@ export default function RouteShutter({ children }) {
     }
 
     runningRef.current = true;
+    navigationIssuedRef.current = false;
     setActive(true);
     document.documentElement.style.overflow = "hidden";
     timelineRef.current?.kill();
 
-    const timeline = gsap.timeline({ onComplete: finishTransition });
+    const timeline = gsap.timeline({ onComplete: finishTransition, onInterrupt: finishTransition });
     timelineRef.current = timeline;
     timeline
       .set(overlay, { visibility: "visible", pointerEvents: "auto" })
@@ -58,7 +83,11 @@ export default function RouteShutter({ children }) {
       );
     });
 
-    timeline.call(() => navigate(target), [], 0.57);
+    timeline.call(() => {
+      if (navigationIssuedRef.current) return;
+      navigationIssuedRef.current = true;
+      navigate(target);
+    }, [], 0.57);
 
     [...bands].reverse().forEach((band, index) => {
       timeline.to(
@@ -69,6 +98,17 @@ export default function RouteShutter({ children }) {
     });
 
     timeline.set(overlay, { visibility: "hidden", pointerEvents: "none" });
+
+    // WebKit can suspend a GSAP ticker while a route transition is covering the page.
+    // Navigation must never remain trapped behind a half-open shutter in that case.
+    navigationFallbackRef.current = window.setTimeout(() => {
+      if (!runningRef.current) return;
+      if (!navigationIssuedRef.current) {
+        navigationIssuedRef.current = true;
+        navigate(target);
+      }
+      finishTransition();
+    }, 1_600);
   }, [finishTransition, navigate, reduceMotion]);
 
   useEffect(() => {
@@ -103,8 +143,20 @@ export default function RouteShutter({ children }) {
     return () => document.removeEventListener("click", interceptInternalLinks, true);
   }, [location.hash, location.pathname, location.search, navigateWithShutter]);
 
+  useEffect(() => {
+    // Back/forward cache can restore the page while the shutter is still open.
+    // Always reset its visual state before the restored page becomes interactive.
+    window.addEventListener("pagehide", resetTransition);
+    window.addEventListener("pageshow", resetTransition);
+    return () => {
+      window.removeEventListener("pagehide", resetTransition);
+      window.removeEventListener("pageshow", resetTransition);
+    };
+  }, [resetTransition]);
+
   useEffect(() => () => {
     timelineRef.current?.kill();
+    if (navigationFallbackRef.current) window.clearTimeout(navigationFallbackRef.current);
     document.documentElement.style.removeProperty("overflow");
   }, []);
 

@@ -6,9 +6,10 @@ export const HeroVideo = () => {
   const videoRef = useRef(null);
   const mobile = useIsMobile();
   const portraitTablet = useMediaQuery("(min-width: 768px) and (max-width: 1199px) and (orientation: portrait)");
-  const usePortraitMedia = mobile || portraitTablet;
-  const source = usePortraitMedia ? HERO_MEDIA.mobileSrc : HERO_MEDIA.src;
-  const poster = usePortraitMedia ? HERO_MEDIA.mobileWebpSrc : HERO_MEDIA.webpSrc;
+  const compactLandscape = useMediaQuery("(max-width: 1199px) and (max-height: 900px) and (orientation: landscape)");
+  const mediaVariant = compactLandscape ? "landscape" : mobile || portraitTablet ? "mobile" : "desktop";
+  const source = HERO_MEDIA[`${mediaVariant === "desktop" ? "" : mediaVariant}Src`] || HERO_MEDIA.src;
+  const poster = HERO_MEDIA[`${mediaVariant === "desktop" ? "" : mediaVariant}WebpSrc`] || HERO_MEDIA.webpSrc || HERO_POSTER;
   const [videoFailed, setVideoFailed] = useState(false);
 
   useEffect(() => {
@@ -19,17 +20,109 @@ export const HeroVideo = () => {
     if (videoFailed) return undefined;
     const video = videoRef.current;
     if (!video) return undefined;
+    let disposed = false;
+    let lifecycleHidden = false;
+    let retryTimer;
+    let errorAttempts = 0;
+    const lifecycleTimers = new Set();
 
-    const attemptPlayback = () => {
-      if (video.paused) video.play().catch(() => undefined);
+    const clearRetry = () => {
+      if (retryTimer) window.clearTimeout(retryTimer);
+      retryTimer = undefined;
     };
 
-    attemptPlayback();
-    video.addEventListener("canplay", attemptPlayback);
-    document.addEventListener("visibilitychange", attemptPlayback);
+    const attemptPlayback = (force = false) => {
+      if (disposed || (!force && document.visibilityState === "hidden")) return;
+      const promise = video.play();
+      promise?.catch(() => {
+        if (disposed) return;
+        clearRetry();
+        retryTimer = window.setTimeout(attemptPlayback, 320);
+      });
+    };
+
+    const recoverPlayback = (force = false) => {
+      if (disposed || (!force && document.visibilityState === "hidden")) return;
+      if (video.readyState < 2 || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+        video.load();
+      }
+      attemptPlayback(force);
+    };
+
+    const scheduleLifecycleRecovery = () => {
+      [120, 650].forEach((delay) => {
+        const timer = window.setTimeout(() => {
+          lifecycleTimers.delete(timer);
+          recoverPlayback(true);
+        }, delay);
+        lifecycleTimers.add(timer);
+      });
+    };
+
+    const onVisibilityChange = () => {
+      lifecycleHidden = document.visibilityState === "hidden";
+      if (lifecycleHidden) video.pause();
+      else recoverPlayback();
+    };
+
+    const onPageHide = () => {
+      lifecycleHidden = true;
+      video.pause();
+    };
+    const onPageShow = () => {
+      lifecycleHidden = false;
+      recoverPlayback(true);
+      scheduleLifecycleRecovery();
+    };
+    const onFocus = () => {
+      if (!lifecycleHidden) recoverPlayback(true);
+    };
+    const onOnline = () => {
+      if (!lifecycleHidden) recoverPlayback(true);
+    };
+    const onError = () => {
+      if (errorAttempts < 2) {
+        errorAttempts += 1;
+        clearRetry();
+        retryTimer = window.setTimeout(recoverPlayback, 220 * errorAttempts);
+        return;
+      }
+      setVideoFailed(true);
+    };
+    const onLoadedMetadata = () => attemptPlayback();
+    const onLoadedData = () => attemptPlayback();
+    const onCanPlay = () => attemptPlayback();
+    const onStalled = () => recoverPlayback();
+
+    video.addEventListener("loadedmetadata", onLoadedMetadata);
+    video.addEventListener("loadeddata", onLoadedData);
+    video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("playing", clearRetry);
+    video.addEventListener("stalled", onStalled);
+    video.addEventListener("error", onError);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("online", onOnline);
+
+    recoverPlayback();
     return () => {
-      video.removeEventListener("canplay", attemptPlayback);
-      document.removeEventListener("visibilitychange", attemptPlayback);
+      disposed = true;
+      clearRetry();
+      lifecycleTimers.forEach((timer) => window.clearTimeout(timer));
+      lifecycleTimers.clear();
+      video.removeEventListener("loadedmetadata", onLoadedMetadata);
+      video.removeEventListener("loadeddata", onLoadedData);
+      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("playing", clearRetry);
+      video.removeEventListener("stalled", onStalled);
+      video.removeEventListener("error", onError);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("online", onOnline);
     };
   }, [source, videoFailed]);
 
@@ -39,8 +132,8 @@ export const HeroVideo = () => {
         <img
           src={poster || HERO_POSTER}
           alt="Spectacol de drone și artificii FireArtRo"
-          width={usePortraitMedia ? "2160" : "3840"}
-          height={usePortraitMedia ? "3840" : "2160"}
+          width={mediaVariant === "mobile" ? "2160" : "1920"}
+          height={mediaVariant === "mobile" ? "3840" : "1080"}
           className="hero-media-surface hero-media-webp absolute inset-0 h-full w-full object-cover"
           style={{ objectPosition: HERO_MEDIA.position || "52% center" }}
           fetchPriority="high"
@@ -49,7 +142,6 @@ export const HeroVideo = () => {
         />
       ) : (
         <video
-          key={source}
           ref={videoRef}
           src={source}
           poster={poster || HERO_POSTER}
@@ -60,8 +152,7 @@ export const HeroVideo = () => {
           preload="metadata"
           className="hero-media-surface hero-media-video absolute inset-0 h-full w-full object-cover"
           style={{ objectPosition: HERO_MEDIA.position || "52% center" }}
-          onCanPlay={(event) => event.currentTarget.play().catch(() => undefined)}
-          onError={() => setVideoFailed(true)}
+          data-media-variant={mediaVariant}
           aria-label="Spectacol video cu drone și artificii FireArtRo"
         />
       )}

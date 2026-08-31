@@ -26,9 +26,9 @@ export const HERO_POSTER =
   "/media/fireart-hero-poster.webp";
 
 export const HERO_MEDIA = {
-  src: "/media/fireart-drone-fireworks-cinematic-desktop.mp4?v=20260831",
-  landscapeSrc: "/media/fireart-drone-fireworks-cinematic-landscape.mp4?v=20260831",
-  mobileSrc: "/media/fireart-drone-fireworks-cinematic-mobile-web.mp4?v=20260831",
+  src: "/media/fireart-drone-fireworks-cinematic-desktop.mp4?v=20260831-compact",
+  landscapeSrc: "/media/fireart-drone-fireworks-cinematic-landscape.mp4?v=20260831-compact",
+  mobileSrc: "/media/fireart-drone-fireworks-cinematic-mobile-web.mp4?v=20260831-compact",
   webpSrc: "/media/fireart-drone-fireworks-cinematic-desktop.webp?v=20260831",
   mobileWebpSrc: "/media/fireart-drone-fireworks-cinematic-mobile-web.webp?v=20260831",
   label: "Spectacol cinematic FireArtRo cu drone, artificii și formații luminoase",

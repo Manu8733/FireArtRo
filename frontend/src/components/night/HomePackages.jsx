@@ -41,6 +41,8 @@ export default function HomePackages() {
       if (!panels.length || !sticky || !handoff || !revealCopy) return;
 
       const viewportWidth = () => sticky.clientWidth || window.innerWidth;
+      const isCompactHandoff = () => window.innerWidth <= 899;
+      const handoffStartX = () => (isCompactHandoff() ? -viewportWidth() : 0);
       const measureSceneWidth = () => {
         section.style.setProperty("--nr-scene-width", `${viewportWidth()}px`);
       };
@@ -53,7 +55,7 @@ export default function HomePackages() {
         autoAlpha: 0,
         force3D: true,
       });
-      gsap.set(handoff, { x: 0, xPercent: 0, force3D: true });
+      gsap.set(handoff, { x: handoffStartX, xPercent: 0, autoAlpha: 1, force3D: true });
       gsap.set(revealCopy, { y: 0, opacity: 1 });
       gsap.set(link, { y: 24, opacity: 0 });
 
@@ -86,6 +88,12 @@ export default function HomePackages() {
         duration: handoffDuration,
         ease: "sine.inOut",
       }, 0);
+
+      timeline.to(handoff, {
+        autoAlpha: 0,
+        duration: 0.24,
+        ease: "sine.inOut",
+      }, handoffDuration + 0.12);
 
       timeline.to(revealCopy, {
         y: -24,

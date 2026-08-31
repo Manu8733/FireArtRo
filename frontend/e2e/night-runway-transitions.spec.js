@@ -136,6 +136,49 @@ test.describe("FireArt scroll-directed motion", () => {
     await expect.poll(translateX, { timeout: 4_000 }).toBeLessThan(-120);
   });
 
+  test("continues from the gallery outro without replaying the final photo", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const packages = page.getByTestId("home-packages");
+    const handoff = page.getByTestId("gallery-package-handoff");
+    const packageTop = await packages.evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
+
+    await page.evaluate((top) => window.scrollTo(0, top + 2), packageTop);
+    await page.waitForTimeout(1_100);
+
+    const handoffLayout = await handoff.evaluate((node) => ({
+      cardRight: node.querySelector(".fa-packages__handoff-card").getBoundingClientRect().right,
+      outroLeft: node.querySelector(".fa-packages__handoff-outro").getBoundingClientRect().left,
+    }));
+
+    expect(handoffLayout.cardRight, "the final gallery photo should not re-enter from the left").toBeLessThanOrEqual(2);
+    expect(handoffLayout.outroLeft, "the continuation copy should hold the same viewport").toBeGreaterThanOrEqual(-2);
+  });
+
+  test("clears the continuation sheet before the package lineup becomes visible", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const packages = page.getByTestId("home-packages");
+    const packageTop = await packages.evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
+
+    await page.evaluate((top) => window.scrollTo(0, top + 1_800), packageTop);
+    await page.waitForTimeout(1_100);
+
+    const state = await packages.evaluate((node) => ({
+      handoffOpacity: Number(getComputedStyle(node.querySelector("[data-gallery-handoff]")).opacity),
+      handoffVisibility: getComputedStyle(node.querySelector("[data-gallery-handoff]")).visibility,
+      firstPackageOpacity: Number(getComputedStyle(node.querySelector("[data-package-slab]")).opacity),
+    }));
+
+    expect(state.handoffOpacity, "the continuation sheet must not cover the package scene").toBeLessThan(0.05);
+    expect(state.handoffVisibility).toBe("hidden");
+    expect(state.firstPackageOpacity, "the package lineup should be visible after the handoff").toBeGreaterThan(0.2);
+  });
+
   test("uses a longer scroll runway for the gallery continuation sheet", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 1440, height: 900 });

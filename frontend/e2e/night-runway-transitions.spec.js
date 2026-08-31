@@ -179,6 +179,31 @@ test.describe("FireArt scroll-directed motion", () => {
     expect(state.firstPackageOpacity, "the package lineup should be visible after the handoff").toBeGreaterThan(0.2);
   });
 
+  test("does not crossfade the continuation copy with the package intro", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const packages = page.getByTestId("home-packages");
+    const packageTop = await packages.evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
+
+    await page.evaluate((top) => window.scrollTo(0, top + 1_200), packageTop);
+    await page.waitForTimeout(1_100);
+    const beforeIntro = await packages.locator("[data-gallery-handoff], [data-package-reveal-copy]").evaluateAll((nodes) => (
+      nodes.map((node) => Number(getComputedStyle(node).opacity))
+    ));
+
+    await page.evaluate((top) => window.scrollTo(0, top + 1_500), packageTop);
+    await page.waitForTimeout(1_100);
+    const duringIntro = await packages.locator("[data-gallery-handoff], [data-package-reveal-copy]").evaluateAll((nodes) => (
+      nodes.map((node) => Number(getComputedStyle(node).opacity))
+    ));
+
+    expect(beforeIntro[1], "the package intro must wait for the continuation sheet").toBeLessThan(0.05);
+    expect(duringIntro[0], "the continuation sheet must be gone before the package intro").toBeLessThan(0.05);
+    expect(duringIntro[1], "the package intro should enter as its own scene").toBeGreaterThan(0.2);
+  });
+
   test("uses a longer scroll runway for the gallery continuation sheet", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 1440, height: 900 });

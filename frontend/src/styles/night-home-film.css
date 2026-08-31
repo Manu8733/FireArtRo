@@ -1235,6 +1235,38 @@
   }
 }
 
+@media (max-width: 899px) and (orientation: landscape) {
+  .fa-work__sticky {
+    height: 100svh;
+    min-height: 100svh;
+  }
+
+  .fa-work__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    padding-block: 0.5rem;
+  }
+
+  .fa-work__card figure {
+    width: min(50vw, 28rem);
+    height: auto;
+    aspect-ratio: 3 / 2;
+    margin-inline: auto;
+  }
+
+  .fa-work__meta {
+    width: min(50vw, 28rem);
+    margin-inline: auto;
+    padding-top: 0.7rem;
+  }
+
+  .fa-work__meta h3 {
+    font-size: clamp(1.15rem, 3.3vw, 1.7rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fa-line-link::after,
   .fa-line-link svg,

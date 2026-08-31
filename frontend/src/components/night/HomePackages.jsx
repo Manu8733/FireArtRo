@@ -42,6 +42,7 @@ export default function HomePackages() {
 
       const viewportWidth = () => sticky.clientWidth || window.innerWidth;
       const isCompactHandoff = () => window.innerWidth <= 899;
+      const compactHandoff = isCompactHandoff();
       const handoffStartX = () => (isCompactHandoff() ? -viewportWidth() : 0);
       const measureSceneWidth = () => {
         section.style.setProperty("--nr-scene-width", `${viewportWidth()}px`);
@@ -56,11 +57,13 @@ export default function HomePackages() {
         force3D: true,
       });
       gsap.set(handoff, { x: handoffStartX, xPercent: 0, autoAlpha: 1, force3D: true });
-      gsap.set(revealCopy, { y: 0, opacity: 1 });
+      gsap.set(revealCopy, { y: 18, opacity: 0 });
       gsap.set(link, { y: 24, opacity: 0 });
 
-      const handoffDuration = 1.82;
-      const revealCopyStart = 2;
+      const handoffDuration = compactHandoff ? 1.52 : 1.82;
+      const handoffFadeStart = handoffDuration + (compactHandoff ? 0.06 : 0.12);
+      const handoffFadeDuration = compactHandoff ? 0.18 : 0.24;
+      const revealCopyInStart = handoffFadeStart + handoffFadeDuration;
       const panelsStart = 2.47;
       const panelDuration = 1.24;
       const panelStagger = 0.56;
@@ -91,16 +94,23 @@ export default function HomePackages() {
 
       timeline.to(handoff, {
         autoAlpha: 0,
-        duration: 0.24,
+        duration: handoffFadeDuration,
         ease: "sine.inOut",
-      }, handoffDuration + 0.12);
+      }, handoffFadeStart);
+
+      timeline.to(revealCopy, {
+        y: 0,
+        opacity: 1,
+        duration: 0.2,
+        ease: "sine.out",
+      }, revealCopyInStart);
 
       timeline.to(revealCopy, {
         y: -24,
         opacity: 0,
-        duration: 0.34,
+        duration: 0.24,
         ease: "sine.inOut",
-      }, revealCopyStart);
+      }, panelsStart);
 
       panels.forEach((panel, index) => {
         timeline.to(panel, {

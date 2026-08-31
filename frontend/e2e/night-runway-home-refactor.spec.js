@@ -177,6 +177,18 @@ test.describe("FireArt homepage structural refactor", () => {
     }
   });
 
+  test("keeps gallery photos framed for touch landscape phones", async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const figures = page.getByTestId("home-gallery").locator("[data-gallery-item] figure");
+    for (const figure of await figures.all()) {
+      const box = await figure.boundingBox();
+      expect(box.width / box.height, "landscape phone photos should not become ultra-wide crops").toBeLessThanOrEqual(2.1);
+      expect(box.height, "landscape phone photos should retain a substantial frame").toBeGreaterThanOrEqual(250);
+    }
+  });
+
   test("uses a concise brief after the conditional reviews slot and a quiet directory footer", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
 

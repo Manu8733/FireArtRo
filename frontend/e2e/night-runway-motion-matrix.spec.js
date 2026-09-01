@@ -9,6 +9,6 @@ test.describe("FireArt motion matrix", () => {
 
     await expect(gallery).toHaveAttribute("data-motion", "scroll");
     await expect(packages).toHaveAttribute("data-motion", "reveal");
-    await expect(packages.locator(".pin-spacer")).toHaveCount(0);
+    expect(await packages.evaluate((node) => Boolean(node.closest(".pin-spacer")))).toBe(false);
   });
 });

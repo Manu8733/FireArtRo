@@ -110,10 +110,14 @@ test.describe("FireArt homepage structural refactor", () => {
 
     for (const viewport of [
       { width: 1440, height: 900, columns: true },
+      { width: 1138, height: 872, columns: true },
       { width: 1024, height: 768, columns: true },
+      { width: 1024, height: 1366, columns: false },
+      { width: 912, height: 1368, columns: false },
       { width: 834, height: 1194, columns: false },
       { width: 430, height: 932, columns: false },
       { width: 390, height: 844, columns: false },
+      { width: 932, height: 430, columns: false },
       { width: 844, height: 390, columns: false },
       { width: 568, height: 320, columns: false },
     ]) {
@@ -163,6 +167,33 @@ test.describe("FireArt homepage structural refactor", () => {
       scroll: document.documentElement.scrollWidth,
     }));
     expect(zoomWidth.scroll).toBeLessThanOrEqual(zoomWidth.client + 1);
+  });
+
+  test("reveals a package panel synchronously when its CTA receives focus", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const focusState = await page.getByTestId("home-packages").evaluate((section) => {
+      const panel = section.querySelector("[data-package-panel]");
+      const button = panel?.querySelector("[data-package-request]");
+      button?.focus({ preventScroll: true });
+
+      const style = panel ? getComputedStyle(panel) : null;
+      const matrix = style?.transform === "none"
+        ? null
+        : new DOMMatrixReadOnly(style?.transform);
+
+      return {
+        active: document.activeElement === button,
+        opacity: Number.parseFloat(style?.opacity || "0"),
+        translateY: matrix?.m42 || 0,
+      };
+    });
+
+    expect(focusState.active).toBe(true);
+    expect(focusState.opacity).toBeGreaterThanOrEqual(0.99);
+    expect(Math.abs(focusState.translateY)).toBeLessThanOrEqual(0.5);
   });
 
   test("keeps the desktop package triptych header and scene compact", async ({ page }) => {

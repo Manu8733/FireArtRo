@@ -12,7 +12,7 @@ test.describe("FireArt scroll-directed motion", () => {
     await expect(packages.locator("[data-package-triptych]")).toHaveCount(1);
     await expect(packages.locator("[data-package-transition-band]")).toHaveCount(0);
     await expect(packages.locator("[data-package-dock]")).toHaveCount(0);
-    await expect(packages.locator(".pin-spacer")).toHaveCount(0);
+    expect(await packages.evaluate((node) => Boolean(node.closest(".pin-spacer")))).toBe(false);
     await expect(page.getByTestId("service-stage")).toHaveCount(0);
     await expect(page.getByTestId("section-shutter")).toHaveCount(0);
     await expect(page.getByTestId("home-process")).toHaveCount(0);
@@ -57,6 +57,12 @@ test.describe("FireArt scroll-directed motion", () => {
     await expect(packages.locator("[data-package-panel]")).toHaveCount(3);
     for (const panel of await packages.locator("[data-package-panel]").all()) {
       await expect(panel).toBeVisible();
+      const settled = await panel.evaluate((node) => {
+        const style = getComputedStyle(node);
+        return { opacity: Number.parseFloat(style.opacity), transform: style.transform };
+      });
+      expect(settled.opacity).toBeGreaterThanOrEqual(0.99);
+      expect(settled.transform).toBe("none");
     }
     await expect(page.getByTestId("home-partners").locator("canvas")).toHaveCount(0);
     await expect(page.getByTestId("home-partners").locator("[data-partner-name]")).toHaveCount(12);

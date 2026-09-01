@@ -35,7 +35,21 @@ export default function HomePackages() {
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
-    if (!section || reduceMotion) return undefined;
+    if (!section) return undefined;
+
+    const revealFocusedPanel = (event) => {
+      const panel = event.target?.closest?.("[data-package-panel]");
+      if (!panel || !section.contains(panel)) return;
+
+      gsap.killTweensOf(panel);
+      gsap.set(panel, { y: 0, opacity: 1 });
+    };
+
+    section.addEventListener("focusin", revealFocusedPanel);
+
+    if (reduceMotion) {
+      return () => section.removeEventListener("focusin", revealFocusedPanel);
+    }
 
     const context = gsap.context(() => {
       gsap.fromTo(
@@ -56,7 +70,10 @@ export default function HomePackages() {
       );
     }, section);
 
-    return () => context.revert();
+    return () => {
+      section.removeEventListener("focusin", revealFocusedPanel);
+      context.revert();
+    };
   }, [featuredPackages.length, reduceMotion]);
 
   return (

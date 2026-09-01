@@ -24,7 +24,7 @@ test.describe("FireArt touch motion", () => {
 
     await expect(gallery).toHaveAttribute("data-motion", "scroll");
     await expect(packages).toHaveAttribute("data-motion", "reveal");
-    await expect(packages.locator(".pin-spacer")).toHaveCount(0);
+    expect(await packages.evaluate((node) => Boolean(node.closest(".pin-spacer")))).toBe(false);
 
     await gallery.scrollIntoViewIfNeeded();
     await scrollPage(page, 420);
@@ -33,6 +33,8 @@ test.describe("FireArt touch motion", () => {
     await packages.scrollIntoViewIfNeeded();
     for (const panel of await packages.locator("[data-package-panel]").all()) {
       await expect(panel).toBeVisible();
+      await expect.poll(() => panel.evaluate((node) => Number.parseFloat(getComputedStyle(node).opacity)))
+        .toBeGreaterThanOrEqual(0.99);
     }
   });
 });

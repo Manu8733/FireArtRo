@@ -5,6 +5,8 @@
   --fa-muted: #aeb7c7;
   --fa-blue: #4169ff;
   --fa-blue-soft: #8eb8ff;
+  --nr-handoff-color: 3 7 12;
+  --nr-handoff-depth: clamp(7rem, 24svh, 26rem);
   color: var(--fa-white);
   background: var(--fa-black);
 }
@@ -29,12 +31,21 @@
   position: absolute;
   z-index: 1;
   right: 0;
-  bottom: -1px;
+  bottom: 0;
   left: 0;
-  height: clamp(5rem, 14vh, 9rem);
+  height: var(--nr-handoff-depth);
   content: "";
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 0% 76%, rgba(3, 7, 12, 0.28) 90%, #03070c 100%);
+  /* Ease only the bottom of the image into the gallery's exact edge color. */
+  background: linear-gradient(180deg,
+    rgb(var(--nr-handoff-color) / 0) 0%,
+    rgb(var(--nr-handoff-color) / 0.04) 16%,
+    rgb(var(--nr-handoff-color) / 0.16) 32%,
+    rgb(var(--nr-handoff-color) / 0.36) 48%,
+    rgb(var(--nr-handoff-color) / 0.64) 64%,
+    rgb(var(--nr-handoff-color) / 0.88) 80%,
+    rgb(var(--nr-handoff-color) / 0.98) 92%,
+    rgb(var(--nr-handoff-color)) 100%);
 }
 
 .nr-hero__media {

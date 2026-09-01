@@ -85,9 +85,13 @@ export const HeroVideo = () => {
       attemptPlayback(force);
     };
 
-    const releasePlayback = () => {
+    const pausePlayback = () => {
       clearRetry();
       video.pause();
+    };
+
+    const releasePlayback = () => {
+      pausePlayback();
       if (video.getAttribute("src")) {
         video.removeAttribute("src");
         video.load();
@@ -99,7 +103,10 @@ export const HeroVideo = () => {
       mediaVisible = rect.bottom > 0 && rect.top < window.innerHeight
         && rect.right > 0 && rect.left < window.innerWidth;
       if (mediaVisible) recoverPlayback(force);
-      else releasePlayback();
+      // Keep the decoded source attached while the homepage is still mounted.
+      // Calling load() at this exact scroll boundary can stall the first gallery
+      // frame, especially in mobile Safari. Unmount cleanup still releases it.
+      else pausePlayback();
     };
 
     playbackWatchdog = window.setInterval(() => {

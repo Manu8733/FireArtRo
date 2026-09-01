@@ -75,7 +75,7 @@
   position: relative;
   z-index: 1;
   color: #f4f7fc;
-  background: #03070c;
+  background: rgb(var(--nr-handoff-color));
 }
 
 .fa-work__sticky {
@@ -110,7 +110,18 @@
   inset: 0;
   content: "";
   pointer-events: none;
+  /* Paint above the decorative layers so both scenes meet without a color seam.
+     This is an overlay only: the pinned gallery's scroll geometry stays intact. */
   background:
+    linear-gradient(180deg,
+      rgb(var(--nr-handoff-color)) 0%,
+      rgb(var(--nr-handoff-color) / 0.98) 8%,
+      rgb(var(--nr-handoff-color) / 0.88) 20%,
+      rgb(var(--nr-handoff-color) / 0.64) 36%,
+      rgb(var(--nr-handoff-color) / 0.36) 52%,
+      rgb(var(--nr-handoff-color) / 0.16) 68%,
+      rgb(var(--nr-handoff-color) / 0.04) 84%,
+      rgb(var(--nr-handoff-color) / 0) 100%) top / 100% var(--nr-handoff-depth) no-repeat,
     radial-gradient(circle at 70% 42%, rgba(35, 111, 205, 0.16), transparent 30%),
     linear-gradient(90deg, rgba(2, 4, 7, 0.78), rgba(2, 7, 14, 0.18) 48%, rgba(2, 4, 7, 0.68)),
     linear-gradient(180deg, rgba(2, 4, 7, 0.58), transparent 42%, rgba(2, 4, 7, 0.72));

@@ -239,21 +239,25 @@ test.describe("hero video lifecycle", () => {
     await expectProgress(video);
   });
 
-  test("releases the hero video offscreen and restores it when returning", async ({ page }) => {
+  test("pauses the hero video offscreen without resetting it and resumes when returning", async ({ page }) => {
     await page.setViewportSize({ width: 430, height: 932 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const video = page.locator("[data-testid='hero-section'] video");
     await expectPlaying(video);
+    const before = await video.evaluate(heroVideoState);
+    const sourceBeforeScroll = await video.getAttribute("src");
     await page.evaluate(() => window.scrollTo(0, document.querySelector("[data-testid='hero-section']").offsetHeight + 120));
 
     await expect.poll(() => video.evaluate((node) => ({
       paused: node.paused,
       source: node.getAttribute("src"),
-    }))).toEqual({ paused: true, source: null });
+    }))).toEqual({ paused: true, source: sourceBeforeScroll });
+    await expect.poll(() => video.evaluate((node) => node.currentTime)).toBeGreaterThanOrEqual(before.currentTime - 0.05);
 
     await page.evaluate(() => window.scrollTo(0, 0));
     await expectPlaying(video);
+    await expectProgress(video);
   });
 
   test("restarts playback after the page is shown again", async ({ page }) => {

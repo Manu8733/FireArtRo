@@ -207,10 +207,7 @@ export const HeroVideo = () => {
   }, [source, videoFailed]);
 
   return (
-    <div
-      className="hero-video-stage absolute inset-0 z-0 overflow-hidden"
-      style={{ "--hero-backdrop-image": `url("${poster || HERO_POSTER}")` }}
-    >
+    <div className="hero-video-stage absolute inset-0 z-0 overflow-hidden">
       {videoFailed ? (
         <img
           src={poster || HERO_POSTER}

@@ -130,7 +130,7 @@
 .fa-work__viewport {
   position: relative;
   z-index: 1;
-  width: min(100%, var(--nr-max));
+  width: min(100%, var(--nr-cinematic-max));
   height: 100%;
   margin-inline: auto;
   overflow: hidden;
@@ -160,7 +160,7 @@
   max-width: 10ch;
   margin-top: 1.15rem;
   font-family: "Sora", sans-serif;
-  font-size: clamp(3rem, 5.1vw, 5.4rem);
+  font-size: clamp(3rem, max(4.6vw, 3.4vmin), 7.25rem);
   font-weight: 480;
   line-height: 0.98;
 }
@@ -193,7 +193,7 @@
 
 .fa-work__card figure {
   position: relative;
-  height: min(63vh, 39rem);
+  height: min(68dvh, clamp(39rem, 36vw, 61rem));
   overflow: hidden;
   border-radius: 0;
   background: #0b1119;
@@ -229,7 +229,7 @@
 
 .fa-work__meta h3 {
   font-family: "Sora", sans-serif;
-  font-size: clamp(1.35rem, 2vw, 2.15rem);
+  font-size: clamp(1.35rem, max(1.6vw, 1.45vmin), 3rem);
   font-weight: 480;
 }
 
@@ -256,7 +256,7 @@
   max-width: 9ch;
   margin-top: 1.1rem;
   font-family: "Sora", sans-serif;
-  font-size: clamp(3rem, 5vw, 5.2rem);
+  font-size: clamp(3rem, max(4.6vw, 3.4vmin), 7.25rem);
   font-weight: 480;
   line-height: 0.98;
 }

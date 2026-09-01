@@ -7,6 +7,7 @@
   --fa-blue-soft: #8eb8ff;
   --nr-handoff-color: 3 7 12;
   --nr-handoff-depth: clamp(7rem, 24svh, 26rem);
+  --nr-cinematic-max: clamp(90rem, 72vw, 160rem);
   color: var(--fa-white);
   background: var(--fa-black);
 }
@@ -74,19 +75,8 @@
 }
 
 .hero-video-stage::before {
-  position: absolute;
-  z-index: 0;
-  inset: -10%;
-  content: "";
-  pointer-events: none;
-  opacity: 0.58;
-  background-color: #020407;
-  background-image: var(--hero-backdrop-image);
-  background-position: center;
-  background-size: cover;
-  filter: blur(42px) brightness(0.34) saturate(1.08) contrast(1.06);
-  transform: scale(1.1);
-  animation: hero-backdrop-breathe 18s ease-in-out infinite alternate;
+  content: none;
+  opacity: 0;
 }
 
 .hero-video-overlay {
@@ -121,17 +111,6 @@
   filter: brightness(1.1) saturate(1.04) contrast(1.02);
 }
 
-@keyframes hero-backdrop-breathe {
-  from { transform: scale(1.1); }
-  to { transform: scale(1.16); }
-}
-
-@media (hover: none), (pointer: coarse) {
-  .hero-video-stage::before {
-    animation: none;
-  }
-}
-
 .nr-hero__veil {
   position: absolute;
   z-index: -2;
@@ -159,6 +138,10 @@
   will-change: transform, opacity;
 }
 
+#acasa .nr-hero__content {
+  width: min(calc(100% - (2 * var(--nr-gutter))), var(--nr-cinematic-max));
+}
+
 .nr-hero__content > * {
   pointer-events: auto;
 }
@@ -182,6 +165,7 @@
   align-items: center;
   gap: 0.85rem;
   font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(0.72rem, max(0.52vw, 0.75vmin), 1rem);
   letter-spacing: 0.11em;
   font-synthesis: none;
 }
@@ -254,7 +238,7 @@
   margin: 1.25rem 0 0;
   color: rgba(244, 246, 251, 0.8);
   font-family: "Inter", sans-serif;
-  font-size: 1rem;
+  font-size: clamp(1rem, max(0.72vw, 1vmin), 1.35rem);
   font-weight: 500;
   line-height: 1.6;
   font-synthesis: none;
@@ -282,7 +266,7 @@
   backdrop-filter: none;
   font-family: "IBM Plex Mono", monospace;
   font-weight: 600;
-  font-size: 0.64rem;
+  font-size: clamp(0.64rem, max(0.44vw, 0.62vmin), 0.9rem);
   letter-spacing: 0.095em;
   text-transform: uppercase;
   font-synthesis: none;
@@ -853,7 +837,7 @@
 
 @media (min-width: 1200px) {
   .nr-hero__title {
-    font-size: min(clamp(4.4rem, 6.1vw, 6.5rem), 18cqi);
+    font-size: min(clamp(4.4rem, max(6.1vw, 5.4vmin), 8.5rem), 18cqi);
     line-height: 0.92;
   }
 }
@@ -1336,10 +1320,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-video-stage::before {
-    animation: none;
-  }
-
   .fa-service-stage__copy,
   .fa-gallery-preview__viewer figure > img {
     animation: none;

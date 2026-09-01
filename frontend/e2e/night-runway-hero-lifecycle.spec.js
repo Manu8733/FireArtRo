@@ -102,6 +102,7 @@ test.describe("hero video lifecycle", () => {
           objectPosition: surfaceStyle.objectPosition,
           backdropImage: backdropStyle.backgroundImage,
           backdropContent: backdropStyle.content,
+          backdropOpacity: Number.parseFloat(backdropStyle.opacity || "0"),
         };
       });
 
@@ -115,8 +116,9 @@ test.describe("hero video lifecycle", () => {
       expect(Math.abs(framing.stage.top - framing.hero.top)).toBeLessThanOrEqual(1);
       expect(Math.abs(framing.stage.right - framing.hero.right)).toBeLessThanOrEqual(1);
       expect(Math.abs(framing.stage.bottom - framing.hero.bottom)).toBeLessThanOrEqual(1);
-      expect(framing.backdropContent).not.toBe("none");
-      expect(framing.backdropImage).not.toBe("none");
+      expect(framing.backdropContent).toBe("none");
+      expect(framing.backdropImage).toBe("none");
+      expect(framing.backdropOpacity).toBe(0);
     }
   });
 
@@ -177,7 +179,7 @@ test.describe("hero video lifecycle", () => {
     const backdrop = await page.locator(".hero-video-stage").evaluate((stage) => (
       getComputedStyle(stage, "::before").backgroundImage
     ));
-    expect(backdrop).not.toBe("none");
+    expect(backdrop).toBe("none");
   });
 
   test("continues playback after a phone rotates into landscape", async ({ page }) => {

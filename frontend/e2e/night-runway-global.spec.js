@@ -151,7 +151,7 @@ test("keeps every public layout fluid, centered and free of horizontal overflow"
             return { className: node.className, left: rect.left, right: rect.right };
           })
           .filter(({ left, right }) => left < -1 || right > viewportWidth + 1);
-        const shellWidths = [...document.querySelectorAll(".nr-shell")]
+        const shellWidths = [...document.querySelectorAll(".nr-shell:not(.nr-hero__content)")]
           .map((node) => node.getBoundingClientRect().width)
           .filter((value) => value > 0);
         const readingOverflow = [...document.querySelectorAll(".fa-blog-body p")]

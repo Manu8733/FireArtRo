@@ -78,7 +78,7 @@ Run:
 
 ```powershell
 Set-Location frontend
-npx playwright test e2e/night-runway-full-bleed.spec.js --project=chromium
+npx playwright test e2e/night-runway-full-bleed.spec.js --project=desktop-chromium
 ```
 
 Expected: FAIL because the stage pseudo-layer opacity is `0.58` and the gallery is only `1440px` wide.
@@ -336,7 +336,7 @@ Run:
 
 ```powershell
 Set-Location frontend
-npx playwright test e2e/night-runway-full-bleed.spec.js --project=chromium
+npx playwright test e2e/night-runway-full-bleed.spec.js --project=desktop-chromium
 ```
 
 Expected: PASS with zero failed tests.
@@ -375,7 +375,7 @@ npx playwright test `
   e2e/night-runway-global.spec.js `
   e2e/night-runway-home.spec.js `
   e2e/night-runway-home-refactor.spec.js `
-  --project=chromium
+  --project=desktop-chromium
 ```
 
 Expected: zero failures.

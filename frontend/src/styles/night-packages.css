@@ -7,7 +7,7 @@
 
 .nr-package-comparator {
   position: relative;
-  min-height: 100svh;
+  min-height: 100dvh;
   padding: clamp(4.8rem, 5vw, 5.5rem) 0 clamp(2.25rem, 3.4vw, 3.5rem);
   overflow: hidden;
   background:
@@ -32,7 +32,7 @@
 
 .nr-package-comparator__header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.48fr);
+  grid-template-columns: minmax(0, 1.3fr) minmax(min(17rem, 35vw), 0.7fr);
   align-items: end;
   gap: 1.25rem;
   padding-inline: clamp(0.75rem, 1.8vw, 1.5rem);
@@ -594,7 +594,7 @@
 }
 
 .nr-package-video-dialog {
-  width: min(calc(100vw - 2.5rem), 72rem) !important;
+  width: min(calc(100vw - 2.5rem), calc((100dvh - 2rem) * 16 / 9), 72rem) !important;
   max-width: none !important;
   min-height: 0;
   aspect-ratio: 16 / 9;
@@ -778,15 +778,31 @@
   }
 
   .nr-package-video-dialog {
-    width: calc(100vw - 1rem) !important;
+    width: min(calc(100vw - 1rem), calc((100dvh - 1rem) * 16 / 9)) !important;
     border-radius: 6px;
   }
 
   .nr-package-video-dialog > button {
     top: 0.5rem !important;
     right: 0.5rem !important;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+@media (max-height: 42rem) and (orientation: landscape) {
+  .nr-package-comparator {
+    min-height: 100dvh;
+    padding-top: clamp(4.75rem, 13svh, 5.75rem);
+    padding-bottom: clamp(2rem, 5svh, 3rem);
+  }
+
+  .nr-package-comparator__header {
+    gap: 0.85rem clamp(1rem, 2.5vw, 1.75rem);
+  }
+
+  .nr-package-stage__main {
+    gap: clamp(0.85rem, 1.8vw, 1.35rem);
   }
 }
 

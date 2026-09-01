@@ -15,7 +15,7 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(hero).toBeVisible();
     const heroVideo = hero.locator("video");
     await expect(heroVideo).toHaveCount(1);
-    await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-desktop\.mp4/);
+    await expect.poll(() => heroVideo.evaluate((node) => node.currentSrc)).toMatch(/fireart-hero-wide\.mp4/);
     await expect(page.getByTestId("hero-primary-cta")).toHaveAttribute("href", /contact/);
     await expect(page.getByTestId("hero-secondary-cta")).toHaveAttribute("href", "/galerie");
   });
@@ -27,7 +27,7 @@ test.describe("FireArt scroll canvas landing", () => {
     const hero = page.getByTestId("hero-section");
     await expect(hero).toBeVisible();
     await expect(hero.locator("video")).toHaveCount(1);
-    await expect.poll(() => hero.locator("video").evaluate((node) => node.currentSrc)).toMatch(/fireart-drone-fireworks-cinematic-desktop\.mp4/);
+    await expect.poll(() => hero.locator("video").evaluate((node) => node.currentSrc)).toMatch(/fireart-hero-wide\.mp4/);
     await expect(page.getByTestId("hero-primary-cta")).toHaveAttribute("href", /contact/);
     await expect(page.getByTestId("hero-secondary-cta")).toHaveAttribute("href", "/galerie");
   });
@@ -121,7 +121,7 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(socialLinks.first()).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   });
 
-  test("keeps the hero video full bleed on wide desktop screens", async ({ page }) => {
+  test("keeps the hero video full bleed across the complete stage", async ({ page }) => {
     await page.setViewportSize({ width: 1914, height: 905 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 

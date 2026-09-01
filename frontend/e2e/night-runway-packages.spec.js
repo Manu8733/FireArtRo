@@ -56,6 +56,20 @@ test.describe("Night Runway package stage", () => {
     await expect(dialog.locator("iframe")).toHaveAttribute("src", /youtube-nocookie/);
   });
 
+  test("keeps the full preview and close control inside rotated viewports", async ({ page }) => {
+    await page.getByTestId("package-media").getByRole("button").click();
+    const dialog = page.getByTestId("package-video-dialog");
+    for (const [width, height] of [[375, 812], [844, 390], [568, 320], [1024, 600], [1512, 982], [5120, 1440]]) {
+      await page.setViewportSize({ width, height });
+      await expect.poll(() => dialog.evaluate((node) => {
+        const rect = node.getBoundingClientRect();
+        const close = node.querySelector(":scope > button").getBoundingClientRect();
+        return rect.top >= 0 && rect.bottom <= innerHeight && rect.left >= 0 && rect.right <= innerWidth
+          && close.top >= 0 && close.bottom <= innerHeight && close.height >= 44;
+      }), { message: `preview framing at ${width}x${height}` }).toBe(true);
+    }
+  });
+
   test("offers a dedicated custom quote path for Drone show", async ({ page }) => {
     const categories = page.getByRole("tablist", { name: "Categorii de spectacol" });
     await categories.getByRole("tab", { name: "Show drone" }).click();

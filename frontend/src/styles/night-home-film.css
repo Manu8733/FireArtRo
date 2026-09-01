@@ -80,8 +80,8 @@
 
 .fa-work__sticky {
   position: relative;
-  height: 100svh;
-  min-height: 43rem;
+  block-size: 100dvh;
+  min-block-size: 100svh;
   overflow: clip;
   isolation: isolate;
   backface-visibility: hidden;
@@ -119,7 +119,9 @@
 .fa-work__viewport {
   position: relative;
   z-index: 1;
+  width: min(100%, var(--nr-max));
   height: 100%;
+  margin-inline: auto;
   overflow: hidden;
 }
 
@@ -139,7 +141,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(7rem, 10vw, 11rem) max(var(--nr-gutter), 4vw);
+  padding: clamp(4rem, 10svh, 7rem) clamp(var(--nr-gutter), 4vw, 4.75rem);
   text-align: center;
 }
 
@@ -160,12 +162,22 @@
 .fa-work__card {
   width: calc(var(--nr-scene-width, 100vw) / 2);
   min-width: calc(var(--nr-scene-width, 100vw) / 2);
-  padding: 9vh 2.4vw 7vh;
+  padding: 9vh clamp(1rem, 2.4vw, 3rem) 7vh;
 }
 
 .fa-work__card-inner,
 .fa-work__outro-inner {
   will-change: transform;
+}
+
+.fa-work__card-inner {
+  width: min(100%, 72rem);
+  margin-inline: auto;
+}
+
+.fa-work__intro,
+.fa-work__outro-inner {
+  will-change: transform, opacity;
 }
 
 .fa-work__card figure {
@@ -218,7 +230,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8vh max(var(--nr-gutter), 4vw);
+  padding: 8vh clamp(var(--nr-gutter), 4vw, 4.75rem);
   text-align: center;
 }
 
@@ -771,8 +783,8 @@
 .fa-partners__sticky {
   position: sticky;
   top: 0;
-  height: 100svh;
-  min-height: 43rem;
+  block-size: 100dvh;
+  min-block-size: 100svh;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 50%, rgba(40, 103, 184, 0.2), transparent 31%),
@@ -907,14 +919,17 @@
   transform: translateX(0.25rem);
 }
 
-@media (max-width: 899px), (hover: none) and (pointer: coarse) {
+@media (max-width: 899px),
+  (hover: none) and (pointer: coarse),
+  (min-width: 900px) and (max-width: 1199px) and (orientation: portrait),
+  (min-width: 900px) and (max-width: 999px) and (max-height: 560px) and (orientation: landscape) {
   .fa-work {
     padding-block: 0;
   }
 
   .fa-work__sticky {
-    height: 100svh;
-    min-height: 43rem;
+    block-size: 100dvh;
+    min-block-size: 100svh;
     overflow: clip;
   }
 
@@ -932,8 +947,8 @@
   }
 
   .fa-work__intro {
-    width: var(--nr-scene-width, 100vw);
-    min-width: var(--nr-scene-width, 100vw);
+    width: calc(var(--nr-scene-width, 100vw) * 0.76);
+    min-width: calc(var(--nr-scene-width, 100vw) * 0.76);
     min-height: 0;
     height: 100%;
     justify-content: center;
@@ -963,8 +978,8 @@
   }
 
   .fa-work__outro {
-    width: var(--nr-scene-width, 100vw);
-    min-width: var(--nr-scene-width, 100vw);
+    width: calc(var(--nr-scene-width, 100vw) * 0.76);
+    min-width: calc(var(--nr-scene-width, 100vw) * 0.76);
     min-height: 0;
     height: 100%;
     justify-content: center;
@@ -1213,7 +1228,8 @@
   }
 }
 
-@media (max-width: 899px) and (orientation: landscape) {
+@media (max-width: 899px) and (orientation: landscape),
+  (min-width: 900px) and (max-width: 999px) and (max-height: 560px) and (orientation: landscape) {
   .fa-work__sticky {
     height: 100svh;
     min-height: 100svh;
@@ -1224,24 +1240,59 @@
     flex-direction: column;
     justify-content: center;
     box-sizing: border-box;
-    padding-block: 0.5rem;
+    height: 100%;
+    padding-block: calc(4rem + env(safe-area-inset-top)) 1rem;
   }
 
   .fa-work__card figure {
-    width: min(50vw, 28rem);
+    width: min(50vw, 28rem, calc((100svh - 10rem) * 1.5));
     height: auto;
     aspect-ratio: 3 / 2;
     margin-inline: auto;
   }
 
   .fa-work__meta {
-    width: min(50vw, 28rem);
+    width: min(50vw, 28rem, calc((100svh - 10rem) * 1.5));
     margin-inline: auto;
     padding-top: 0.7rem;
   }
 
   .fa-work__meta h3 {
     font-size: clamp(1.15rem, 3.3vw, 1.7rem);
+  }
+
+  .fa-work__intro,
+  .fa-work__outro {
+    padding-block: calc(4rem + env(safe-area-inset-top)) 1rem;
+  }
+
+  .fa-work__intro h2,
+  .fa-work__outro h3 {
+    font-size: clamp(2rem, 8svh, 3.6rem);
+  }
+}
+
+@media (min-width: 1000px) and (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .fa-work__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100%;
+    padding-block: calc(4rem + env(safe-area-inset-top)) 1rem;
+  }
+
+  .fa-work__card figure {
+    width: min(68vw, 48rem, calc((100svh - 10rem) * 1.5));
+    height: auto;
+    aspect-ratio: 3 / 2;
+    margin-inline: auto;
+  }
+
+  .fa-work__meta {
+    width: min(68vw, 48rem, calc((100svh - 10rem) * 1.5));
+    margin-inline: auto;
+    padding-top: 0.8rem;
   }
 }
 
@@ -1284,7 +1335,7 @@
   }
 
   .fa-partners__sticky {
-    min-height: 46rem;
+    min-height: min(46rem, 100svh);
     padding: 7rem var(--nr-gutter);
   }
 

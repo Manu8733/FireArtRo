@@ -14,7 +14,6 @@ export const Hero = () => {
     offset: ["start start", "end start"],
   });
 
-  const mediaScale = useTransform(scrollYProgress, [0, 1], [1, 1.045]);
   const copyY = useTransform(scrollYProgress, [0, 0.72], [0, -42]);
   const copyOpacity = useTransform(scrollYProgress, [0, 0.62, 0.88], [1, 1, 0]);
 
@@ -28,7 +27,6 @@ export const Hero = () => {
     >
       <motion.div
         className="nr-hero__media"
-        style={reduceMotion ? undefined : { scale: mediaScale }}
         aria-hidden="true"
       >
         <HeroVideo />

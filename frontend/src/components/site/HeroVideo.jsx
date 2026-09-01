@@ -1,16 +1,42 @@
 import { useEffect, useRef, useState } from "react";
 import { HERO_MEDIA, HERO_POSTER } from "@/data/content";
-import { useIsMobile, useMediaQuery } from "@/hooks/useMediaQuery";
+
+// Choose one composition atomically from the CSS viewport. Independent media
+// query updates can briefly select an intermediate source during rotation.
+const readMediaVariant = () => {
+  if (typeof window === "undefined") return "wide";
+  const ratio = window.innerWidth / Math.max(1, window.innerHeight);
+  if (ratio <= 1) {
+    if (ratio <= 0.5) return "mobile-tall";
+    return ratio >= 0.6 ? "tablet-portrait" : "mobile";
+  }
+  if (ratio <= 1.5) return "tablet-landscape";
+  return ratio >= 2 ? "ultrawide" : "wide";
+};
 
 export const HeroVideo = () => {
   const videoRef = useRef(null);
-  const mobile = useIsMobile();
-  const portraitTablet = useMediaQuery("(min-width: 768px) and (max-width: 1199px) and (orientation: portrait)");
-  const compactLandscape = useMediaQuery("(max-width: 1199px) and (max-height: 900px) and (orientation: landscape)");
-  const mediaVariant = compactLandscape ? "landscape" : mobile || portraitTablet ? "mobile" : "desktop";
-  const source = HERO_MEDIA[`${mediaVariant === "desktop" ? "" : mediaVariant}Src`] || HERO_MEDIA.src;
-  const poster = HERO_MEDIA[`${mediaVariant === "desktop" ? "" : mediaVariant}WebpSrc`] || HERO_MEDIA.webpSrc || HERO_POSTER;
+  const [mediaVariant, setMediaVariant] = useState(readMediaVariant);
+  const media = HERO_MEDIA.variants[mediaVariant] || HERO_MEDIA.variants.wide;
+  const source = media.src;
+  const poster = media.poster || HERO_POSTER;
+  const objectPosition = HERO_MEDIA.position || "50% 50%";
   const [videoFailed, setVideoFailed] = useState(false);
+
+  useEffect(() => {
+    const updateVariant = () => setMediaVariant(readMediaVariant());
+    updateVariant();
+    window.addEventListener("resize", updateVariant, { passive: true });
+    window.addEventListener("orientationchange", updateVariant, { passive: true });
+    window.addEventListener("pageshow", updateVariant);
+    window.visualViewport?.addEventListener("resize", updateVariant, { passive: true });
+    return () => {
+      window.removeEventListener("resize", updateVariant);
+      window.removeEventListener("orientationchange", updateVariant);
+      window.removeEventListener("pageshow", updateVariant);
+      window.visualViewport?.removeEventListener("resize", updateVariant);
+    };
+  }, []);
 
   useEffect(() => {
     setVideoFailed(false);
@@ -20,6 +46,7 @@ export const HeroVideo = () => {
     if (videoFailed) return undefined;
     const video = videoRef.current;
     if (!video) return undefined;
+    const scene = video.closest("#acasa") || video;
     let disposed = false;
     let lifecycleHidden = false;
     let mediaVisible = true;
@@ -38,7 +65,7 @@ export const HeroVideo = () => {
       if (disposed || lifecycleHidden || !mediaVisible || (!force && document.visibilityState === "hidden")) return;
       const promise = video.play();
       promise?.catch(() => {
-        if (disposed) return;
+        if (disposed || lifecycleHidden || !mediaVisible) return;
         clearRetry();
         retryTimer = window.setTimeout(attemptPlayback, 320);
       });
@@ -46,9 +73,15 @@ export const HeroVideo = () => {
 
     const recoverPlayback = (force = false) => {
       if (disposed || lifecycleHidden || !mediaVisible || (!force && document.visibilityState === "hidden")) return;
-      if (video.readyState < 2 || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+      if (!video.getAttribute("src")) {
+        video.setAttribute("src", source);
+        video.load();
+      } else if (video.error || video.networkState === HTMLMediaElement.NETWORK_EMPTY
+        || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
         video.load();
       }
+      // A slow request is still a valid request. Calling load() for readyState 0
+      // repeatedly aborts that request and can leave Safari on its poster forever.
       attemptPlayback(force);
     };
 
@@ -61,25 +94,26 @@ export const HeroVideo = () => {
       }
     };
 
-    const restorePlayback = () => {
-      if (!video.getAttribute("src")) {
-        video.setAttribute("src", source);
-        video.load();
-      }
-      recoverPlayback();
+    const syncSceneVisibility = (force = false) => {
+      const rect = scene.getBoundingClientRect();
+      mediaVisible = rect.bottom > 0 && rect.top < window.innerHeight
+        && rect.right > 0 && rect.left < window.innerWidth;
+      if (mediaVisible) recoverPlayback(force);
+      else releasePlayback();
     };
 
     playbackWatchdog = window.setInterval(() => {
-      if (disposed || lifecycleHidden || !video.paused) return;
-      if (video.readyState >= 2) attemptPlayback(true);
-      else if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) recoverPlayback(true);
+      if (disposed || lifecycleHidden) return;
+      // Reconcile against the stable section as well as IntersectionObserver:
+      // restored pages can miss a video-element intersection notification.
+      syncSceneVisibility();
     }, 1_200);
 
     const scheduleLifecycleRecovery = () => {
       [120, 650, 1400, 2600, 5000].forEach((delay) => {
         const timer = window.setTimeout(() => {
           lifecycleTimers.delete(timer);
-          recoverPlayback(true);
+          syncSceneVisibility(true);
         }, delay);
         lifecycleTimers.add(timer);
       });
@@ -88,7 +122,7 @@ export const HeroVideo = () => {
     const onVisibilityChange = () => {
       lifecycleHidden = document.visibilityState === "hidden";
       if (lifecycleHidden) video.pause();
-      else recoverPlayback();
+      else syncSceneVisibility();
     };
 
     const onPageHide = () => {
@@ -97,16 +131,17 @@ export const HeroVideo = () => {
     };
     const onPageShow = () => {
       lifecycleHidden = false;
-      recoverPlayback(true);
+      syncSceneVisibility(true);
       scheduleLifecycleRecovery();
     };
     const onFocus = () => {
-      if (!lifecycleHidden) recoverPlayback(true);
+      if (!lifecycleHidden) syncSceneVisibility(true);
     };
     const onOnline = () => {
-      if (!lifecycleHidden) recoverPlayback(true);
+      if (!lifecycleHidden) syncSceneVisibility(true);
     };
     const onError = () => {
+      if (disposed || !mediaVisible || !video.getAttribute("src")) return;
       if (errorAttempts < 2) {
         errorAttempts += 1;
         clearRetry();
@@ -118,23 +153,20 @@ export const HeroVideo = () => {
     const onLoadedMetadata = () => attemptPlayback();
     const onLoadedData = () => attemptPlayback();
     const onCanPlay = () => attemptPlayback();
+    const onPlaying = () => {
+      clearRetry();
+    };
     const onStalled = () => recoverPlayback();
 
     if (typeof IntersectionObserver !== "undefined") {
-      visibilityObserver = new IntersectionObserver(([entry]) => {
-        const nextVisible = entry.isIntersecting && entry.intersectionRatio > 0;
-        if (nextVisible === mediaVisible) return;
-        mediaVisible = nextVisible;
-        if (mediaVisible) restorePlayback();
-        else releasePlayback();
-      }, { threshold: [0, 0.01] });
-      visibilityObserver.observe(video);
+      visibilityObserver = new IntersectionObserver(() => syncSceneVisibility(), { threshold: [0, 0.01] });
+      visibilityObserver.observe(scene);
     }
 
     video.addEventListener("loadedmetadata", onLoadedMetadata);
     video.addEventListener("loadeddata", onLoadedData);
     video.addEventListener("canplay", onCanPlay);
-    video.addEventListener("playing", clearRetry);
+    video.addEventListener("playing", onPlaying);
     video.addEventListener("stalled", onStalled);
     video.addEventListener("error", onError);
     document.addEventListener("visibilitychange", onVisibilityChange);
@@ -143,7 +175,7 @@ export const HeroVideo = () => {
     window.addEventListener("focus", onFocus);
     window.addEventListener("online", onOnline);
 
-    recoverPlayback();
+    syncSceneVisibility();
     scheduleLifecycleRecovery();
     return () => {
       disposed = true;
@@ -156,7 +188,7 @@ export const HeroVideo = () => {
       video.removeEventListener("loadedmetadata", onLoadedMetadata);
       video.removeEventListener("loadeddata", onLoadedData);
       video.removeEventListener("canplay", onCanPlay);
-      video.removeEventListener("playing", clearRetry);
+      video.removeEventListener("playing", onPlaying);
       video.removeEventListener("stalled", onStalled);
       video.removeEventListener("error", onError);
       document.removeEventListener("visibilitychange", onVisibilityChange);
@@ -168,15 +200,19 @@ export const HeroVideo = () => {
   }, [source, videoFailed]);
 
   return (
-    <div className="hero-video-stage absolute inset-0 z-0 overflow-hidden">
+    <div
+      className="hero-video-stage absolute inset-0 z-0 overflow-hidden"
+      style={{ "--hero-backdrop-image": `url("${poster || HERO_POSTER}")` }}
+    >
       {videoFailed ? (
         <img
           src={poster || HERO_POSTER}
           alt="Spectacol de drone și artificii FireArtRo"
-          width={mediaVariant === "mobile" ? "1080" : "1920"}
-          height={mediaVariant === "mobile" ? "1920" : "1080"}
+          width={media.width}
+          height={media.height}
           className="hero-media-surface hero-media-webp absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: HERO_MEDIA.position || "52% center" }}
+          style={{ objectPosition }}
+          data-crop-profile={mediaVariant}
           fetchPriority="high"
           decoding="async"
           loading="eager"
@@ -193,8 +229,9 @@ export const HeroVideo = () => {
           playsInline
           preload="metadata"
           className="hero-media-surface hero-media-video absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: HERO_MEDIA.position || "52% center" }}
+          style={{ objectPosition }}
           data-media-variant={mediaVariant}
+          data-crop-profile={mediaVariant}
           aria-label="Spectacol video cu drone și artificii FireArtRo"
         />
       )}

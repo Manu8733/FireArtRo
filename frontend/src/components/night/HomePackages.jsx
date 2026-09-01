@@ -38,6 +38,7 @@ export default function HomePackages() {
     if (!section) return undefined;
 
     const revealFocusedPanel = (event) => {
+      if (!event.target?.matches?.(":focus-visible")) return;
       const panel = event.target?.closest?.("[data-package-panel]");
       if (!panel || !section.contains(panel)) return;
 

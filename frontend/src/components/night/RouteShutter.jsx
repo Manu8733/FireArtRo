@@ -21,6 +21,15 @@ export default function RouteShutter({ children }) {
   const reduceMotion = useReducedMotion();
 
   const finishTransition = useCallback(() => {
+    // The timeout can finish navigation while WebKit has suspended GSAP.
+    // Dispose the old timeline before it gets another frame and reopens the bands.
+    const timeline = timelineRef.current;
+    timelineRef.current = null;
+    if (timeline) {
+      timeline.eventCallback("onComplete", null);
+      timeline.eventCallback("onInterrupt", null);
+      timeline.kill();
+    }
     if (navigationFallbackRef.current) {
       window.clearTimeout(navigationFallbackRef.current);
       navigationFallbackRef.current = null;
@@ -36,15 +45,7 @@ export default function RouteShutter({ children }) {
   }, []);
 
   const resetTransition = useCallback(() => {
-    timelineRef.current?.kill();
-    timelineRef.current = null;
     navigationIssuedRef.current = true;
-
-    if (overlayRef.current) {
-      gsap.set(overlayRef.current, { visibility: "hidden", pointerEvents: "none" });
-    }
-    const bands = bandRefs.current.filter(Boolean);
-    if (bands.length) gsap.set(bands, { scaleY: 0 });
     finishTransition();
   }, [finishTransition]);
 

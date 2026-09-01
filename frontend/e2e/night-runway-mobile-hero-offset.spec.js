@@ -21,10 +21,12 @@ test("gives the mobile hero copy clear space below the navigation", async ({ pag
   const eyebrowBox = await eyebrow.boundingBox();
   const titleBox = await title.boundingBox();
   const primaryCtaBox = await primaryCta.boundingBox();
+  const navigationBox = await page.getByTestId("main-navbar").boundingBox();
 
-  expect(eyebrowBox?.y).toBeGreaterThanOrEqual(210);
+  expect(eyebrowBox.y - navigationBox.y - navigationBox.height).toBeGreaterThanOrEqual(24);
   expect(titleBox?.y).toBeGreaterThan(eyebrowBox?.y || 0);
   expect(primaryCtaBox?.y).toBeGreaterThan(titleBox?.y || 0);
+  expect(primaryCtaBox.y + primaryCtaBox.height).toBeLessThanOrEqual(844 - 60);
 
   await page.screenshot({ path: testInfo.outputPath("mobile-hero-copy-lowered.png") });
 });

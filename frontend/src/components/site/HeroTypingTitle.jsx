@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 const KEYWORDS = ["lumină.", "mișcare.", "aer.", "ritm."];
@@ -12,44 +12,73 @@ const sliceCharacters = (value, length) => Array.from(value).slice(0, length).jo
 
 export const HeroTypingTitle = () => {
   const reduceMotion = useReducedMotion();
-  const initialCharacterPending = useRef(true);
   const [wordIndex, setWordIndex] = useState(0);
   const [displayedWord, setDisplayedWord] = useState("");
   const [phase, setPhase] = useState("typing");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (reduceMotion) return undefined;
 
-    const targetWord = KEYWORDS[wordIndex];
-    const targetLength = Array.from(targetWord).length;
-    const displayedLength = Array.from(displayedWord).length;
-    let timeoutId;
+    let timeoutId = 0;
+    let active = true;
+    let currentWordIndex = 0;
+    let currentWord = "";
+    let currentPhase = "typing";
 
-    if (phase === "typing") {
-      const delay = initialCharacterPending.current ? INITIAL_DELAY : TYPE_DELAY;
+    const publish = () => {
+      if (!active) return;
+      setWordIndex(currentWordIndex);
+      setDisplayedWord(currentWord);
+      setPhase(currentPhase);
+    };
+
+    const schedule = (delay) => {
       timeoutId = window.setTimeout(() => {
-        initialCharacterPending.current = false;
-        const nextLength = displayedLength + 1;
-        setDisplayedWord(sliceCharacters(targetWord, nextLength));
-        if (nextLength === targetLength) setPhase("holding");
+        if (!active) return;
+
+        const targetWord = KEYWORDS[currentWordIndex];
+
+        if (currentPhase === "typing") {
+          const nextLength = Array.from(currentWord).length + 1;
+          currentWord = sliceCharacters(targetWord, nextLength);
+          if (nextLength === Array.from(targetWord).length) currentPhase = "holding";
+          publish();
+          schedule(currentPhase === "holding" ? HOLD_DELAY : TYPE_DELAY);
+          return;
+        }
+
+        if (currentPhase === "holding") {
+          currentPhase = "deleting";
+          publish();
+          schedule(DELETE_DELAY);
+          return;
+        }
+
+        if (currentPhase === "deleting") {
+          const nextLength = Math.max(0, Array.from(currentWord).length - 1);
+          currentWord = sliceCharacters(targetWord, nextLength);
+          if (nextLength === 0) currentPhase = "paused";
+          publish();
+          schedule(currentPhase === "paused" ? PAUSE_DELAY : DELETE_DELAY);
+          return;
+        }
+
+        currentWordIndex = (currentWordIndex + 1) % KEYWORDS.length;
+        currentWord = "";
+        currentPhase = "typing";
+        publish();
+        schedule(TYPE_DELAY);
       }, delay);
-    } else if (phase === "holding") {
-      timeoutId = window.setTimeout(() => setPhase("deleting"), HOLD_DELAY);
-    } else if (phase === "deleting") {
-      timeoutId = window.setTimeout(() => {
-        const nextLength = displayedLength - 1;
-        setDisplayedWord(sliceCharacters(targetWord, nextLength));
-        if (nextLength === 0) setPhase("paused");
-      }, DELETE_DELAY);
-    } else {
-      timeoutId = window.setTimeout(() => {
-        setWordIndex((currentIndex) => (currentIndex + 1) % KEYWORDS.length);
-        setPhase("typing");
-      }, PAUSE_DELAY);
-    }
+    };
 
-    return () => window.clearTimeout(timeoutId);
-  }, [displayedWord, phase, reduceMotion, wordIndex]);
+    publish();
+    schedule(INITIAL_DELAY);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeoutId);
+    };
+  }, [reduceMotion]);
 
   const visualWord = reduceMotion ? KEYWORDS[0] : displayedWord;
   const caretVisible = !reduceMotion && (phase === "typing" || phase === "deleting");

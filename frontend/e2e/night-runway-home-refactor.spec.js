@@ -35,6 +35,19 @@ const necessaryConsent = {
   expiresAt: "2099-08-31T00:00:00.000Z",
 };
 
+async function scrollInstantly(page, top) {
+  await page.evaluate(async (nextTop) => {
+    const root = document.documentElement;
+    const previousBehavior = root.style.scrollBehavior;
+
+    root.style.scrollBehavior = "auto";
+    window.scrollTo({ top: nextTop, behavior: "auto" });
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+    root.style.scrollBehavior = previousBehavior;
+  }, top);
+}
+
 test.describe("FireArt homepage structural refactor", () => {
   test("routes homepage anchors from gallery and keeps the active indicator consistent", async ({ page }) => {
     await page.goto("/galerie", { waitUntil: "domcontentloaded" });
@@ -104,6 +117,7 @@ test.describe("FireArt homepage structural refactor", () => {
   });
 
   test("lays out the text-only package triptych without viewport overflow", async ({ page }) => {
+    test.setTimeout(60_000);
     await page.addInitScript((consent) => {
       window.localStorage.setItem("fireartro-cookie-consent-v1", JSON.stringify(consent));
     }, necessaryConsent);
@@ -238,32 +252,149 @@ test.describe("FireArt homepage structural refactor", () => {
     }
   });
 
-  test("keeps every mobile gallery panel readable at full viewport width", async ({ page }) => {
+  test("keeps mobile gallery photos full-width and gives the outro a readable handoff width", async ({ page }) => {
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 834, height: 1194 },
+      { width: 912, height: 1368 },
+      { width: 1024, height: 1366 },
     ]) {
       await page.setViewportSize(viewport);
       await page.goto("/", { waitUntil: "domcontentloaded" });
 
-      const panels = page.getByTestId("home-gallery").locator("[data-gallery-panel]");
-      await expect(panels).toHaveCount(4);
-      for (const panel of await panels.all()) {
-        const box = await panel.boundingBox();
-        expect(Math.abs(box.width - viewport.width)).toBeLessThanOrEqual(2);
+      const gallery = page.getByTestId("home-gallery");
+      const cards = gallery.locator("[data-gallery-item]");
+      const outro = gallery.locator(".fa-work__outro");
+      await expect(cards).toHaveCount(3);
+      const sceneWidth = await page.getByTestId("home-gallery").locator(".fa-work__viewport")
+        .evaluate((node) => node.clientWidth);
+      for (const card of await cards.all()) {
+        const box = await card.boundingBox();
+        expect(Math.abs(box.width - sceneWidth)).toBeLessThanOrEqual(2);
       }
+      const outroBox = await outro.boundingBox();
+      expect(outroBox.width / sceneWidth).toBeGreaterThanOrEqual(0.72);
+      expect(outroBox.width / sceneWidth).toBeLessThanOrEqual(0.8);
+    }
+  });
+
+  test("keeps the final mobile photo visible while the gallery outro settles", async ({ page }) => {
+    await page.addInitScript((consent) => {
+      window.localStorage.setItem("fireartro-cookie-consent-v1", JSON.stringify(consent));
+    }, necessaryConsent);
+    await page.setViewportSize({ width: 834, height: 1194 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const gallery = page.getByTestId("home-gallery");
+    const endPosition = await gallery.locator(".fa-work__sticky").evaluate((sticky) => {
+      const holder = sticky.parentElement?.classList.contains("pin-spacer") ? sticky.parentElement : sticky;
+      return holder.getBoundingClientRect().top + window.scrollY + holder.offsetHeight - window.innerHeight;
+    });
+    await scrollInstantly(page, endPosition);
+
+    const overlap = await gallery.evaluate((section) => {
+      const viewport = section.querySelector(".fa-work__viewport").getBoundingClientRect();
+      const lastCard = section.querySelector("[data-gallery-item]:last-of-type").getBoundingClientRect();
+      const outro = section.querySelector(".fa-work__outro").getBoundingClientRect();
+      const visibleWidth = (rect) => Math.max(0, Math.min(rect.right, viewport.right) - Math.max(rect.left, viewport.left));
+      return {
+        sceneWidth: viewport.width,
+        lastCard: visibleWidth(lastCard),
+        outro: visibleWidth(outro),
+      };
+    });
+
+    expect(overlap.lastCard / overlap.sceneWidth).toBeGreaterThanOrEqual(0.18);
+    expect(overlap.outro / overlap.sceneWidth).toBeGreaterThanOrEqual(0.7);
+  });
+
+  test("holds back the gallery outro copy until its mobile panel is readable", async ({ page }) => {
+    await page.addInitScript((consent) => {
+      window.localStorage.setItem("fireartro-cookie-consent-v1", JSON.stringify(consent));
+    }, necessaryConsent);
+    await page.setViewportSize({ width: 834, height: 1194 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const gallery = page.getByTestId("home-gallery");
+    const range = await gallery.locator(".fa-work__sticky").evaluate((sticky) => {
+      const holder = sticky.parentElement?.classList.contains("pin-spacer") ? sticky.parentElement : sticky;
+      return {
+        start: holder.getBoundingClientRect().top + window.scrollY,
+        distance: Math.max(1, holder.offsetHeight - window.innerHeight),
+      };
+    });
+
+    await scrollInstantly(page, range.start + range.distance * 0.9);
+    await expect(gallery.locator(".fa-work__outro-inner")).toHaveCSS("opacity", /^(0|0\.\d+)$/);
+    const enteringOpacity = Number.parseFloat(
+      await gallery.locator(".fa-work__outro-inner").evaluate((node) => getComputedStyle(node).opacity),
+    );
+    expect(enteringOpacity).toBeLessThanOrEqual(0.15);
+
+    await scrollInstantly(page, range.start + range.distance * 0.93);
+    const settlingOpacity = Number.parseFloat(
+      await gallery.locator(".fa-work__outro-inner").evaluate((node) => getComputedStyle(node).opacity),
+    );
+    expect(settlingOpacity).toBeGreaterThanOrEqual(0.25);
+    expect(settlingOpacity).toBeLessThanOrEqual(0.55);
+
+    await scrollInstantly(page, range.start + range.distance);
+    await expect(gallery.locator(".fa-work__outro-inner")).toHaveCSS("opacity", "1");
+  });
+
+  test("recalculates the gallery frame immediately after phone and tablet rotation", async ({ page }) => {
+    await page.setViewportSize({ width: 430, height: 932 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    for (const viewport of [
+      { width: 932, height: 430 },
+      { width: 1024, height: 1366 },
+      { width: 1366, height: 1024 },
+      { width: 430, height: 932 },
+    ]) {
+      await page.setViewportSize(viewport);
+      const gallery = page.getByTestId("home-gallery");
+
+      await expect.poll(async () => gallery.evaluate((section) => {
+        const viewportNode = section.querySelector(".fa-work__viewport");
+        const panel = section.querySelector("[data-gallery-panel]");
+        const sceneWidth = Number.parseFloat(getComputedStyle(section).getPropertyValue("--nr-scene-width"));
+        const compactScene = window.matchMedia(
+          "(max-width: 899px), (hover: none) and (pointer: coarse), "
+            + "(min-width: 900px) and (max-width: 1199px) and (orientation: portrait), "
+            + "(min-width: 900px) and (max-width: 999px) and (max-height: 560px) and (orientation: landscape)",
+        ).matches;
+        const expectedPanelWidth = viewportNode.clientWidth / (compactScene ? 1 : 2);
+        return Math.max(
+          Math.abs(sceneWidth - viewportNode.clientWidth),
+          Math.abs(panel.getBoundingClientRect().width - expectedPanelWidth),
+        );
+      })).toBeLessThanOrEqual(2);
+
+      const overflow = await page.evaluate(() => ({
+        client: document.documentElement.clientWidth,
+        scroll: document.documentElement.scrollWidth,
+      }));
+      expect(overflow.scroll).toBeLessThanOrEqual(overflow.client + 1);
     }
   });
 
   test("keeps gallery photos framed for touch landscape phones", async ({ page }) => {
-    await page.setViewportSize({ width: 844, height: 390 });
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    for (const viewport of [
+      { width: 568, height: 320 },
+      { width: 844, height: 390 },
+      { width: 932, height: 430 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/", { waitUntil: "domcontentloaded" });
 
-    const figures = page.getByTestId("home-gallery").locator("[data-gallery-item] figure");
-    for (const figure of await figures.all()) {
-      const box = await figure.boundingBox();
-      expect(box.width / box.height, "landscape phone photos should not become ultra-wide crops").toBeLessThanOrEqual(2.1);
-      expect(box.height, "landscape phone photos should retain a substantial frame").toBeGreaterThanOrEqual(250);
+      const figures = page.getByTestId("home-gallery").locator("[data-gallery-item] figure");
+      for (const figure of await figures.all()) {
+        const box = await figure.boundingBox();
+        expect(box.width / box.height, "landscape phone photos should not become ultra-wide crops").toBeLessThanOrEqual(2.1);
+        expect(box.height, "photos should use the available short-viewport height").toBeGreaterThanOrEqual(viewport.height * 0.45);
+        expect(box.height, "photos must leave room for navigation and captions").toBeLessThanOrEqual(viewport.height - 150);
+      }
     }
   });
 

@@ -210,14 +210,12 @@ export const Packages = ({ items }) => {
                   onClick={() => chooseVariant(index)}
                   onKeyDown={(event) => handleVariantKeyDown(event, index)}
                 >
-                  <span className="nr-package-variant-strip__media">
-                    <img src={getPackageVisual(item)} alt="" loading="lazy" decoding="async" />
-                    {item.videoUrl && <Play aria-hidden="true" fill="currentColor" />}
-                  </span>
+                  <span className="nr-package-variant-strip__index">{String(index + 1).padStart(2, "0")}</span>
                   <span className="nr-package-variant-strip__copy">
                     <small>{item.category}</small>
                     <strong>{item.title}</strong>
                   </span>
+                  <ArrowUpRight aria-hidden="true" />
                 </button>
               ))}
             </div>

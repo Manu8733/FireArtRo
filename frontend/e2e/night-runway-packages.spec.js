@@ -51,7 +51,7 @@ test.describe("Night Runway package stage", () => {
     expect((mediaBox?.y || 0) - ((railBox?.y || 0) + (railBox?.height || 0))).toBeLessThan(40);
   });
 
-  test("leads with the active package before the variant rail on mobile", async ({ page }) => {
+  test("lists package names before the active preview on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 467, height: 872 });
     await page.reload({ waitUntil: "domcontentloaded" });
 
@@ -60,7 +60,8 @@ test.describe("Night Runway package stage", () => {
     const stageBox = await stage.boundingBox();
     const railBox = await rail.boundingBox();
 
-    expect(stageBox?.y).toBeLessThan(railBox?.y || 0);
+    expect(railBox?.y).toBeLessThan(stageBox?.y || 0);
+    await expect(rail.locator("img")).toHaveCount(0);
   });
 
   test("opens the selected package preview in an expanded video dialog", async ({ page }) => {

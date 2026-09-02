@@ -138,7 +138,7 @@ test.describe("FireArt scroll canvas landing", () => {
     await expect(page.locator(".hero-media-video")).toHaveCSS("object-fit", "cover");
   });
 
-  test("uses a larger right-shifted desktop title without moving the mobile gutter", async ({ page }) => {
+  test("keeps the desktop title in its left safe zone without moving the mobile gutter", async ({ page }) => {
     await page.setViewportSize({ width: 1914, height: 905 });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
@@ -146,7 +146,8 @@ test.describe("FireArt scroll canvas landing", () => {
     const desktopTitleBox = await desktopTitle.boundingBox();
     const desktopFontSize = Number.parseFloat(await desktopTitle.evaluate((node) => getComputedStyle(node).fontSize));
 
-    expect(desktopTitleBox?.x).toBeGreaterThanOrEqual(250);
+    expect(desktopTitleBox?.x).toBeGreaterThanOrEqual(1914 * 0.04);
+    expect(desktopTitleBox?.x).toBeLessThanOrEqual(1914 * 0.12);
     expect(desktopFontSize).toBeGreaterThanOrEqual(96);
 
     await page.setViewportSize({ width: 430, height: 932 });
@@ -327,8 +328,8 @@ test.describe("FireArt scroll canvas landing", () => {
       return pinSpacer?.classList.contains("pin-spacer") ? pinSpacer.getBoundingClientRect().height : 0;
     });
 
-    expect(galleryPinHeight).toBeGreaterThan(2700);
-    expect(galleryPinHeight).toBeLessThan(3100);
+    expect(galleryPinHeight / 900).toBeGreaterThan(2.3);
+    expect(galleryPinHeight / 900).toBeLessThan(2.85);
   });
 
   test("keeps the about section anonymous without team portraits or member interaction", async ({ page }) => {

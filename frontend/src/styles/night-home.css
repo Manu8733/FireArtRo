@@ -7,7 +7,8 @@
   --fa-blue-soft: #8eb8ff;
   --nr-handoff-color: 3 7 12;
   --nr-handoff-depth: clamp(7rem, 24svh, 26rem);
-  --nr-cinematic-max: clamp(90rem, 72vw, 160rem);
+  --nr-cinematic-max: var(--nr-cinematic-width);
+  --nr-gallery-panel-width: clamp(42rem, 54vw, 180rem);
   color: var(--fa-white);
   background: var(--fa-black);
 }
@@ -32,7 +33,7 @@
   position: absolute;
   z-index: 1;
   right: 0;
-  bottom: 0;
+  bottom: -1px;
   left: 0;
   height: var(--nr-handoff-depth);
   content: "";

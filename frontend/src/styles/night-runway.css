@@ -8,10 +8,13 @@
   --nr-line: #385578;
   --nr-muted: #97a6bc;
   --nr-transition: #010102;
-  --nr-section-space: clamp(4rem, 7vw, 8rem);
-  --nr-gutter: clamp(1rem, 2.5vw, 4rem);
-  --nr-max: 90rem;
-  --nr-control-size: clamp(2.75rem, 3vw, 3.25rem);
+  --nr-section-space: clamp(4rem, 7vmin, 12rem);
+  --nr-gutter: clamp(1rem, 2.5vw, 8rem);
+  --nr-readable-max: 72ch;
+  --nr-layout-max: clamp(90rem, 82vw, 220rem);
+  --nr-cinematic-width: 100vw;
+  --nr-max: var(--nr-layout-max);
+  --nr-control-size: clamp(3rem, calc(2rem + max(0.6vmin, 0.16vw)), 4.5rem);
 }
 
 html {
@@ -32,6 +35,7 @@ body {
 body:has(main[data-design="night-runway"]) {
   color: var(--nr-paper);
   background: var(--nr-obsidian);
+  font-size: clamp(0.9375rem, calc(0.7rem + max(0.35vmin, 0.14vw)), 1.25rem);
 }
 
 main[data-design="night-runway"] {
@@ -85,12 +89,12 @@ body:has(main[data-design="night-runway"]) .mobile-nav-sheet {
 
 @media (min-width: 1024px) {
   body:has(main[data-design="night-runway"]) .site-navbar-links > a {
-    padding-inline: clamp(0.54rem, 0.82vw, 0.76rem);
-    font-size: clamp(0.75rem, 0.44vw + 0.36rem, 0.92rem);
+    padding-inline: clamp(0.54rem, 0.82vw, 1.35rem);
+    font-size: clamp(0.75rem, calc(0.5rem + max(0.49vmin, 0.2vw)), 1.25rem);
   }
 
   body:has(main[data-design="night-runway"]) .site-navbar-brand img {
-    height: clamp(2.3rem, 1.4vw + 1.3rem, 3.1rem);
+    height: clamp(2.3rem, calc(1.3rem + max(1.35vmin, 0.45vw)), 4.75rem);
   }
 
   body:has(main[data-design="night-runway"]) .desktop-social-dock {
@@ -98,13 +102,13 @@ body:has(main[data-design="night-runway"]) .mobile-nav-sheet {
   }
 
   body:has(main[data-design="night-runway"]) .desktop-social-dock .social-dock-link {
-    width: 3.08rem;
-    height: 3.08rem;
+    width: var(--nr-control-size);
+    height: var(--nr-control-size);
   }
 
   body:has(main[data-design="night-runway"]) .desktop-social-dock .social-dock-icon {
-    width: 1.18rem;
-    height: 1.18rem;
+    width: clamp(1.18rem, calc(0.75rem + 0.45vmin), 1.9rem);
+    height: clamp(1.18rem, calc(0.75rem + 0.45vmin), 1.9rem);
   }
 }
 
@@ -151,13 +155,25 @@ body:has(main[data-design="night-runway"]) .mobile-nav-sheet {
 }
 
 .nr-shell {
-  width: min(calc(100% - (2 * var(--nr-gutter))), var(--nr-max));
+  width: min(calc(100% - (2 * var(--nr-gutter))), var(--nr-layout-max));
   min-width: 0;
   margin-inline: auto;
 }
 
+.nr-readable {
+  width: min(calc(100% - (2 * var(--nr-gutter))), var(--nr-readable-max));
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.nr-cinematic {
+  width: var(--nr-cinematic-width);
+  max-width: none;
+  margin-inline: calc(50% - 50vw);
+}
+
 body:has(main[data-design="night-runway"]) .site-navbar-layout {
-  width: min(100%, var(--nr-max));
+  width: min(100%, var(--nr-layout-max));
   min-width: 0;
 }
 
@@ -175,7 +191,7 @@ body:has(main[data-design="night-runway"]) .site-navbar-layout {
   max-width: 12ch;
   color: var(--nr-paper);
   font-family: "Sora", sans-serif;
-  font-size: clamp(2.6rem, 5vw, 4.8rem);
+  font-size: clamp(2.6rem, max(5vw, 4.2vmin), 8rem);
   font-weight: 520;
   line-height: 0.98;
   letter-spacing: 0;
@@ -183,10 +199,10 @@ body:has(main[data-design="night-runway"]) .site-navbar-layout {
 }
 
 .nr-lead {
-  max-width: 42rem;
+  max-width: min(var(--nr-readable-max), 42rem);
   color: var(--nr-muted);
   font-family: "Sora", sans-serif;
-  font-size: clamp(0.95rem, 1.25vw, 1.08rem);
+  font-size: clamp(0.95rem, calc(0.76rem + max(0.36vmin, 0.1vw)), 1.35rem);
   line-height: 1.6;
 }
 

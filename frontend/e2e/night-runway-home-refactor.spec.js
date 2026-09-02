@@ -252,7 +252,7 @@ test.describe("FireArt homepage structural refactor", () => {
     }
   });
 
-  test("keeps mobile gallery photos full-width and gives the outro a readable handoff width", async ({ page }) => {
+  test("keeps mobile gallery photos and the outro full-width", async ({ page }) => {
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 834, height: 1194 },
@@ -273,8 +273,8 @@ test.describe("FireArt homepage structural refactor", () => {
         expect(Math.abs(box.width - sceneWidth)).toBeLessThanOrEqual(2);
       }
       const outroBox = await outro.boundingBox();
-      expect(outroBox.width / sceneWidth).toBeGreaterThanOrEqual(0.72);
-      expect(outroBox.width / sceneWidth).toBeLessThanOrEqual(0.8);
+      expect(outroBox.width / sceneWidth).toBeGreaterThanOrEqual(0.98);
+      expect(outroBox.width / sceneWidth).toBeLessThanOrEqual(1.02);
     }
   });
 
@@ -286,11 +286,21 @@ test.describe("FireArt homepage structural refactor", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const gallery = page.getByTestId("home-gallery");
-    const endPosition = await gallery.locator(".fa-work__sticky").evaluate((sticky) => {
+    const range = await gallery.locator(".fa-work__sticky").evaluate((sticky) => {
       const holder = sticky.parentElement?.classList.contains("pin-spacer") ? sticky.parentElement : sticky;
-      return holder.getBoundingClientRect().top + window.scrollY + holder.offsetHeight - window.innerHeight;
+      return {
+        start: holder.getBoundingClientRect().top + window.scrollY,
+        distance: holder.offsetHeight - window.innerHeight,
+      };
     });
-    await scrollInstantly(page, endPosition);
+    await scrollInstantly(page, range.start + range.distance * 0.94);
+
+    await expect.poll(async () => gallery.evaluate((section) => {
+      const viewport = section.querySelector(".fa-work__viewport").getBoundingClientRect();
+      const outro = section.querySelector(".fa-work__outro").getBoundingClientRect();
+      const visibleWidth = Math.max(0, Math.min(outro.right, viewport.right) - Math.max(outro.left, viewport.left));
+      return visibleWidth / viewport.width;
+    })).toBeGreaterThanOrEqual(0.7);
 
     const overlap = await gallery.evaluate((section) => {
       const viewport = section.querySelector(".fa-work__viewport").getBoundingClientRect();
@@ -325,6 +335,9 @@ test.describe("FireArt homepage structural refactor", () => {
     });
 
     await scrollInstantly(page, range.start + range.distance * 0.9);
+    await expect.poll(async () => Number.parseFloat(
+      await gallery.locator(".fa-work__outro-inner").evaluate((node) => getComputedStyle(node).opacity),
+    )).toBeGreaterThanOrEqual(0.06);
     await expect(gallery.locator(".fa-work__outro-inner")).toHaveCSS("opacity", /^(0|0\.\d+)$/);
     const enteringOpacity = Number.parseFloat(
       await gallery.locator(".fa-work__outro-inner").evaluate((node) => getComputedStyle(node).opacity),
@@ -332,6 +345,9 @@ test.describe("FireArt homepage structural refactor", () => {
     expect(enteringOpacity).toBeLessThanOrEqual(0.15);
 
     await scrollInstantly(page, range.start + range.distance * 0.93);
+    await expect.poll(async () => Number.parseFloat(
+      await gallery.locator(".fa-work__outro-inner").evaluate((node) => getComputedStyle(node).opacity),
+    )).toBeGreaterThanOrEqual(0.25);
     const settlingOpacity = Number.parseFloat(
       await gallery.locator(".fa-work__outro-inner").evaluate((node) => getComputedStyle(node).opacity),
     );
@@ -339,7 +355,9 @@ test.describe("FireArt homepage structural refactor", () => {
     expect(settlingOpacity).toBeLessThanOrEqual(0.55);
 
     await scrollInstantly(page, range.start + range.distance);
-    await expect(gallery.locator(".fa-work__outro-inner")).toHaveCSS("opacity", "1");
+    await expect.poll(async () => Number.parseFloat(
+      await gallery.locator(".fa-work__outro-inner").evaluate((node) => getComputedStyle(node).opacity),
+    )).toBeGreaterThanOrEqual(0.99);
   });
 
   test("recalculates the gallery frame immediately after phone and tablet rotation", async ({ page }) => {
@@ -364,7 +382,14 @@ test.describe("FireArt homepage structural refactor", () => {
             + "(min-width: 900px) and (max-width: 1199px) and (orientation: portrait), "
             + "(min-width: 900px) and (max-width: 999px) and (max-height: 560px) and (orientation: landscape)",
         ).matches;
-        const expectedPanelWidth = viewportNode.clientWidth / (compactScene ? 1 : 2);
+        const rootSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const fluidPanelWidth = Math.min(
+          Math.max(42 * rootSize, window.innerWidth * 0.54),
+          180 * rootSize,
+        );
+        const expectedPanelWidth = compactScene
+          ? viewportNode.clientWidth
+          : Math.min(viewportNode.clientWidth, fluidPanelWidth);
         return Math.max(
           Math.abs(sceneWidth - viewportNode.clientWidth),
           Math.abs(panel.getBoundingClientRect().width - expectedPanelWidth),
@@ -396,6 +421,48 @@ test.describe("FireArt homepage structural refactor", () => {
         expect(box.height, "photos must leave room for navigation and captions").toBeLessThanOrEqual(viewport.height - 150);
       }
     }
+  });
+
+  test("eases touch-driven gallery travel across multiple animation frames", async ({ page }) => {
+    await page.setViewportSize({ width: 430, height: 932 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const gallery = page.getByTestId("home-gallery");
+    const range = await gallery.locator(".fa-work__sticky").evaluate((sticky) => {
+      const holder = sticky.parentElement?.classList.contains("pin-spacer") ? sticky.parentElement : sticky;
+      return {
+        start: holder.getBoundingClientRect().top + window.scrollY,
+        distance: Math.max(1, holder.offsetHeight - window.innerHeight),
+      };
+    });
+    await scrollInstantly(page, range.start);
+
+    const samples = await gallery.locator(".fa-work__track").evaluate(async (track, targetY) => {
+      const root = document.documentElement;
+      const previousBehavior = root.style.scrollBehavior;
+      const x = () => new DOMMatrixReadOnly(getComputedStyle(track).transform).m41;
+      const values = [x()];
+      root.style.scrollBehavior = "auto";
+      window.scrollTo({ top: targetY, behavior: "auto" });
+      for (let index = 0; index < 8; index += 1) {
+        await new Promise((resolve) => window.requestAnimationFrame(resolve));
+        values.push(x());
+      }
+      root.style.scrollBehavior = previousBehavior;
+      return values;
+    }, range.start + range.distance * 0.35);
+
+    const rounded = samples.map((value) => Math.round(value));
+    const distinct = new Set(rounded);
+    const totalTravel = Math.abs(samples[samples.length - 1] - samples[0]);
+    const largestFrameStep = Math.max(
+      ...samples.slice(1).map((value, index) => Math.abs(value - samples[index])),
+    );
+
+    expect(distinct.size, "gallery motion should progress through intermediate frames").toBeGreaterThanOrEqual(4);
+    expect(totalTravel, "gallery should visibly travel after the scroll input").toBeGreaterThan(40);
+    expect(largestFrameStep / totalTravel, "no frame should contain most of the horizontal jump")
+      .toBeLessThan(0.55);
   });
 
   test("uses a concise brief after the conditional reviews slot and a quiet directory footer", async ({ page }) => {

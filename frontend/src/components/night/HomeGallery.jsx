@@ -40,7 +40,6 @@ export default function HomeGallery() {
       let liftDistance = 0;
       let viewportWidth = 0;
       let panelMetrics = [];
-      let renderedProgress = 0;
       let refreshFrame = 0;
       let settleTimer = 0;
       let resizeObserver;
@@ -93,7 +92,6 @@ export default function HomeGallery() {
         positionPanels(progress);
         setIntroOpacity(introOpacity);
         setOutroOpacity(outroOpacity);
-        renderedProgress = progress;
       };
 
       measure();
@@ -112,18 +110,18 @@ export default function HomeGallery() {
               + "(min-width: 900px) and (max-width: 1199px) and (orientation: portrait), "
               + "(min-width: 900px) and (max-width: 999px) and (max-height: 560px) and (orientation: landscape)",
           ).matches;
-          const compactRunwayMultiplier = gsap.utils.clamp(
-            0.42,
-            0.72,
-            0.72 - Math.max(0, viewportWidth - 480) * 0.0004,
-          );
-          const scrollRunwayMultiplier = compactScene ? compactRunwayMultiplier : 0.686;
-          return `+=${Math.max(viewportWidth * 1.392, travelDistance * scrollRunwayMultiplier)}`;
+          const scrollRunwayMultiplier = compactScene ? 0.44 : 0.62;
+          const viewportRunwayMultiplier = compactScene ? 0.82 : 0.95;
+          return `+=${Math.max(
+            viewportWidth * viewportRunwayMultiplier,
+            travelDistance * scrollRunwayMultiplier,
+          )}`;
         },
         pin: ".fa-work__sticky",
         invalidateOnRefresh: true,
         anticipatePin: 1,
         onUpdate: (self) => {
+          if (touchDriven) return;
           motion.progress = self.progress;
           renderMotion();
         },
@@ -138,13 +136,18 @@ export default function HomeGallery() {
         if (!touchDriven) return;
         const trigger = galleryTrigger;
         if (!trigger || trigger.end <= trigger.start) return;
-        const nextProgress = gsap.utils.clamp(
+        const targetProgress = gsap.utils.clamp(
           0,
           1,
           (window.scrollY - trigger.start) / (trigger.end - trigger.start),
         );
-        if (Math.abs(nextProgress - renderedProgress) < 0.001) return;
-        motion.progress = nextProgress;
+        const delta = targetProgress - motion.progress;
+        if (Math.abs(delta) < 0.0005) {
+          if (motion.progress === targetProgress) return;
+          motion.progress = targetProgress;
+        } else {
+          motion.progress += delta * 0.24;
+        }
         renderMotion();
       };
 

@@ -1,31 +1,89 @@
 const { test, expect } = require("@playwright/test");
 
 const viewportMatrix = [
-  { name: "compact Android", width: 360, height: 800, mobile: true },
-  { name: "iPhone portrait", width: 390, height: 844, mobile: true },
-  { name: "large phone", width: 430, height: 932, mobile: true },
-  { name: "phone landscape", width: 844, height: 390, mobile: true },
-  { name: "tablet portrait", width: 768, height: 1024, mobile: true },
-  { name: "tablet landscape", width: 1024, height: 768, mobile: false },
-  { name: "laptop", width: 1366, height: 768, mobile: false },
-  { name: "wide desktop", width: 1920, height: 1080, mobile: false },
+  { name: "phone compact", width: 375, height: 812 },
+  { name: "phone large", width: 430, height: 932 },
+  { name: "tablet portrait", width: 768, height: 1024 },
+  { name: "laptop", width: 1366, height: 768 },
+  { name: "desktop", width: 1440, height: 900 },
+  { name: "MacBook Retina viewport", width: 1512, height: 982 },
+  { name: "full HD", width: 1920, height: 1080 },
+  { name: "2K", width: 2560, height: 1440 },
+  { name: "ultrawide", width: 3440, height: 1440 },
+  { name: "4K", width: 3840, height: 2160 },
+  { name: "32:9 ultrawide", width: 5120, height: 1440 },
 ];
 
-test.describe("FireArt home responsive matrix", () => {
-  test("keeps critical home content inside the viewport at common device sizes", async ({ page }) => {
+const publicRoutes = [
+  "/",
+  "/galerie",
+  "/pachete",
+  "/intrebari-frecvente",
+  "/contact",
+  "/blog",
+  "/confidentialitate",
+  "/termeni-si-conditii",
+  "/cookies",
+];
+
+test.describe("FireArt public responsive matrix", () => {
+  test("keeps every public route inside every approved viewport", async ({ page }) => {
+    test.setTimeout(240_000);
+
+    for (const route of publicRoutes) {
+      await page.goto(route, { waitUntil: "domcontentloaded" });
+      await expect(page.locator("main").first(), `${route} main content`).toBeVisible();
+
+      for (const viewport of viewportMatrix) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForTimeout(80);
+
+        const dimensions = await page.evaluate(() => {
+          const main = document.querySelector("main");
+          const mainRect = main?.getBoundingClientRect();
+          return {
+            viewport: document.documentElement.clientWidth,
+            page: document.documentElement.scrollWidth,
+            mainLeft: mainRect?.left ?? -1,
+            mainRight: mainRect?.right ?? Number.POSITIVE_INFINITY,
+          };
+        });
+        const label = `${route} at ${viewport.name} (${viewport.width}x${viewport.height})`;
+        expect(dimensions.page, `${label} should not create horizontal page overflow`)
+          .toBeLessThanOrEqual(dimensions.viewport + 1);
+        expect(dimensions.mainLeft, `${label} main starts inside viewport`).toBeGreaterThanOrEqual(-1);
+        expect(dimensions.mainRight, `${label} main ends inside viewport`)
+          .toBeLessThanOrEqual(dimensions.viewport + 1);
+
+        const mobileMenu = page.getByTestId("mobile-menu-trigger");
+        const desktopLinks = page.locator(".site-navbar-links > a");
+        const isMobileNavigation = await mobileMenu.isVisible();
+        const isDesktopNavigation = await desktopLinks.first().isVisible();
+        expect(isMobileNavigation || isDesktopNavigation, `${label} navigation is available`).toBeTruthy();
+
+        if (isMobileNavigation) {
+          const menuBox = await mobileMenu.boundingBox();
+          expect(Math.min(menuBox?.width || 0, menuBox?.height || 0), `${label} menu touch target`)
+            .toBeGreaterThanOrEqual(44);
+        }
+      }
+    }
+  });
+
+  test("keeps critical homepage content visible on touch and landscape layouts", async ({ page }) => {
+    const homeViewports = [
+      { name: "phone portrait", width: 375, height: 812 },
+      { name: "phone landscape", width: 844, height: 390 },
+      { name: "tablet portrait", width: 768, height: 1024 },
+      { name: "tablet landscape", width: 1024, height: 768 },
+    ];
+
     await page.goto("/", { waitUntil: "domcontentloaded" });
-
-    for (const viewport of viewportMatrix) {
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    for (const viewport of homeViewports) {
+      await page.setViewportSize(viewport);
       await page.evaluate(() => window.scrollTo(0, 0));
-      await page.waitForTimeout(120);
-
-      const dimensions = await page.evaluate(() => ({
-        viewport: document.documentElement.clientWidth,
-        page: document.documentElement.scrollWidth,
-      }));
-      expect(dimensions.page, `${viewport.name} should not create horizontal page overflow`)
-        .toBeLessThanOrEqual(dimensions.viewport + 1);
+      await page.waitForTimeout(100);
 
       const hero = page.getByTestId("hero-section");
       const primaryCta = page.getByTestId("hero-primary-cta");
@@ -41,32 +99,11 @@ test.describe("FireArt home responsive matrix", () => {
           .toBeLessThanOrEqual(viewport.width + 1);
       }
 
-      const sections = [
-        ["showcase", page.getByTestId("home-showcase")],
-        ["about", page.getByTestId("home-about")],
-        ["partners", page.getByTestId("home-partners")],
-        ["brief", page.getByTestId("home-brief")],
-      ];
-
-      for (const [name, section] of sections) {
-        await section.evaluate((element) => element.scrollIntoView({ block: "center" }));
+      for (const section of ["home-gallery", "home-about", "home-partners", "home-brief"]) {
+        const locator = page.getByTestId(section);
+        await locator.evaluate((element) => element.scrollIntoView({ block: "center" }));
         await page.waitForTimeout(80);
-        await expect(section, `${viewport.name} section`).toBeVisible();
-      }
-
-      const mobileMenu = page.getByTestId("mobile-menu-trigger");
-      const desktopLinks = page.locator(".site-navbar-links > a");
-      const isMobileNavigation = await mobileMenu.isVisible();
-      const isDesktopNavigation = await desktopLinks.first().isVisible();
-      expect(isMobileNavigation || isDesktopNavigation, `${viewport.name} navigation is available`)
-        .toBeTruthy();
-
-      if (isMobileNavigation) {
-        const menuBox = await mobileMenu.boundingBox();
-        expect(Math.min(menuBox?.width || 0, menuBox?.height || 0), `${viewport.name} menu touch target`)
-          .toBeGreaterThanOrEqual(44);
-      } else {
-        expect(isDesktopNavigation, `${viewport.name} desktop navigation`).toBeTruthy();
+        await expect(locator, `${viewport.name} ${section}`).toBeVisible();
       }
     }
   });

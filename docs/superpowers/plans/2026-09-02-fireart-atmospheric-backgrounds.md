@@ -171,13 +171,13 @@ Use these focused values in `night-home-film.css`:
 ```css
 .fa-work__sticky::before {
   opacity: 0.15;
-  filter: blur(24px) saturate(1.24) contrast(1.08) brightness(0.5);
+  filter: saturate(1.24) contrast(1.08) brightness(0.5);
   transform: scale(1.08);
 }
 
 .fa-packages::before {
   opacity: 0.14;
-  filter: blur(20px) saturate(1.18) contrast(1.08) brightness(0.46);
+  filter: saturate(1.18) contrast(1.08) brightness(0.46);
   transform: scale(1.08);
 }
 ```
@@ -214,7 +214,7 @@ At the existing compact breakpoint, cap the Home gallery/package pseudo-element 
   .fa-work__sticky::before,
   .fa-packages::before {
     opacity: 0.11;
-    filter: blur(16px) saturate(1.12) contrast(1.05) brightness(0.44);
+    filter: saturate(1.12) contrast(1.05) brightness(0.44);
   }
 
   .fa-about__image img {

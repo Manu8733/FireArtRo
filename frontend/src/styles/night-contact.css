@@ -5,11 +5,38 @@
 .nr-contact-main {
   position: relative;
   padding: clamp(5.5rem, 8vmin, 9rem) 0 clamp(3rem, 5vmin, 6rem);
+  overflow: hidden;
   color: var(--nr-paper);
   background: #03050a;
+  isolation: isolate;
+}
+
+.nr-contact-main::before {
+  position: absolute;
+  z-index: 0;
+  inset: -8%;
+  content: "";
+  pointer-events: none;
+  opacity: 0.14;
+  background: url("../../public/media/gallery/fireartro-artificii-noapte-spectacol-070.webp") 46% 48% / cover no-repeat;
+  filter: blur(26px) saturate(1.12) brightness(0.44);
+  transform: scale(1.08);
+}
+
+.nr-contact-main::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 28% 36%, rgba(191, 52, 71, 0.16), transparent 35%),
+    linear-gradient(90deg, rgba(3, 5, 10, 0.7), rgba(3, 5, 10, 0.9));
 }
 
 .nr-contact-layout {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 0.56fr) minmax(0, 1.44fr);
   width: min(100%, 80rem);
@@ -405,6 +432,12 @@
 }
 
 @media (max-width: 960px) {
+  .nr-contact-main::before {
+    opacity: 0.1;
+    background-position: 40% 50%;
+    filter: blur(18px) saturate(1.08) brightness(0.42);
+  }
+
   .nr-contact-layout {
     gap: 2.5rem;
   }

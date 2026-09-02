@@ -131,7 +131,7 @@ export default function HomeGallery() {
               + "(min-width: 900px) and (max-width: 1199px) and (orientation: portrait), "
               + "(min-width: 900px) and (max-width: 999px) and (max-height: 560px) and (orientation: landscape)",
           ).matches;
-          const scrollRunwayMultiplier = compactScene ? 0.44 : 0.62;
+          const scrollRunwayMultiplier = compactScene ? 0.44 : 0.48;
           const viewportRunwayMultiplier = compactScene ? 0.82 : 0.95;
           return `+=${Math.max(
             viewportWidth * viewportRunwayMultiplier,

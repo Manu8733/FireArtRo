@@ -1,10 +1,46 @@
 .nr-faq-route {
+  position: relative;
+  isolation: isolate;
   min-height: 100dvh;
+  overflow: clip;
   color: var(--nr-paper, #f5f7fb);
   background: #050608;
 }
 
-.nr-faq-page {
+.nr-faq-route::before {
+  position: absolute;
+  z-index: 0;
+  top: -5rem;
+  right: -6%;
+  left: -6%;
+  height: clamp(44rem, 100dvh, 64rem);
+  content: "";
+  pointer-events: none;
+  opacity: 0.3;
+  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat;
+  filter: blur(18px) saturate(1.4) brightness(0.84);
+  transform: scale(1.08);
+}
+
+.nr-faq-route::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 68% 22%, rgba(81, 74, 255, 0.22), transparent 28rem),
+    radial-gradient(circle at 31% 42%, rgba(217, 67, 61, 0.1), transparent 24rem),
+    linear-gradient(180deg, rgba(5, 6, 8, 0.34), rgba(5, 6, 8, 0.8) 56rem, #050608 72rem);
+}
+
+.nr-faq-page,
+.nr-faq-route > footer {
+  position: relative;
+  z-index: 1;
+}
+
+main.nr-faq-page[data-design="night-runway"] {
   --faq-blue: var(--nr-electric, #2f7dff);
   --faq-ice: var(--nr-ice, #9cc9ff);
   --faq-paper: var(--nr-paper, #f5f7fb);
@@ -272,6 +308,14 @@
   from {
     opacity: 0;
     transform: translateY(-0.35rem);
+  }
+}
+
+@media (max-width: 899px) {
+  .nr-faq-route::before {
+    opacity: 0.24;
+    background-position: 50% 28%;
+    filter: blur(14px) saturate(1.3) brightness(0.76);
   }
 }
 

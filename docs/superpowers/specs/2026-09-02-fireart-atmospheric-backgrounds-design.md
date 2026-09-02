@@ -14,10 +14,10 @@ The homepage horizontal gallery must also feel substantial on laptop and desktop
 The shared treatment uses three layers:
 
 1. A near-black base (`#020407` to `#05080d`).
-2. One existing FireArt WebP photograph, enlarged slightly, darkened, softly blurred, and kept between 10% and 16% effective visibility on desktop.
+2. One existing FireArt WebP photograph, enlarged slightly, darkened, softened where performance allows, and kept between 10% and 16% effective visibility on desktop.
 3. One or two broad radial color washes derived from the photograph, followed by a dark contrast veil beneath the content.
 
-The result must still read as black at first glance. The photograph should be perceived as atmosphere and light, not as a second hero image. Decorative layers are non-interactive, remain behind content, and do not affect document geometry.
+The result must still read as black at first glance. The photograph should be perceived as atmosphere and light, not as a second hero image. Decorative layers are non-interactive, remain behind content, and do not affect document geometry. The pinned homepage gallery and package handoff use low-opacity imagery plus broad radial color washes instead of a viewport-sized CSS blur, preserving smooth scroll performance; static surfaces retain the real blur treatment.
 
 ## Image assignment
 

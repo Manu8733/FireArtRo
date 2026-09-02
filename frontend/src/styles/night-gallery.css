@@ -7,6 +7,33 @@
   background: #06080b;
 }
 
+.nr-gallery-page::before {
+  position: absolute;
+  z-index: 0;
+  top: -6rem;
+  right: -6%;
+  left: -6%;
+  height: clamp(48rem, 110dvh, 72rem);
+  content: "";
+  pointer-events: none;
+  opacity: 0.28;
+  background: url("../../public/media/gallery/fireartro-drone-show-untold-img-6900-2.webp") 50% 38% / cover no-repeat;
+  filter: blur(18px) saturate(1.34) brightness(0.78);
+  transform: scale(1.08);
+}
+
+.nr-gallery-page::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(105, 61, 230, 0.21), transparent 30rem),
+    radial-gradient(circle at 28% 32%, rgba(229, 71, 100, 0.1), transparent 25rem),
+    linear-gradient(180deg, rgba(6, 8, 11, 0.34), rgba(6, 8, 11, 0.82) 58rem, #06080b 72rem);
+}
+
 .nr-gallery-stage {
   position: relative;
   z-index: 1;
@@ -337,6 +364,12 @@
 .nr-gallery-lightbox__nav--next { right: 1.25rem; }
 
 @media (max-width: 860px) {
+  .nr-gallery-page::before {
+    opacity: 0.22;
+    background-position: 52% 20%;
+    filter: blur(14px) saturate(1.26) brightness(0.7);
+  }
+
   .nr-gallery-mosaic { column-width: clamp(11.5rem, 29vw, 14rem); }
 }
 

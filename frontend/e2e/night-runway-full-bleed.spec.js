@@ -90,8 +90,10 @@ test("hero is full-bleed and cinematic gallery scales on a 32:9 viewport", async
   expect(geometry.fit).toBe("cover");
   expect(geometry.backdropOpacity).toBe(0);
   expect(geometry.galleryWidth).toBeGreaterThanOrEqual(geometry.viewportWidth * 0.98);
-  expect(geometry.panelWidth).toBeGreaterThanOrEqual(geometry.viewportWidth * 0.48);
-  expect(geometry.mediaWidth).toBeGreaterThanOrEqual(geometry.viewportWidth * 0.38);
+  expect(geometry.panelWidth).toBeGreaterThanOrEqual(1_200);
+  expect(geometry.panelWidth).toBeLessThanOrEqual(1_441);
+  expect(geometry.mediaWidth).toBeGreaterThanOrEqual(1_000);
+  expect(geometry.mediaWidth).toBeLessThanOrEqual(1_201);
   expect(geometry.documentOverflow).toBeLessThanOrEqual(1);
 });
 

@@ -384,8 +384,8 @@ test.describe("FireArt homepage structural refactor", () => {
         ).matches;
         const rootSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
         const fluidPanelWidth = Math.min(
-          Math.max(42 * rootSize, window.innerWidth * 0.54),
-          180 * rootSize,
+          Math.max(48 * rootSize, window.innerWidth * 0.64),
+          84 * rootSize,
         );
         const expectedPanelWidth = compactScene
           ? viewportNode.clientWidth

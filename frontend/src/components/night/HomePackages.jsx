@@ -89,8 +89,7 @@ export default function HomePackages() {
       <div className="fa-packages__inner nr-shell">
         <header className="fa-packages__header">
           <p className="fa-kicker">Pachete FireArtRo</p>
-          <h2 id="fa-packages-title">Trei moduri de a aprinde noaptea.</h2>
-          <p>Alege un punct de plecare. Configurația finală se adaptează locului, ritmului și momentului.</p>
+          <h2 id="fa-packages-title">Fiecare noapte cere alt spectacol.</h2>
         </header>
 
         <div className="fa-packages__triptych" data-package-triptych>

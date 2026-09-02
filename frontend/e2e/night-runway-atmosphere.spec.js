@@ -34,8 +34,8 @@ test("homepage gallery is substantial and requested sections use photographic at
 
   expect(metrics.cardRatio).toBeGreaterThanOrEqual(0.54);
   expect(metrics.cardRatio).toBeLessThanOrEqual(0.6);
-  expect(metrics.gallery).toContain("fireartro-drone-show-focsani-dji-0768-enhanced-nr.webp");
-  expect(metrics.packages).toContain("fireartro-artificii-noapte-spectacol-091.webp");
+  expect(metrics.gallery).toContain("fireartro-drone-show-focsani-dji-0768-enhanced-nr");
+  expect(metrics.packages).toContain("fireartro-artificii-noapte-spectacol-091");
   expect(metrics.aboutFilter).toContain("blur");
   expect(metrics.overflow).toBeLessThanOrEqual(1);
 
@@ -60,7 +60,21 @@ for (const [route, selector, asset] of [
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     }));
 
-    expect(state.image).toContain(asset);
+    expect(state.image).toContain(asset.replace(/\.webp$/, ""));
+    expect(state.image).toContain(".webp");
     expect(state.overflow).toBeLessThanOrEqual(1);
   });
 }
+
+test("keeps FAQ content transparent so its atmospheric photo stays visible", async ({ page }) => {
+  await page.setViewportSize({ width: 430, height: 932 });
+  await page.goto("/intrebari-frecvente", { waitUntil: "domcontentloaded" });
+
+  const state = await page.locator("main.nr-faq-page").evaluate((node) => ({
+    contentBackground: getComputedStyle(node).backgroundColor,
+    atmosphere: getComputedStyle(node.parentElement, "::before").backgroundImage,
+  }));
+
+  expect(state.contentBackground).toBe("rgba(0, 0, 0, 0)");
+  expect(state.atmosphere).toContain("fireartro-drone-show-neversea-show-img-4351");
+});

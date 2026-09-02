@@ -1373,6 +1373,49 @@
   }
 }
 
+/* Keep the gallery, packages, and about scenes on one continuous atmosphere. */
+.fa-home {
+  isolation: isolate;
+  background: var(--fa-atmosphere-base);
+}
+
+.fa-home::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: var(--fa-atmosphere-opacity);
+  background: var(--fa-atmosphere-image) var(--fa-atmosphere-position) / cover no-repeat fixed;
+  filter: var(--fa-atmosphere-filter);
+}
+
+.fa-home::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: var(--fa-atmosphere-scrim);
+}
+
+.fa-home > :where(.fa-work, .fa-packages, .fa-about, .fa-partners, .fa-brief) {
+  z-index: 1;
+}
+
+.fa-packages,
+.fa-about {
+  background: transparent;
+}
+
+.fa-packages::before,
+.fa-packages::after,
+.fa-about__image,
+.fa-about__shade {
+  background: none;
+  opacity: 0;
+}
+
 /* Full group photograph with alpha cutouts aligned over the original people. */
 .fa-team__stage {
   position: relative;

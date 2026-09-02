@@ -62,6 +62,41 @@ test("homepage gallery is substantial and requested sections use photographic at
   await expect(packages).not.toContainText("Alege un punct de plecare");
 });
 
+test("keeps gallery, packages, and about on one continuous atmospheric layer", async ({ page }) => {
+  await page.setViewportSize({ width: 1512, height: 982 });
+  await page.goto("/#acasa", { waitUntil: "domcontentloaded" });
+
+  const state = await page.evaluate(() => {
+    const home = document.querySelector(".fa-home");
+    const packages = document.querySelector(".fa-packages");
+    const about = document.querySelector(".fa-about");
+    const aboutImage = document.querySelector(".fa-about__image");
+
+    return {
+      rootImage: getComputedStyle(home, "::before").backgroundImage,
+      rootScrim: getComputedStyle(home, "::after").backgroundImage,
+      localBackgrounds: [
+        getComputedStyle(packages).backgroundImage,
+        getComputedStyle(about).backgroundImage,
+      ],
+      localImages: [
+        getComputedStyle(packages, "::before").backgroundImage,
+        getComputedStyle(aboutImage).backgroundImage,
+      ],
+      localScrims: [
+        getComputedStyle(packages, "::after").backgroundImage,
+        getComputedStyle(document.querySelector(".fa-about__shade")).backgroundImage,
+      ],
+    };
+  });
+
+  expect(state.rootImage).toContain("fireartro-drone-show-neversea-show-img-4351");
+  expect(state.rootScrim).toContain("linear-gradient");
+  expect(state.localBackgrounds).toEqual(["none", "none"]);
+  expect(state.localImages).toEqual(["none", "none"]);
+  expect(state.localScrims).toEqual(["none", "none"]);
+});
+
 for (const [route, selector, asset] of [
   ["/contact", ".nr-contact-main", "fireartro-drone-show-neversea-show-img-4351.webp"],
   ["/intrebari-frecvente", ".nr-faq-route", "fireartro-drone-show-neversea-show-img-4351.webp"],

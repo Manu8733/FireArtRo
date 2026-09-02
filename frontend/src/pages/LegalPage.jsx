@@ -8,6 +8,7 @@ import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
 import { EMAIL } from "@/lib/constants";
 import { SITE_DETAILS } from "@/data/businessContent";
+import "@/styles/night-legal.css";
 
 const LEGAL_PAGES = {
   confidentialitate: {
@@ -239,7 +240,7 @@ export default function LegalPage({ type = "confidentialitate" }) {
   });
 
   return (
-    <main className="legal-page min-h-screen overflow-x-clip bg-[#050308] text-white">
+    <main className="legal-page" data-design="night-runway">
       <ScrollProgress />
       <Navbar />
 

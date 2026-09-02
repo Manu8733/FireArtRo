@@ -20,6 +20,7 @@ from blog import (
     create_blog_router,
     request_size_limit,
 )
+from reviews import ReviewsService, create_reviews_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -151,6 +152,9 @@ blog_service = BlogService(blog_repository, blog_media_store)
 app.include_router(
     create_blog_router(blog_service, os.environ.get("ADMIN_API_KEY", ""))
 )
+
+reviews_service = ReviewsService(os.environ)
+app.include_router(create_reviews_router(reviews_service))
 
 rate_windows = defaultdict(deque)
 RATE_LIMIT = 5

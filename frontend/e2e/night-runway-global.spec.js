@@ -106,6 +106,21 @@ test("contact keeps the footer at the bottom of a tall tablet viewport", async (
   expect(layout.footerBottom).toBeGreaterThanOrEqual(layout.viewportHeight - 1);
 });
 
+test("mobile menu trigger is a transparent three-line control", async ({ page }) => {
+  await page.setViewportSize({ width: 467, height: 872 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  const trigger = page.getByTestId("mobile-menu-trigger");
+  await expect(trigger).toBeVisible();
+  await expect(trigger).toHaveCSS("border-width", "0px");
+  await expect(trigger).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(trigger.locator("svg")).toHaveCount(0);
+  await expect(trigger.locator(".menu-button__line")).toHaveCount(3);
+  for (const line of await trigger.locator(".menu-button__line").all()) {
+    await expect(line).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  }
+});
+
 test("uses CSS viewport dimensions independently of Retina pixel density", async ({ browser, baseURL }) => {
   const layouts = [];
   for (const deviceScaleFactor of [1, 2, 3]) {

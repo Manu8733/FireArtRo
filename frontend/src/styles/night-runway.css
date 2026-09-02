@@ -90,6 +90,27 @@ body:has(main[data-design="night-runway"]) :where(.menu-button, .mobile-nav-head
   background: rgba(3, 5, 10, 0.82);
 }
 
+body:has(main[data-design="night-runway"]) .menu-button {
+  padding: 0;
+  border: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+body:has(main[data-design="night-runway"]) .menu-button__lines {
+  display: grid;
+  width: 1.35rem;
+  gap: 0.24rem;
+}
+
+body:has(main[data-design="night-runway"]) .menu-button__line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #fff;
+}
+
 body:has(main[data-design="night-runway"]) .mobile-nav-sheet {
   background: #03050a !important;
 }

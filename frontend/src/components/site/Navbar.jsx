@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -237,7 +237,11 @@ export const Navbar = () => {
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <button type="button" data-testid="mobile-menu-trigger" className="menu-button" aria-label="Deschide meniul">
-                <Menu />
+                <span className="menu-button__lines" aria-hidden="true">
+                  <span className="menu-button__line" />
+                  <span className="menu-button__line" />
+                  <span className="menu-button__line" />
+                </span>
               </button>
             </SheetTrigger>
             <SheetContent

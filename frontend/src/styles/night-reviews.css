@@ -52,7 +52,7 @@
 
 .fa-page-reviews__track blockquote p {
   margin: 0;
-  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+  font-size: var(--nr-type-body);
   line-height: 1.5;
 }
 
@@ -60,7 +60,7 @@
   display: block;
   margin-top: 1.1rem;
   color: #8ebeff;
-  font-size: 0.68rem;
+  font-size: var(--nr-type-label);
   font-style: normal;
 }
 
@@ -68,7 +68,7 @@
   justify-self: center;
   min-height: 44px;
   color: rgba(244, 247, 251, 0.64);
-  font-size: 0.66rem;
+  font-size: var(--nr-type-label);
   text-decoration: underline;
   text-underline-offset: 0.35rem;
 }

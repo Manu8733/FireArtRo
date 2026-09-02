@@ -16,7 +16,7 @@
 .fa-kicker {
   color: var(--fa-ice);
   font-family: "Sora", sans-serif;
-  font-size: 0.7rem;
+  font-size: var(--nr-type-label);
   font-weight: 650;
   line-height: 1.4;
   text-transform: uppercase;
@@ -31,7 +31,7 @@
   padding: 0.7rem 0;
   color: var(--fa-white);
   font-family: "Sora", sans-serif;
-  font-size: 0.72rem;
+  font-size: var(--nr-type-small);
   font-weight: 650;
   text-transform: uppercase;
 }
@@ -97,10 +97,10 @@
   inset: -12%;
   content: "";
   pointer-events: none;
-  opacity: 0.12;
+  opacity: 0.075;
   background: url("../../public/media/gallery/fireartro-drone-show-focsani-dji-0768-enhanced-nr.webp") 58% 46% / cover no-repeat;
-  filter: blur(44px) saturate(1.15) contrast(1.08);
-  transform: scale(1.08);
+  filter: saturate(0.78) contrast(1.04) brightness(0.52);
+  transform: scale(1.02);
   -webkit-mask-image: radial-gradient(ellipse 70% 66% at 56% 48%, #000 12%, rgba(0, 0, 0, 0.82) 48%, transparent 88%);
   mask-image: radial-gradient(ellipse 70% 66% at 56% 48%, #000 12%, rgba(0, 0, 0, 0.82) 48%, transparent 88%);
 }
@@ -289,10 +289,10 @@
   inset: -12%;
   content: "";
   pointer-events: none;
-  opacity: 0.1;
+  opacity: 0.075;
   background: url("../../public/media/gallery/fireartro-artificii-noapte-spectacol-091.webp") 62% 46% / cover no-repeat;
-  filter: blur(52px) saturate(1.18) contrast(1.1);
-  transform: scale(1.1);
+  filter: saturate(0.82) contrast(1.05) brightness(0.54);
+  transform: scale(1.02);
   -webkit-mask-image: radial-gradient(ellipse 74% 68% at 62% 46%, #000 10%, rgba(0, 0, 0, 0.76) 50%, transparent 90%);
   mask-image: radial-gradient(ellipse 74% 68% at 62% 46%, #000 10%, rgba(0, 0, 0, 0.76) 50%, transparent 90%);
 }
@@ -386,7 +386,7 @@
   justify-content: space-between;
   gap: 1rem;
   color: var(--fa-ice);
-  font-size: 0.64rem;
+  font-size: var(--nr-type-label);
   line-height: 1.35;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -416,7 +416,7 @@
   max-width: 32ch;
   margin-top: 0.95rem;
   color: rgba(243, 246, 251, 0.72);
-  font-size: 0.9rem;
+  font-size: var(--nr-type-body);
   line-height: 1.48;
 }
 
@@ -440,7 +440,7 @@
 
 .fa-package-panel dt {
   color: rgba(169, 201, 255, 0.72);
-  font-size: 0.61rem;
+  font-size: var(--nr-type-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -449,7 +449,7 @@
   min-width: 0;
   margin: 0;
   color: rgba(243, 246, 251, 0.76);
-  font-size: 0.76rem;
+  font-size: var(--nr-type-small);
   line-height: 1.35;
 }
 
@@ -458,7 +458,7 @@
   gap: 0.3rem;
   padding-left: 1rem;
   color: rgba(243, 246, 251, 0.68);
-  font-size: 0.76rem;
+  font-size: var(--nr-type-small);
   line-height: 1.35;
 }
 
@@ -552,7 +552,7 @@
   max-width: 34rem;
   margin: 1.35rem 0 0;
   color: #b5c0ce;
-  font-size: clamp(0.95rem, 1.25vw, 1.12rem);
+  font-size: var(--nr-type-lead);
   line-height: 1.6;
 }
 
@@ -678,12 +678,12 @@
 
 .fa-team__people button span {
   color: var(--fa-ice);
-  font-size: 0.62rem;
+  font-size: var(--nr-type-label);
 }
 
 .fa-team__people button strong {
   font-family: "Sora", sans-serif;
-  font-size: clamp(0.78rem, 1.1vw, 1rem);
+  font-size: var(--nr-type-small);
   font-weight: 520;
 }
 
@@ -747,7 +747,7 @@
 
 .fa-team-dialog__copy span {
   color: var(--fa-ice);
-  font-size: 0.68rem;
+  font-size: var(--nr-type-label);
   text-transform: uppercase;
 }
 
@@ -828,6 +828,7 @@
   max-width: 27rem;
   margin: 1.2rem auto 0;
   color: rgba(243, 246, 251, 0.62);
+  font-size: var(--nr-type-body);
   line-height: 1.6;
 }
 
@@ -913,7 +914,7 @@
   color: var(--fa-white);
   background: transparent;
   font-family: "Sora", sans-serif;
-  font-size: 0.76rem;
+  font-size: var(--nr-type-small);
   font-weight: 680;
   text-transform: uppercase;
   transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), background 250ms ease;
@@ -1381,7 +1382,7 @@
   .fa-partners__names span {
     padding: 1rem 0;
     color: rgba(243, 246, 251, 0.62);
-    font-size: 0.72rem;
+    font-size: var(--nr-type-small);
     text-align: center;
   }
 }
@@ -1536,7 +1537,7 @@
   gap: 0.65rem;
   color: rgba(177, 208, 255, 0.82);
   font-family: "Inter", sans-serif;
-  font-size: 0.62rem;
+  font-size: var(--nr-type-label);
   font-weight: 560;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -1573,7 +1574,7 @@
   margin: 0.8rem 0 0;
   color: rgba(226, 233, 243, 0.76);
   font-family: "Inter", sans-serif;
-  font-size: clamp(0.76rem, 0.86vw, 0.9rem);
+  font-size: var(--nr-type-small);
   line-height: 1.55;
 }
 

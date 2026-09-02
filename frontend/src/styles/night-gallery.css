@@ -11,7 +11,7 @@
   position: relative;
   z-index: 1;
   min-height: 100dvh;
-  padding: clamp(5.25rem, 6vw, 6rem) 0 clamp(3.25rem, 5vw, 4.5rem);
+  padding: clamp(5.5rem, 7vmin, 8rem) 0 clamp(3.5rem, 6vmin, 7rem);
   background: radial-gradient(circle at 80% 8%, rgba(181, 103, 55, 0.055), transparent 24rem);
 }
 
@@ -19,8 +19,8 @@
   position: relative;
   z-index: 1;
   display: grid;
-  width: min(calc(100% - (2 * var(--nr-gutter))), 66rem);
-  gap: clamp(0.85rem, 1.4vw, 1.15rem);
+  width: min(calc(100% - (2 * var(--nr-gutter))), 90rem);
+  gap: clamp(1rem, 1.5vmin, 1.75rem);
 }
 
 .nr-gallery-page > footer {
@@ -30,7 +30,7 @@
 
 .nr-gallery-header {
   display: flex;
-  max-width: 34rem;
+  max-width: 50rem;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.7rem;
@@ -40,7 +40,7 @@
 .nr-gallery-header__title > p {
   margin: 0 0 0.55rem;
   color: #75c7eb;
-  font-size: 0.6rem;
+  font-size: var(--nr-type-label);
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -49,17 +49,17 @@
 .nr-gallery-header h1 {
   margin: 0;
   font-family: "Bricolage Grotesque", "Sora", sans-serif;
-  font-size: clamp(2rem, 3vw, 2.7rem);
+  font-size: var(--nr-type-page-title);
   font-weight: 520;
   line-height: 0.98;
   letter-spacing: 0;
 }
 
 .nr-gallery-header__intro {
-  max-width: 30rem;
+  max-width: 42rem;
   margin: 0;
   color: #a9acb3;
-  font-size: 0.78rem;
+  font-size: var(--nr-type-small);
   line-height: 1.55;
 }
 
@@ -87,7 +87,7 @@
   border-radius: 0;
   color: #a6a8ae;
   background: transparent;
-  font: 620 0.64rem/1.1 "Sora", sans-serif;
+  font: 620 var(--nr-type-small)/1.1 "Sora", sans-serif;
   letter-spacing: 0;
   cursor: pointer;
   transition: border-color 180ms ease, color 180ms ease;
@@ -95,7 +95,7 @@
 
 .nr-gallery-filters button small {
   color: #6e737b;
-  font: 600 0.62rem/1 "IBM Plex Mono", monospace;
+  font: 600 var(--nr-type-label)/1 "IBM Plex Mono", monospace;
 }
 
 .nr-gallery-filters button:hover {
@@ -112,8 +112,8 @@
 
 .nr-gallery-mosaic {
   column-count: auto;
-  column-width: clamp(12rem, 16vw, 15rem);
-  column-gap: clamp(0.65rem, 1vw, 0.9rem);
+  column-width: clamp(14rem, 18vw, 20rem);
+  column-gap: clamp(0.75rem, 1.2vmin, 1.25rem);
   width: 100%;
   min-width: 0;
 }

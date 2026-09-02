@@ -847,27 +847,30 @@ summary {
 /* Legal */
 
 .legal-hero {
-    padding-top: clamp(7rem, 9vw, 8rem);
-    padding-bottom: clamp(2.5rem, 4vw, 3.5rem);
+    padding-top: clamp(7rem, 8vmin, 10rem);
+    padding-bottom: clamp(2.75rem, 4.5vmin, 5rem);
     background: #071017;
 }
 
-.legal-hero-inner,
+.legal-hero-inner {
+    width: min(calc(100% - (2 * var(--nr-gutter, 1.5rem))), 90rem);
+}
+
 .legal-layout {
-    width: var(--editorial-content);
+    width: min(calc(100% - (2 * var(--nr-gutter, 1.5rem))), 80rem);
 }
 
 .legal-hero h1 {
     max-width: 22ch;
-    font-size: clamp(1.9rem, 2.8vw, 2.7rem);
+    font-size: var(--nr-type-page-title, clamp(2.75rem, 4vw, 6.5rem));
     font-weight: 620;
     line-height: 1.1;
     letter-spacing: -.034em;
 }
 
 .legal-hero p {
-    max-width: 43rem;
-    font-size: .9rem;
+    max-width: 52rem;
+    font-size: var(--nr-type-lead, 1rem);
 }
 
 .legal-layout {
@@ -881,13 +884,13 @@ summary {
 }
 
 .legal-article h2 {
-    font-size: clamp(1.25rem, 1.65vw, 1.55rem);
+    font-size: var(--nr-type-card-title, clamp(1.75rem, 2.3vw, 4.25rem));
     font-weight: 620;
 }
 
 .legal-article p {
     max-width: 72ch;
-    font-size: .86rem;
+    font-size: var(--nr-type-body, 1rem);
     line-height: 1.75;
 }
 

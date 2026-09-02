@@ -7,7 +7,7 @@
   --fa-blue-soft: #8eb8ff;
   --nr-handoff-color: 3 7 12;
   --nr-handoff-depth: clamp(7rem, 24svh, 26rem);
-  --nr-cinematic-max: var(--nr-cinematic-width);
+  --nr-cinematic-max: var(--nr-cinematic-content-max);
   --nr-gallery-panel-width: clamp(42rem, 54vw, 180rem);
   color: var(--fa-white);
   background: var(--fa-black);

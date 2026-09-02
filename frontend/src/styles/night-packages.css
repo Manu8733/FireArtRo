@@ -8,7 +8,7 @@
 .nr-package-comparator {
   position: relative;
   min-height: 100dvh;
-  padding: clamp(4.8rem, 5vw, 5.5rem) 0 clamp(2.25rem, 3.4vw, 3.5rem);
+  padding: clamp(5rem, 7vmin, 8rem) 0 clamp(3rem, 5vmin, 6rem);
   overflow: hidden;
   background:
     radial-gradient(circle at 75% 14%, rgba(42, 137, 255, 0.09), transparent 32rem),
@@ -27,7 +27,7 @@
 
 .nr-package-comparator__shell {
   display: grid;
-  gap: clamp(0.7rem, 1.1vw, 0.95rem);
+  gap: clamp(0.85rem, 1.2vmin, 1.35rem);
 }
 
 .nr-package-comparator__header {
@@ -39,17 +39,17 @@
 }
 
 .nr-package-comparator__header p {
-  max-width: 34rem;
+  max-width: 42rem;
   margin: 0;
   color: #8d99aa;
-  font-size: 0.8rem;
+  font-size: var(--nr-type-small);
   line-height: 1.55;
 }
 
 .nr-package-comparator__header > div > p {
   margin-bottom: 0.5rem;
   color: var(--nr-ice);
-  font-size: 0.67rem;
+  font-size: var(--nr-type-label);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -58,7 +58,7 @@
   margin: 0;
   color: var(--nr-paper);
   font-family: "Sora", sans-serif;
-  font-size: clamp(2.15rem, 2.8vw, 2.9rem);
+  font-size: var(--nr-type-page-title);
   font-weight: 520;
   line-height: 0.98;
   letter-spacing: 0;
@@ -88,7 +88,7 @@
   border-radius: 0;
   color: #778397;
   background: transparent;
-  font: 620 0.72rem/1.25 "Sora", sans-serif;
+  font: 620 var(--nr-type-small)/1.25 "Sora", sans-serif;
   cursor: pointer;
   transition: color 180ms ease;
 }
@@ -123,7 +123,7 @@
 
 .nr-package-stage__main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr);
+  grid-template-columns: minmax(0, 1fr) minmax(24rem, 0.92fr);
   min-width: 0;
   gap: clamp(1rem, 2vw, 1.8rem);
   align-items: start;
@@ -135,7 +135,7 @@
   min-width: 0;
   aspect-ratio: 16 / 9;
   margin: 0;
-  width: min(100%, 34rem);
+  width: min(100%, clamp(34rem, 44vw, 50rem));
   overflow: hidden;
   border-radius: 8px;
   background: #020307;
@@ -174,7 +174,7 @@
   right: 1rem;
   bottom: 0.9rem;
   color: rgba(244, 246, 251, 0.72);
-  font-size: 0.61rem;
+  font-size: var(--nr-type-label);
   font-weight: 650;
   text-transform: uppercase;
 }
@@ -194,7 +194,7 @@
   color: #fff;
   background: rgba(3, 6, 12, 0.7);
   backdrop-filter: blur(12px);
-  font: 650 0.71rem/1 "Sora", sans-serif;
+  font: 650 var(--nr-type-small)/1 "Sora", sans-serif;
   cursor: pointer;
   transform: translate(-50%, -50%);
   transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
@@ -228,7 +228,7 @@
 .nr-package-stage__copy p {
   margin: 0 0 0.65rem;
   color: var(--nr-ice);
-  font-size: 0.64rem;
+  font-size: var(--nr-type-label);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -238,7 +238,7 @@
   margin: 0;
   color: var(--nr-paper);
   font-family: "Sora", sans-serif;
-  font-size: clamp(1.9rem, 2.65vw, 2.65rem);
+  font-size: var(--nr-type-card-title);
   font-weight: 520;
   line-height: 1;
   letter-spacing: 0;
@@ -249,7 +249,7 @@
   max-width: 37ch;
   margin-top: 0.6rem;
   color: #909caf;
-  font-size: 0.78rem;
+  font-size: var(--nr-type-small);
   line-height: 1.48;
 }
 
@@ -266,7 +266,7 @@
   position: relative;
   padding-left: 0.75rem;
   color: rgba(224, 231, 242, 0.78);
-  font-size: 0.67rem;
+  font-size: var(--nr-type-label);
   line-height: 1.35;
 }
 
@@ -301,7 +301,7 @@
 
 .nr-package-stage__facts dt {
   color: #65748b;
-  font-size: 0.55rem;
+  font-size: var(--nr-type-label);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -309,7 +309,7 @@
 .nr-package-stage__facts dd {
   margin: 0;
   color: #e2e8f1;
-  font-size: 0.7rem;
+  font-size: var(--nr-type-small);
   line-height: 1.45;
 }
 
@@ -318,7 +318,7 @@
   max-width: 42rem;
   margin: 0;
   color: #8592a6;
-  font-size: 0.67rem;
+  font-size: var(--nr-type-label);
   line-height: 1.5;
 }
 
@@ -339,7 +339,7 @@
 .nr-package-more-videos summary {
   padding: 0.5rem 0;
   color: #c7d5e9;
-  font: 620 0.67rem/1.35 "Sora", sans-serif;
+  font: 620 var(--nr-type-label)/1.35 "Sora", sans-serif;
   cursor: pointer;
 }
 
@@ -358,7 +358,7 @@
   padding: 0.4rem 0.55rem;
   border-bottom: 1px solid rgba(141, 211, 255, 0.28);
   color: var(--nr-ice);
-  font-size: 0.62rem;
+  font-size: var(--nr-type-label);
   text-decoration: none;
 }
 
@@ -379,7 +379,7 @@
   border-radius: 0;
   color: #f6f8fc;
   background: transparent;
-  font: 700 0.7rem/1 "Sora", sans-serif;
+  font: 700 var(--nr-type-small)/1 "Sora", sans-serif;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -396,7 +396,7 @@
 
 .nr-package-variant-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 12rem));
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 15rem));
   align-items: start;
   gap: 0.65rem;
   padding: 0.15rem clamp(0.75rem, 1.8vw, 1.5rem) 0.8rem;
@@ -465,7 +465,7 @@
 .nr-package-variant-strip__copy small {
   overflow: hidden;
   color: #6682aa;
-  font: 650 0.54rem/1.2 "Sora", sans-serif;
+  font: 650 var(--nr-type-label)/1.2 "Sora", sans-serif;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -474,7 +474,7 @@
 .nr-package-variant-strip__copy strong {
   overflow: hidden;
   color: currentColor;
-  font: 620 0.77rem/1.3 "Sora", sans-serif;
+  font: 620 var(--nr-type-small)/1.3 "Sora", sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -546,7 +546,7 @@
 .nr-package-drone-request p {
   margin: 0;
   color: var(--nr-ice);
-  font-size: 0.64rem;
+  font-size: var(--nr-type-label);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -555,14 +555,14 @@
   max-width: 14ch;
   margin: 0;
   color: var(--nr-paper);
-  font: 520 clamp(1.8rem, 2.6vw, 2.65rem)/1.02 "Sora", sans-serif;
+  font: 520 var(--nr-type-card-title)/1.02 "Sora", sans-serif;
   letter-spacing: 0;
 }
 
 .nr-package-drone-request > div > span {
   max-width: 42ch;
   color: #9aa8ba;
-  font-size: 0.8rem;
+  font-size: var(--nr-type-small);
   line-height: 1.5;
 }
 
@@ -577,7 +577,7 @@
   border-radius: 5px;
   color: #06101d;
   background: #d9ecfb;
-  font: 700 0.7rem/1 "Sora", sans-serif;
+  font: 700 var(--nr-type-small)/1 "Sora", sans-serif;
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color 180ms ease, transform 180ms ease;

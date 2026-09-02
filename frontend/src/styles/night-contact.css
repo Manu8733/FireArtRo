@@ -4,7 +4,7 @@
 
 .nr-contact-main {
   position: relative;
-  padding: clamp(5.25rem, 6.5vw, 6.75rem) 0 clamp(2.5rem, 4vw, 3.75rem);
+  padding: clamp(5.5rem, 8vmin, 9rem) 0 clamp(3rem, 5vmin, 6rem);
   color: var(--nr-paper);
   background: #03050a;
 }
@@ -12,7 +12,7 @@
 .nr-contact-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.56fr) minmax(0, 1.44fr);
-  width: min(100%, 62rem);
+  width: min(100%, 80rem);
   gap: clamp(2rem, 4.5vw, 4.25rem);
   align-items: start;
 }
@@ -26,7 +26,7 @@
 .nr-contact-form-heading p {
   margin: 0;
   color: #89ccff;
-  font-size: 0.68rem;
+  font-size: var(--nr-type-label);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -36,7 +36,7 @@
   max-width: 10ch;
   margin: 0.85rem 0 0;
   font-family: "Sora", sans-serif;
-  font-size: clamp(2.35rem, 3.2vw, 3.45rem);
+  font-size: var(--nr-type-page-title);
   font-weight: 500;
   line-height: 1.02;
   letter-spacing: 0;
@@ -44,10 +44,10 @@
 }
 
 .nr-contact-lead {
-  max-width: 25rem;
+  max-width: 34rem;
   margin: 1rem 0 0;
   color: #9aa9bb;
-  font-size: clamp(0.9rem, 1.1vw, 1rem);
+  font-size: var(--nr-type-body);
   line-height: 1.65;
 }
 
@@ -68,7 +68,7 @@
   border: 1px solid rgba(141, 211, 255, 0.23);
   border-radius: 6px;
   background: #070b12;
-  font-size: 0.72rem;
+  font-size: var(--nr-type-small);
   font-weight: 650;
   transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
 }
@@ -94,7 +94,7 @@
 .nr-contact-hours {
   margin: 0.8rem 0 0;
   color: #6d7c90;
-  font-size: 0.7rem;
+  font-size: var(--nr-type-label);
   line-height: 1.5;
 }
 
@@ -127,7 +127,7 @@
 
 .nr-contact-form-heading span {
   color: #718197;
-  font-size: 0.7rem;
+  font-size: var(--nr-type-label);
   line-height: 1.4;
   text-align: right;
 }
@@ -136,7 +136,7 @@
   min-height: 1rem;
   margin: 0 0 0.35rem;
   color: #ffb8b8;
-  font-size: 0.72rem;
+  font-size: var(--nr-type-label);
   line-height: 1.4;
 }
 
@@ -155,7 +155,7 @@
 .nr-contact-form-group legend {
   padding: 0;
   color: #dce8f5;
-  font-size: 0.75rem;
+  font-size: var(--nr-type-small);
   font-weight: 650;
 }
 
@@ -180,7 +180,7 @@
 
 .nr-contact-field label {
   color: #bdc9d8;
-  font-size: 0.68rem;
+  font-size: var(--nr-type-label);
   font-weight: 650;
 }
 
@@ -195,7 +195,7 @@
   outline: 0;
   background: #03060b;
   color: #f5f8fc;
-  font-size: 0.84rem;
+  font-size: var(--nr-type-small);
   color-scheme: dark;
   transition: border-color 180ms ease, background-color 180ms ease;
 }
@@ -234,7 +234,7 @@
 .nr-contact-error {
   display: block;
   color: #ffb8b8;
-  font-size: 0.66rem;
+  font-size: var(--nr-type-label);
   line-height: 1.35;
 }
 
@@ -253,7 +253,7 @@
   color: #dce8f5;
   cursor: pointer;
   list-style: none;
-  font-size: 0.75rem;
+  font-size: var(--nr-type-small);
   font-weight: 650;
 }
 
@@ -264,7 +264,7 @@
 .nr-contact-optional summary small {
   overflow: hidden;
   color: #718197;
-  font-size: 0.64rem;
+  font-size: var(--nr-type-label);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -302,7 +302,7 @@
   gap: 0.65rem;
   margin-top: 0.8rem;
   color: #9ba9ba;
-  font-size: 0.68rem;
+  font-size: var(--nr-type-label);
   line-height: 1.45;
   cursor: pointer;
 }
@@ -335,13 +335,13 @@
 
 .nr-contact-submit-error strong {
   color: #ffd1d1;
-  font-size: 0.76rem;
+  font-size: var(--nr-type-small);
 }
 
 .nr-contact-submit-error p {
   margin: 0.25rem 0 0;
   color: #d8b5b5;
-  font-size: 0.7rem;
+  font-size: var(--nr-type-label);
   line-height: 1.45;
 }
 
@@ -357,7 +357,7 @@
   max-width: 19rem;
   margin: 0;
   color: #718197;
-  font-size: 0.64rem;
+  font-size: var(--nr-type-label);
   line-height: 1.45;
 }
 
@@ -393,7 +393,7 @@
 .nr-contact-success h2 {
   margin: 1.3rem 0 0;
   font-family: "Sora", sans-serif;
-  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-size: var(--nr-type-card-title);
   font-weight: 500;
   line-height: 1.08;
 }
@@ -401,7 +401,7 @@
 .nr-contact-success p {
   margin: 0.8rem 0 1.6rem;
   color: #98a7b9;
-  font-size: 0.9rem;
+  font-size: var(--nr-type-body);
 }
 
 @media (max-width: 960px) {

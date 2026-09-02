@@ -1,6 +1,18 @@
 const { test, expect } = require("@playwright/test");
 
 test.describe("FireArt scroll-directed motion", () => {
+  test("avoids viewport-sized blur filters at the hero handoff", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    const filters = await page.evaluate(() => ({
+      gallery: getComputedStyle(document.querySelector(".fa-work__sticky"), "::before").filter,
+      packages: getComputedStyle(document.querySelector(".fa-packages"), "::before").filter,
+    }));
+
+    expect(filters.gallery).not.toContain("blur(");
+    expect(filters.packages).not.toContain("blur(");
+  });
+
   test("builds the three-panel package triptych without the retired service scenes", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 1440, height: 900 });

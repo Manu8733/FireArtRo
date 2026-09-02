@@ -81,7 +81,8 @@ test("uses CSS viewport dimensions independently of Retina pixel density", async
 });
 
 test("keeps every public layout fluid, centered and free of horizontal overflow", async ({ page }) => {
-  test.setTimeout(120_000);
+  // This intentionally exercises 121 route/viewport combinations on one page.
+  test.setTimeout(300_000);
   const viewports = [
     [375, 812],
     [430, 932],

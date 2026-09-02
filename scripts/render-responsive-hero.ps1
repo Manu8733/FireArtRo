@@ -37,12 +37,12 @@ $taskTemporaryRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('fireart-hero-
 [System.IO.Directory]::CreateDirectory($taskTemporaryRoot) | Out-Null
 
 $taskVariants = @(
-  [pscustomobject]@{ Name = 'wide'; Width = 1920; Height = 1200; Source = $taskLandscapeSource; Crf = 26; MaxRate = '3000k'; Buffer = '6000k'; CropX = '(iw-ow)/2'; CropY = '(ih-oh)/2'; SizeLimitMb = 9 },
-  [pscustomobject]@{ Name = 'ultrawide'; Width = 1920; Height = 900; Source = $taskLandscapeSource; Crf = 26; MaxRate = '2800k'; Buffer = '5600k'; CropX = '(iw-ow)/2'; CropY = '(ih-oh)/2'; SizeLimitMb = 9 },
-  [pscustomobject]@{ Name = 'tablet-landscape'; Width = 1440; Height = 1080; Source = $taskLandscapeSource; Crf = 27; MaxRate = '2200k'; Buffer = '4400k'; CropX = 'iw-ow'; CropY = '(ih-oh)/2'; SizeLimitMb = 6 },
-  [pscustomobject]@{ Name = 'tablet-portrait'; Width = 1080; Height = 1440; Source = $taskPortraitSource; Crf = 27; MaxRate = '2000k'; Buffer = '4000k'; CropX = '(iw-ow)/2'; CropY = 'ih-oh'; SizeLimitMb = 6 },
-  [pscustomobject]@{ Name = 'mobile'; Width = 900; Height = 1600; Source = $taskPortraitSource; Crf = 27; MaxRate = '2000k'; Buffer = '4000k'; CropX = '(iw-ow)/2'; CropY = '(ih-oh)/2'; SizeLimitMb = 6 },
-  [pscustomobject]@{ Name = 'mobile-tall'; Width = 900; Height = 1950; Source = $taskPortraitSource; Crf = 28; MaxRate = '1800k'; Buffer = '3600k'; CropX = '(iw-ow)/2'; CropY = '(ih-oh)/2'; SizeLimitMb = 6 }
+  [pscustomobject]@{ Name = 'wide'; Width = 1920; Height = 1200; Source = $taskLandscapeSource; Crf = 27; MaxRate = '2600k'; Buffer = '5200k'; CropX = 'iw-ow'; CropY = '(ih-oh)/2'; SizeLimitMb = 7 },
+  [pscustomobject]@{ Name = 'ultrawide'; Width = 1920; Height = 900; Source = $taskLandscapeSource; Crf = 27; MaxRate = '2400k'; Buffer = '4800k'; CropX = '(iw-ow)/2'; CropY = '(ih-oh)/2'; SizeLimitMb = 7 },
+  [pscustomobject]@{ Name = 'tablet-landscape'; Width = 1440; Height = 1080; Source = $taskLandscapeSource; Crf = 28; MaxRate = '1800k'; Buffer = '3600k'; CropX = 'iw-ow'; CropY = '(ih-oh)/2'; SizeLimitMb = 5 },
+  [pscustomobject]@{ Name = 'tablet-portrait'; Width = 1080; Height = 1440; Source = $taskPortraitSource; Crf = 28; MaxRate = '1700k'; Buffer = '3400k'; CropX = '(iw-ow)/2'; CropY = 'ih-oh'; SizeLimitMb = 5 },
+  [pscustomobject]@{ Name = 'mobile'; Width = 900; Height = 1600; Source = $taskPortraitSource; Crf = 29; MaxRate = '1500k'; Buffer = '3000k'; CropX = '(iw-ow)/2'; CropY = '(ih-oh)/2'; SizeLimitMb = 4.5 },
+  [pscustomobject]@{ Name = 'mobile-tall'; Width = 900; Height = 1950; Source = $taskPortraitSource; Crf = 29; MaxRate = '1400k'; Buffer = '2800k'; CropX = '(iw-ow)/2'; CropY = '(ih-oh)/2'; SizeLimitMb = 4.5 }
 )
 
 function Invoke-TaskNativeCommand {

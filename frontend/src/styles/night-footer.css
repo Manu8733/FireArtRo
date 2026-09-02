@@ -54,7 +54,7 @@
   max-width: 26ch;
   margin: 0;
   color: rgba(244, 247, 251, 0.92);
-  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+  font-size: var(--nr-type-body);
   font-weight: 500;
   line-height: 1.35;
 }
@@ -86,7 +86,7 @@
   margin: 0 0 0.35rem;
   color: rgba(138, 188, 255, 0.76);
   font-family: "Sora", sans-serif;
-  font-size: 0.64rem;
+  font-size: var(--nr-type-label);
   font-weight: 650;
   text-transform: uppercase;
 }
@@ -97,7 +97,7 @@
   align-items: center;
   gap: 0.48rem;
   color: rgba(244, 247, 251, 0.62);
-  font-size: clamp(0.75rem, 0.88vw, 0.88rem);
+  font-size: var(--nr-type-small);
   transition: color 180ms ease, transform 180ms ease;
 }
 
@@ -126,7 +126,7 @@
   gap: 1.5rem;
   min-height: 3.25rem;
   color: rgba(244, 247, 251, 0.34);
-  font-size: 0.62rem;
+  font-size: var(--nr-type-label);
 }
 
 .fa-footer__legal {

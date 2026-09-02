@@ -99,6 +99,27 @@ export default function HomeGallery() {
       gsap.set(track, { x: 0, force3D: true });
       renderMotion();
 
+      const advanceTouchMotion = (targetProgress) => {
+        const delta = targetProgress - motion.progress;
+        if (Math.abs(delta) < 0.0005) {
+          if (motion.progress === targetProgress) return;
+          motion.progress = targetProgress;
+        } else {
+          // Safari/WebKit may throttle animation frames during a fast scroll or
+          // an orientation change. Keep ordinary touch scrolling eased, but
+          // catch up in one frame when the viewport jumps across most of the
+          // pinned scene so the outgoing image cannot remain stranded.
+          const distance = Math.abs(delta);
+          const jumpsToBoundary = (targetProgress <= 0.015 || targetProgress >= 0.985)
+            && distance >= 0.25;
+          const response = jumpsToBoundary
+            ? 0.985
+            : Math.min(0.62, 0.38 + distance * 0.28);
+          motion.progress += delta * response;
+        }
+        renderMotion();
+      };
+
       const galleryTrigger = ScrollTrigger.create({
         id: "fireart-gallery-track",
         trigger: section,
@@ -132,27 +153,32 @@ export default function HomeGallery() {
         },
       });
 
-      const syncTouchMotion = () => {
+      const getTouchTarget = () => {
         if (!touchDriven) return;
         const trigger = galleryTrigger;
         if (!trigger || trigger.end <= trigger.start) return;
-        const targetProgress = gsap.utils.clamp(
+        return gsap.utils.clamp(
           0,
           1,
           (window.scrollY - trigger.start) / (trigger.end - trigger.start),
         );
-        const delta = targetProgress - motion.progress;
-        if (Math.abs(delta) < 0.0005) {
-          if (motion.progress === targetProgress) return;
-          motion.progress = targetProgress;
-        } else {
-          motion.progress += delta * 0.24;
-        }
-        renderMotion();
+      };
+
+      const syncTouchMotion = () => {
+        const targetProgress = getTouchTarget();
+        if (targetProgress === undefined) return;
+        advanceTouchMotion(targetProgress);
+      };
+
+      const syncTouchBoundary = () => {
+        const targetProgress = getTouchTarget();
+        if (targetProgress === undefined || (targetProgress > 0.015 && targetProgress < 0.985)) return;
+        advanceTouchMotion(targetProgress);
       };
 
       if (touchDriven) {
         gsap.ticker.add(syncTouchMotion);
+        window.addEventListener("scroll", syncTouchBoundary, { passive: true });
       }
 
       const refreshGeometry = () => {
@@ -194,6 +220,7 @@ export default function HomeGallery() {
         window.clearTimeout(settleTimer);
         resizeObserver?.disconnect();
         gsap.ticker.remove(syncTouchMotion);
+        window.removeEventListener("scroll", syncTouchBoundary);
         window.removeEventListener("resize", scheduleGeometryRefresh);
         window.removeEventListener("orientationchange", scheduleGeometryRefresh);
         window.visualViewport?.removeEventListener("resize", scheduleGeometryRefresh);

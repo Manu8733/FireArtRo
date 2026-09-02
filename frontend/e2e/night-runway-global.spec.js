@@ -60,9 +60,12 @@ test("contact uses the shared Night Glass form and secondary direct actions", as
 
   const form = page.locator(".nr-contact-form-wrap");
   const actions = page.locator(".nr-contact-direct a");
+  const rail = page.getByTestId("contact-form-rail");
 
   await expect(form).toHaveCSS("border-radius", "0px");
   await expect(form).not.toHaveCSS("clip-path", "none");
+  await expect(rail).toHaveCSS("height", "1px");
+  await expect(rail).toHaveCSS("background-image", /linear-gradient/);
   await expect(actions).toHaveCount(3);
   for (const action of await actions.all()) {
     await expect(action).toHaveClass(/nr-button--secondary/);

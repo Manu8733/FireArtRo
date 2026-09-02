@@ -139,11 +139,11 @@
   position: relative;
   min-width: 0;
   padding: clamp(1.05rem, 2vw, 1.5rem);
-  border: 1px solid rgba(141, 211, 255, 0.2);
+  border: 1px solid rgba(141, 211, 255, 0.14);
   border-radius: 0;
-  background: linear-gradient(145deg, rgba(12, 28, 48, 0.74), rgba(3, 6, 12, 0.82));
-  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(16px);
+  background: linear-gradient(145deg, rgba(8, 14, 24, 0.58), rgba(3, 6, 12, 0.78));
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(12px);
   clip-path: polygon(0 0.7rem, 0.7rem 0, calc(100% - 0.7rem) 0, 100% 0.7rem, 100% 100%, 0.7rem 100%, 0 calc(100% - 0.7rem));
 }
 
@@ -152,8 +152,8 @@
   top: -1px;
   right: clamp(1.05rem, 2vw, 1.5rem);
   left: clamp(1.05rem, 2vw, 1.5rem);
-  height: 2px;
-  background: #84caf8;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(141, 211, 255, 0.42) 12%, rgba(141, 211, 255, 0.22) 88%, transparent);
 }
 
 .nr-contact-form-heading {

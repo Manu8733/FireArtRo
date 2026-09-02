@@ -38,7 +38,10 @@ test.describe("Night Runway package stage", () => {
     await expect(page.locator("body")).not.toContainText(/plan de zbor|flight|telemetrie/i);
   });
 
-  test("keeps selectable package previews directly above the selected package", async ({ page }) => {
+  test("keeps selectable package previews directly above the selected package on desktop", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+
     const rail = page.getByTestId("package-variant-strip");
     const media = page.getByTestId("package-media");
     const railBox = await rail.boundingBox();
@@ -46,6 +49,18 @@ test.describe("Night Runway package stage", () => {
 
     expect(railBox?.y).toBeLessThan(mediaBox?.y || 0);
     expect((mediaBox?.y || 0) - ((railBox?.y || 0) + (railBox?.height || 0))).toBeLessThan(40);
+  });
+
+  test("leads with the active package before the variant rail on mobile", async ({ page }) => {
+    await page.setViewportSize({ width: 467, height: 872 });
+    await page.reload({ waitUntil: "domcontentloaded" });
+
+    const stage = page.getByTestId("package-stage");
+    const rail = page.getByTestId("package-variant-strip");
+    const stageBox = await stage.boundingBox();
+    const railBox = await rail.boundingBox();
+
+    expect(stageBox?.y).toBeLessThan(railBox?.y || 0);
   });
 
   test("opens the selected package preview in an expanded video dialog", async ({ page }) => {

@@ -97,12 +97,13 @@
   inset: -12%;
   content: "";
   pointer-events: none;
-  opacity: 0.15;
-  background: url("../../public/media/gallery/fireartro-drone-show-focsani-dji-0768-enhanced-nr.webp") 58% 46% / cover no-repeat;
-  filter: saturate(1.24) contrast(1.08) brightness(0.5);
+  opacity: 0.3;
+  background:
+    radial-gradient(circle at 72% 24%, rgba(81, 74, 255, 0.24), transparent 28%),
+    radial-gradient(circle at 28% 58%, rgba(217, 67, 61, 0.14), transparent 30%),
+    url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat;
+  filter: saturate(1.4) brightness(0.84);
   transform: scale(1.08);
-  -webkit-mask-image: radial-gradient(ellipse 70% 66% at 56% 48%, #000 12%, rgba(0, 0, 0, 0.82) 48%, transparent 88%);
-  mask-image: radial-gradient(ellipse 70% 66% at 56% 48%, #000 12%, rgba(0, 0, 0, 0.82) 48%, transparent 88%);
 }
 
 .fa-work__sticky::after {
@@ -115,18 +116,18 @@
      This is an overlay only: the pinned gallery's scroll geometry stays intact. */
   background:
     linear-gradient(180deg,
-      rgb(var(--nr-handoff-color) / 0.6) 0%,
-      rgb(var(--nr-handoff-color) / 0.59) 8%,
-      rgb(var(--nr-handoff-color) / 0.53) 20%,
-      rgb(var(--nr-handoff-color) / 0.38) 36%,
-      rgb(var(--nr-handoff-color) / 0.22) 52%,
-      rgb(var(--nr-handoff-color) / 0.1) 68%,
-      rgb(var(--nr-handoff-color) / 0.025) 84%,
+      rgb(var(--nr-handoff-color)) 0%,
+      rgb(var(--nr-handoff-color) / 0.98) 8%,
+      rgb(var(--nr-handoff-color) / 0.88) 20%,
+      rgb(var(--nr-handoff-color) / 0.64) 36%,
+      rgb(var(--nr-handoff-color) / 0.36) 52%,
+      rgb(var(--nr-handoff-color) / 0.16) 68%,
+      rgb(var(--nr-handoff-color) / 0.04) 84%,
       rgb(var(--nr-handoff-color) / 0) 100%) top / 100% var(--nr-handoff-depth) no-repeat,
     radial-gradient(circle at 70% 42%, rgba(35, 111, 205, 0.16), transparent 30%),
     radial-gradient(circle at 38% 76%, rgba(210, 73, 55, 0.12), transparent 34%),
-    linear-gradient(90deg, rgba(2, 4, 7, 0.47), rgba(2, 7, 14, 0.11) 48%, rgba(2, 4, 7, 0.41)),
-    linear-gradient(180deg, rgba(2, 4, 7, 0.35), transparent 42%, rgba(2, 4, 7, 0.43));
+    linear-gradient(90deg, rgba(2, 4, 7, 0.78), rgba(2, 7, 14, 0.18) 48%, rgba(2, 4, 7, 0.68)),
+    linear-gradient(180deg, rgba(2, 4, 7, 0.58), transparent 42%, rgba(2, 4, 7, 0.72));
 }
 
 .fa-work__viewport {
@@ -280,7 +281,7 @@
   padding: clamp(4rem, 6.5vw, 6rem) 0;
   color: var(--fa-white);
   background:
-    linear-gradient(180deg, rgba(2, 7, 14, 0.59) 0%, rgba(5, 19, 36, 0.58) 48%, rgba(2, 4, 7, 0.6) 100%),
+    linear-gradient(180deg, rgba(2, 7, 14, 0.99) 0%, rgba(5, 19, 36, 0.97) 48%, #020407 100%),
     repeating-linear-gradient(128deg, transparent 0 12rem, rgba(127, 180, 255, 0.026) 12.08rem 12.15rem);
 }
 
@@ -290,12 +291,13 @@
   inset: -12%;
   content: "";
   pointer-events: none;
-  opacity: 0.14;
-  background: url("../../public/media/gallery/fireartro-artificii-noapte-spectacol-091.webp") 62% 46% / cover no-repeat;
-  filter: saturate(1.18) contrast(1.08) brightness(0.46);
+  opacity: 0.3;
+  background:
+    radial-gradient(circle at 72% 24%, rgba(81, 74, 255, 0.24), transparent 28%),
+    radial-gradient(circle at 28% 58%, rgba(217, 67, 61, 0.14), transparent 30%),
+    url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat;
+  filter: saturate(1.4) brightness(0.84);
   transform: scale(1.08);
-  -webkit-mask-image: radial-gradient(ellipse 74% 68% at 62% 46%, #000 10%, rgba(0, 0, 0, 0.76) 50%, transparent 90%);
-  mask-image: radial-gradient(ellipse 74% 68% at 62% 46%, #000 10%, rgba(0, 0, 0, 0.76) 50%, transparent 90%);
 }
 
 .fa-packages::after {
@@ -508,15 +510,9 @@
 
 .fa-about__image {
   inset: -6%;
-}
-
-.fa-about__image img {
-  width: 100%;
-  height: 100%;
-  opacity: 0.7;
-  object-fit: cover;
-  object-position: center 70%;
-  filter: blur(16px) saturate(1.18) contrast(1.08) brightness(0.58);
+  opacity: 0.3;
+  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat;
+  filter: blur(18px) saturate(1.4) brightness(0.84);
   transform: scale(1.08);
 }
 
@@ -524,7 +520,7 @@
   background:
     radial-gradient(circle at 76% 72%, rgba(65, 114, 255, 0.22), transparent 34%),
     radial-gradient(circle at 68% 62%, rgba(220, 70, 52, 0.1), transparent 24%),
-    linear-gradient(90deg, rgba(2, 5, 9, 0.49), rgba(2, 5, 9, 0.3) 62%, rgba(2, 5, 9, 0.37));
+    linear-gradient(90deg, rgba(2, 5, 9, 0.82), rgba(2, 5, 9, 0.5) 62%, rgba(2, 5, 9, 0.62));
 }
 
 .fa-about__inner {
@@ -953,14 +949,15 @@
 
   .fa-work__sticky::before,
   .fa-packages::before {
-    opacity: 0.11;
-    filter: saturate(1.12) contrast(1.05) brightness(0.44);
+    opacity: 0.24;
+    background-position: 50% 28%;
+    filter: saturate(1.3) brightness(0.76);
   }
 
-  .fa-about__image img {
-    opacity: 0.62;
-    object-position: center 72%;
-    filter: blur(14px) saturate(1.14) contrast(1.06) brightness(0.54);
+  .fa-about__image {
+    opacity: 0.24;
+    background-position: 50% 28%;
+    filter: blur(14px) saturate(1.3) brightness(0.76);
   }
 
   .fa-work {

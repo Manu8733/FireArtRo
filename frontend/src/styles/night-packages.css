@@ -16,9 +16,9 @@
   height: clamp(46rem, 105dvh, 68rem);
   content: "";
   pointer-events: none;
-  opacity: 0.18;
-  background: url("../../public/media/gallery/fireartro-artificii-noapte-spectacol-091.webp") 52% 42% / cover no-repeat;
-  filter: blur(22px) saturate(1.2) brightness(0.54);
+  opacity: 0.3;
+  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat;
+  filter: blur(18px) saturate(1.4) brightness(0.84);
   transform: scale(1.08);
 }
 
@@ -30,7 +30,7 @@
   pointer-events: none;
   background:
     radial-gradient(circle at 28% 28%, rgba(201, 58, 49, 0.15), transparent 30rem),
-    linear-gradient(180deg, rgba(2, 4, 8, 0.29), rgba(2, 4, 8, 0.6) 64rem);
+    linear-gradient(180deg, rgba(2, 4, 8, 0.48), var(--nr-obsidian) 64rem);
 }
 
 .nr-package-comparator,
@@ -688,9 +688,9 @@
 
 @media (max-width: 940px) {
   .nr-packages-page::before {
-    opacity: 0.15;
-    background-position: 48% 30%;
-    filter: blur(18px) saturate(1.16) brightness(0.51);
+    opacity: 0.24;
+    background-position: 50% 28%;
+    filter: blur(14px) saturate(1.3) brightness(0.76);
   }
 
   .nr-package-stage__main {

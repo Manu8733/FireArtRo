@@ -34,8 +34,8 @@ test("homepage gallery is substantial and requested sections use photographic at
 
   expect(metrics.cardRatio).toBeGreaterThanOrEqual(0.54);
   expect(metrics.cardRatio).toBeLessThanOrEqual(0.6);
-  expect(metrics.gallery).toContain("fireartro-drone-show-focsani-dji-0768-enhanced-nr");
-  expect(metrics.packages).toContain("fireartro-artificii-noapte-spectacol-091");
+  expect(metrics.gallery).toContain("fireartro-drone-show-neversea-show-img-4351");
+  expect(metrics.packages).toContain("fireartro-drone-show-neversea-show-img-4351");
   expect(metrics.aboutFilter).toContain("blur");
   expect(metrics.overflow).toBeLessThanOrEqual(1);
 
@@ -46,10 +46,10 @@ test("homepage gallery is substantial and requested sections use photographic at
 });
 
 for (const [route, selector, asset] of [
-  ["/contact", ".nr-contact-main", "fireartro-artificii-noapte-spectacol-070.webp"],
+  ["/contact", ".nr-contact-main", "fireartro-drone-show-neversea-show-img-4351.webp"],
   ["/intrebari-frecvente", ".nr-faq-route", "fireartro-drone-show-neversea-show-img-4351.webp"],
-  ["/galerie", ".nr-gallery-page", "fireartro-drone-show-untold-img-6900-2.webp"],
-  ["/pachete", ".nr-packages-page", "fireartro-artificii-noapte-spectacol-091.webp"],
+  ["/galerie", ".nr-gallery-page", "fireartro-drone-show-neversea-show-img-4351.webp"],
+  ["/pachete", ".nr-packages-page", "fireartro-drone-show-neversea-show-img-4351.webp"],
 ]) {
   test(`${route} uses its assigned atmospheric image behind content`, async ({ page }) => {
     await page.setViewportSize({ width: 1512, height: 982 });

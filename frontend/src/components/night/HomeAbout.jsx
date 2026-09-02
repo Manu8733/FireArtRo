@@ -1,5 +1,3 @@
-import { MEDIA } from "@/data/content";
-
 export default function HomeAbout() {
   return (
     <section
@@ -9,9 +7,7 @@ export default function HomeAbout() {
       data-testid="home-about"
       aria-labelledby="fa-about-title"
     >
-      <div className="fa-about__image" aria-hidden="true">
-        <img src={MEDIA.fireworksSky} alt="" loading="lazy" decoding="async" />
-      </div>
+      <div className="fa-about__image" aria-hidden="true" />
       <div className="fa-about__shade" aria-hidden="true" />
 
       <div className="nr-shell fa-about__inner">

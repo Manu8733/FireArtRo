@@ -84,3 +84,18 @@ All updated surfaces use the existing fluid type and spacing tokens. The contact
 The implementation will be limited to the affected public components, styles, review endpoint, provider normalization, and documented server environment variables. No unrelated page redesign or data migration is included.
 
 Review behavior is verified without real credentials by mocking provider responses. Live credentials are not requested, committed, printed, or exposed in frontend environment variables.
+
+## Design contract
+
+| Field | Decision |
+| --- | --- |
+| Screen job | Help an event organizer understand the offer, submit a usable brief, and see authentic public proof before reaching the footer. |
+| Primary user and action | An organizer with a date and location submits the existing quote form or chooses one direct contact channel. |
+| Content hierarchy | Event context first, required form fields second, optional detail third, verified reviews before legal navigation. |
+| Navigation and controls | Existing NightButton geometry for equivalent CTAs; native, labeled form controls; filters, accordions, icon controls, cookies, and Admin remain role-specific. |
+| Visual language | Obsidian `#03050a`, carbon `#080c14`, paper `#f5f7fb`, ice `#8dd3ff`, electric blue `#1677ff`; Sora for display and labels, Inter for controls/body, Cormorant only for the existing editorial accent; square clipped surfaces and restrained hairlines. |
+| Required states | Existing form default, hover, focus, validation error, loading, disabled, submit failure, and success states; review loading/error/unconfigured/empty states render no section, while partial provider success renders only that provider. |
+| Responsive behavior | Two-column contact layout where space permits, one column below the existing structural breakpoint, wrapping 44px contact/legal targets, fluid review cards, no page-level horizontal overflow, static touch-scroll rails for reduced motion. |
+| Evidence used | UIZZE Registered Address: calm field grouping; UIZZE Reimbursement Details: compact dark surface hierarchy; UIZZE Spending Period: clear section grouping and one dominant action. Transfer structure and density only, never finance branding or exact layouts. |
+| Forbidden defaults | No generic rounded glass cards, neon gradients, invented ratings, oversized headings, decorative badges, redundant CTA styles, or setup placeholders visible to visitors. |
+| Acceptance criteria | Gallery/Packages/About share perceived darkness; form logic and focus order are unchanged; direct contact actions use NightButton styling; company/CUI is absent only from footer; provider secrets stay server-side; reviews appear only from valid configured provider data and move in the approved directions immediately above every public footer. |

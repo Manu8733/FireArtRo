@@ -292,18 +292,6 @@
   filter: blur(18px) saturate(1.4) brightness(0.84);
 }
 
-.fa-packages::after {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  right: var(--nr-gutter);
-  left: var(--nr-gutter);
-  height: 1px;
-  content: "";
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(141, 211, 255, 0.72), transparent);
-}
-
 .fa-packages__inner {
   position: relative;
   z-index: 1;

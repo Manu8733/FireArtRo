@@ -185,7 +185,11 @@ export default function GalleryPage() {
   }, [expandedIndex, movePhoto]);
 
   return (
-    <main className="nr-gallery-page" data-design="editorial-mosaic">
+    <main
+      className="nr-gallery-page"
+      data-design="night-runway"
+      data-gallery-design="editorial-mosaic"
+    >
       <ScrollProgress />
       <Navbar />
 

@@ -16,7 +16,7 @@ test.describe("Editorial mosaic gallery", () => {
   test("renders a compact adaptive photo mosaic", async ({ page }) => {
     await openGallery(page);
 
-    await expect(page.locator("main[data-design='editorial-mosaic']")).toBeVisible();
+    await expect(page.locator("main[data-design='night-runway'][data-gallery-design='editorial-mosaic']")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Galerie" })).toHaveCount(1);
     await expect(page.getByTestId("gallery-card")).toHaveCount(205);
     await expect(page.locator(".nr-gallery-card__copy")).toHaveCount(0);

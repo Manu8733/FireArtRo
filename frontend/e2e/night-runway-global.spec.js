@@ -3,7 +3,7 @@ const { test, expect } = require("@playwright/test");
 const routeDesigns = [
   ["/", "night-runway"],
   ["/pachete", "night-runway"],
-  ["/galerie", "editorial-mosaic"],
+  ["/galerie", "night-runway"],
   ["/intrebari-frecvente", "night-runway"],
   ["/contact", "night-runway"],
 ];

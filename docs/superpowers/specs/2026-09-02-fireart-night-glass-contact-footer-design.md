@@ -8,9 +8,8 @@ The change covers:
 
 - background continuity across the homepage Gallery, Packages, and About sections;
 - the Contact page form surface, fields, direct-contact actions, and related public CTA styling;
+- secure Google and Facebook review rails above the shared footer;
 - the legal row in the shared footer.
-
-The reviews integration is explicitly outside this implementation and remains a separate follow-up.
 
 ## Background continuity
 
@@ -44,6 +43,26 @@ Equivalent public conversion actions use the existing NightButton visual languag
 
 The consistency pass applies only to equivalent public CTAs. Filters, accordion controls, gallery controls, social icons, cookie controls, and Admin controls keep their role-specific treatment.
 
+## Verified reviews
+
+Reviews move from the current browser-managed placeholder model to one public backend endpoint. Provider credentials never enter the React bundle.
+
+Google is enabled only when both `GOOGLE_PLACES_API_KEY` and `GOOGLE_PLACE_ID` are present. Facebook is enabled only when both `META_PAGE_ID` and `META_PAGE_ACCESS_TOKEN` are present. Each provider is queried independently, normalized to a small public review model, and omitted when configuration is incomplete, the provider request fails, or no real review text is returned.
+
+The endpoint never returns credentials or raw provider responses. Requests use a short timeout and a bounded in-memory cache so repeated page visits do not repeatedly consume provider quota. Failure of one provider does not hide valid data from the other provider.
+
+The frontend renders no placeholder, setup message, empty shell, or fabricated rating. If neither provider returns usable reviews, the complete reviews section is absent from the document.
+
+The shared `PageEnd` placement remains the single integration point, immediately before the footer on every public page and outside the Admin route.
+
+### Review presentation and motion
+
+Both providers use the same Night Glass card system: translucent black surfaces, square editorial edges, a subtle blue-gray hairline, restrained provider accent, readable review text, author attribution, and rating only when supplied by the provider.
+
+The Google rail moves continuously from left to right. The Facebook rail moves continuously from right to left. Tracks duplicate only rendered provider data to form a seamless loop; duplicates are hidden from assistive technology. Motion pauses during pointer hover or keyboard focus, and `prefers-reduced-motion` produces a static horizontally scrollable row.
+
+The layout remains full-width for motion while card content and headings stay visually aligned with the shared content container. Cards use fluid widths and cannot create page-level horizontal overflow.
+
 ## Footer
 
 Remove the visible legal-company string containing the company name and CUI from the footer only. Legal pages and structured business data remain unchanged.
@@ -62,4 +81,6 @@ All updated surfaces use the existing fluid type and spacing tokens. The contact
 
 ## Verification boundary
 
-The implementation will be limited to the affected public components and styles. No unrelated page redesign, data migration, or review-provider integration is included.
+The implementation will be limited to the affected public components, styles, review endpoint, provider normalization, and documented server environment variables. No unrelated page redesign or data migration is included.
+
+Review behavior is verified without real credentials by mocking provider responses. Live credentials are not requested, committed, printed, or exposed in frontend environment variables.

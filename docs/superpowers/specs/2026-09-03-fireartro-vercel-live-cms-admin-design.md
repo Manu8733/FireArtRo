@@ -118,7 +118,7 @@ Layout code, arbitrary CSS, raw HTML, executable scripts, secrets, backend integ
 
 - `GET /api/content` returns the current published snapshot, revision ID, and publication timestamp.
 - The response uses an `ETag` derived from the revision ID and `Cache-Control: no-cache, must-revalidate` so a refresh sees a new publication without serving a stale CDN copy.
-- If no publication exists yet, the API returns a server-seeded snapshot based on the checked-in defaults.
+- If no publication exists yet, the API returns a not-initialized response and the frontend continues to render its checked-in fallback. The authenticated one-time bootstrap submits that exact fallback, which the server validates before creating the first publication.
 - Existing public Blog and review endpoints remain public and receive consistent failure envelopes.
 
 ### Authentication and session
@@ -225,13 +225,13 @@ Components with hard-coded editable copy are migrated into the managed schema. S
 The rollout is safe for the current public site:
 
 1. Deploy the API and public content provider with checked-in defaults as fallback.
-2. Run a protected idempotent bootstrap that stores the normalized defaults as both the first draft and first public revision.
+2. Run a protected idempotent bootstrap from Admin that submits the checked-in fallback and stores its server-validated form as both the first draft and first public revision.
 3. Verify that the API snapshot renders the same public content as the current build.
 4. Enable the new Admin session and editing UI.
 5. Remove browser-local writes only after server draft and publication paths pass acceptance checks.
 6. Keep JSON export available for operator-controlled backups.
 
-Bootstrap cannot overwrite an existing publication unless an explicit force-migration operation is performed in a non-production environment.
+Bootstrap cannot overwrite an existing publication. Non-production replacement uses normal draft and publish operations so the destructive behavior is covered by revision history.
 
 ## Vercel configuration
 

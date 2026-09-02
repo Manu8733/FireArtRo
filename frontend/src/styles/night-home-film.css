@@ -5,6 +5,18 @@
   --fa-blue: #4a82ff;
   --fa-ice: #a9c9ff;
   --fa-white: #f3f6fb;
+  --fa-atmosphere-image: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp");
+  --fa-atmosphere-position: 50% 32%;
+  --fa-atmosphere-opacity: 0.3;
+  --fa-atmosphere-filter: blur(18px) saturate(1.4) brightness(0.84);
+  --fa-atmosphere-base:
+    linear-gradient(116deg, #020407 0%, #071a2c 49%, #02070e 100%),
+    repeating-linear-gradient(128deg, transparent 0 10rem, rgba(127, 180, 255, 0.045) 10.08rem 10.15rem);
+  --fa-atmosphere-scrim:
+    radial-gradient(circle at 70% 42%, rgba(35, 111, 205, 0.16), transparent 30%),
+    radial-gradient(circle at 38% 76%, rgba(210, 73, 55, 0.12), transparent 34%),
+    linear-gradient(90deg, rgba(2, 4, 7, 0.78), rgba(2, 7, 14, 0.18) 48%, rgba(2, 4, 7, 0.68)),
+    linear-gradient(180deg, rgba(2, 4, 7, 0.58), transparent 42%, rgba(2, 4, 7, 0.72));
   color: var(--fa-white);
   background: var(--fa-night);
 }
@@ -86,20 +98,20 @@
   overflow: clip;
   isolation: isolate;
   backface-visibility: hidden;
-  background:
-    linear-gradient(116deg, #020407 0%, #071a2c 49%, #02070e 100%),
-    repeating-linear-gradient(128deg, transparent 0 10rem, rgba(127, 180, 255, 0.045) 10.08rem 10.15rem);
+  background: var(--fa-atmosphere-base);
 }
 
-.fa-work__sticky::before {
+.fa-work__sticky::before,
+.fa-packages::before,
+.fa-about__image {
   position: absolute;
   z-index: 0;
   inset: -12%;
   content: "";
   pointer-events: none;
-  opacity: 0.3;
-  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat fixed;
-  filter: blur(18px) saturate(1.4) brightness(0.84);
+  opacity: var(--fa-atmosphere-opacity);
+  background: var(--fa-atmosphere-image) var(--fa-atmosphere-position) / cover no-repeat fixed;
+  filter: var(--fa-atmosphere-filter);
 }
 
 .fa-work__sticky::after {
@@ -120,10 +132,7 @@
       rgb(var(--nr-handoff-color) / 0.16) 68%,
       rgb(var(--nr-handoff-color) / 0.04) 84%,
       rgb(var(--nr-handoff-color) / 0) 100%) top / 100% var(--nr-handoff-depth) no-repeat,
-    radial-gradient(circle at 70% 42%, rgba(35, 111, 205, 0.16), transparent 30%),
-    radial-gradient(circle at 38% 76%, rgba(210, 73, 55, 0.12), transparent 34%),
-    linear-gradient(90deg, rgba(2, 4, 7, 0.78), rgba(2, 7, 14, 0.18) 48%, rgba(2, 4, 7, 0.68)),
-    linear-gradient(180deg, rgba(2, 4, 7, 0.58), transparent 42%, rgba(2, 4, 7, 0.72));
+    var(--fa-atmosphere-scrim);
 }
 
 .fa-work__viewport {
@@ -276,20 +285,16 @@
   isolation: isolate;
   padding: clamp(4rem, 6.5vw, 6rem) 0;
   color: var(--fa-white);
-  background:
-    linear-gradient(180deg, rgba(2, 7, 14, 0.99) 0%, rgba(5, 19, 36, 0.97) 48%, #020407 100%),
-    repeating-linear-gradient(128deg, transparent 0 12rem, rgba(127, 180, 255, 0.026) 12.08rem 12.15rem);
+  background: var(--fa-atmosphere-base);
 }
 
-.fa-packages::before {
+.fa-packages::after {
   position: absolute;
   z-index: 0;
-  inset: -12%;
+  inset: 0;
   content: "";
   pointer-events: none;
-  opacity: 0.3;
-  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat fixed;
-  filter: blur(18px) saturate(1.4) brightness(0.84);
+  background: var(--fa-atmosphere-scrim);
 }
 
 .fa-packages__inner {
@@ -479,27 +484,17 @@
   align-items: end;
   overflow: hidden;
   padding: clamp(4.5rem, 8vw, 8rem) 0;
-  background: #05080d;
+  background: var(--fa-atmosphere-base);
 }
 
 .fa-about__image,
 .fa-about__shade {
   position: absolute;
-  inset: 0;
-}
-
-.fa-about__image {
-  inset: -6%;
-  opacity: 0.3;
-  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat fixed;
-  filter: blur(18px) saturate(1.4) brightness(0.84);
 }
 
 .fa-about__shade {
-  background:
-    radial-gradient(circle at 76% 72%, rgba(65, 114, 255, 0.22), transparent 34%),
-    radial-gradient(circle at 68% 62%, rgba(220, 70, 52, 0.1), transparent 24%),
-    linear-gradient(90deg, rgba(2, 5, 9, 0.82), rgba(2, 5, 9, 0.5) 62%, rgba(2, 5, 9, 0.62));
+  inset: 0;
+  background: var(--fa-atmosphere-scrim);
 }
 
 .fa-about__inner {
@@ -926,17 +921,10 @@
     --nr-gallery-panel-width: 100vw;
   }
 
-  .fa-work__sticky::before,
-  .fa-packages::before {
-    opacity: 0.24;
-    background-position: 50% 28%;
-    filter: blur(14px) saturate(1.3) brightness(0.76);
-  }
-
-  .fa-about__image {
-    opacity: 0.24;
-    background-position: 50% 28%;
-    filter: blur(14px) saturate(1.3) brightness(0.76);
+  .fa-film {
+    --fa-atmosphere-position: 50% 28%;
+    --fa-atmosphere-opacity: 0.24;
+    --fa-atmosphere-filter: blur(14px) saturate(1.3) brightness(0.76);
   }
 
   .fa-work {

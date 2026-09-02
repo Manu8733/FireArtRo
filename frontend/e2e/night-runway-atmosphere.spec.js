@@ -21,13 +21,27 @@ test("homepage gallery is substantial and requested sections use photographic at
   const metrics = await page.evaluate(() => {
     const background = (selector, pseudo = "::before") =>
       getComputedStyle(document.querySelector(selector), pseudo).backgroundImage;
+    const imageTreatment = (selector, pseudo) => {
+      const style = getComputedStyle(document.querySelector(selector), pseudo);
+      return {
+        image: style.backgroundImage,
+        opacity: style.opacity,
+        filter: style.filter,
+      };
+    };
     const card = document.querySelector(".fa-work__card-inner").getBoundingClientRect();
+    const galleryImage = imageTreatment(".fa-work__sticky", "::before");
+    const packagesImage = imageTreatment(".fa-packages", "::before");
+    const aboutImage = imageTreatment(".fa-about__image");
 
     return {
       cardRatio: card.width / window.innerWidth,
-      gallery: background(".fa-work__sticky"),
-      packages: background(".fa-packages"),
-      aboutFilter: getComputedStyle(document.querySelector(".fa-about__image img")).filter,
+      gallery: galleryImage.image,
+      packages: packagesImage.image,
+      imageOpacities: [galleryImage.opacity, packagesImage.opacity, aboutImage.opacity],
+      imageFilters: [galleryImage.filter, packagesImage.filter, aboutImage.filter],
+      packagesScrim: background(".fa-packages", "::after"),
+      aboutScrim: background(".fa-about__shade", ""),
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
@@ -36,7 +50,10 @@ test("homepage gallery is substantial and requested sections use photographic at
   expect(metrics.cardRatio).toBeLessThanOrEqual(0.6);
   expect(metrics.gallery).toContain("fireartro-drone-show-neversea-show-img-4351");
   expect(metrics.packages).toContain("fireartro-drone-show-neversea-show-img-4351");
-  expect(metrics.aboutFilter).toContain("blur");
+  expect(new Set(metrics.imageOpacities).size).toBe(1);
+  expect(new Set(metrics.imageFilters).size).toBe(1);
+  expect(metrics.imageFilters[0]).toContain("blur");
+  expect(metrics.packagesScrim).toBe(metrics.aboutScrim);
   expect(metrics.overflow).toBeLessThanOrEqual(1);
 
   const packages = page.getByTestId("home-packages");

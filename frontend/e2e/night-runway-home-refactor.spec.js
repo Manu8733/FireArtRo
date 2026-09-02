@@ -1,31 +1,43 @@
 const { test, expect } = require("@playwright/test");
 
-const managedReviews = {
-  siteDetails: {
-    name: "FireArtRo",
-    siteUrl: "https://www.fireartro.ro",
-    email: "contact@fireart.ro",
-    googleReviewsUrl: "https://www.google.com/maps/place/FireArtRo",
-    legalName: "1A BEST EVENTS SRL",
-    taxId: "RO37037033",
-  },
-  testimonials: [
+const reviewApiPayload = {
+  providers: [
     {
-      id: "facebook-live-1",
-      name: "Client Facebook",
-      quote: "Un spectacol construit atent.",
-      source: "Facebook",
-      replaceable: false,
+      id: "facebook",
+      href: "https://www.facebook.com/FireArtRo/reviews",
+      reviews: [{
+        id: "facebook-live-1",
+        provider: "facebook",
+        author: "Client Facebook",
+        text: "Un spectacol construit atent.",
+        rating: 5,
+        published_at: "2026-08-18T20:00:00Z",
+        url: "",
+      }],
     },
     {
-      id: "google-live-1",
-      name: "Client Google",
-      quote: "Execuție foarte bine coordonată.",
-      source: "Google",
-      replaceable: false,
+      id: "google",
+      href: "https://www.google.com/maps/place/FireArtRo",
+      reviews: [{
+        id: "google-live-1",
+        provider: "google",
+        author: "Client Google",
+        text: "Execuție foarte bine coordonată.",
+        rating: 5,
+        published_at: "2026-08-20T18:30:00Z",
+        url: "https://www.google.com/maps/reviews/google-live-1",
+      }],
     },
   ],
 };
+
+async function mockPublicReviews(page, payload = reviewApiPayload) {
+  await page.route("**/api/reviews", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify(payload),
+  }));
+}
 
 const necessaryConsent = {
   necessary: true,
@@ -68,6 +80,7 @@ test.describe("FireArt homepage structural refactor", () => {
   });
 
   test("keeps review rails completely absent until verified provider data exists", async ({ page }) => {
+    await mockPublicReviews(page, { providers: [] });
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     await expect(page.getByTestId("home-reviews")).toHaveCount(0);
@@ -83,9 +96,7 @@ test.describe("FireArt homepage structural refactor", () => {
   });
 
   test("renders compact opposite-direction review rails only for verified provider data", async ({ page }) => {
-    await page.addInitScript((content) => {
-      window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify(content));
-    }, managedReviews);
+    await mockPublicReviews(page);
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const reviews = page.getByTestId("home-reviews");
@@ -94,6 +105,15 @@ test.describe("FireArt homepage structural refactor", () => {
     await expect(reviews.locator("[data-review-provider='facebook']")).toHaveAttribute("data-direction", "right-to-left");
     await expect(reviews.locator("[data-review-provider='google']")).toHaveAttribute("data-direction", "left-to-right");
     await expect(reviews.locator("[data-review-card]")).toHaveCount(2);
+    await expect(reviews.locator(".fa-page-reviews__group")).toHaveCount(4);
+    await expect(reviews.locator("[data-review-provider='facebook'] .fa-page-reviews__track"))
+      .toHaveCSS("animation-name", "pageReviewRailLeft");
+    await expect(reviews.locator("[data-review-provider='google'] .fa-page-reviews__track"))
+      .toHaveCSS("animation-name", "pageReviewRailRight");
+    await expect(reviews.locator("[data-review-card]").first()).toHaveCSS("border-radius", "0px");
+    await reviews.locator("[data-review-provider='facebook']").hover();
+    await expect(reviews.locator("[data-review-provider='facebook'] .fa-page-reviews__track"))
+      .toHaveCSS("animation-play-state", "paused");
     await expect(reviews.getByRole("link", { name: /Facebook/i })).toBeVisible();
     await expect(reviews.getByRole("link", { name: /Google/i })).toBeVisible();
 
@@ -103,11 +123,19 @@ test.describe("FireArt homepage structural refactor", () => {
   });
 
   test("places connected reviews immediately before the footer on every public page", async ({ page }) => {
-    await page.addInitScript((content) => {
-      window.localStorage.setItem("fireartro-managed-content-v1", JSON.stringify(content));
-    }, managedReviews);
+    await mockPublicReviews(page);
 
-    for (const route of ["/", "/galerie", "/pachete", "/intrebari-frecvente", "/contact", "/confidentialitate"]) {
+    for (const route of [
+      "/",
+      "/galerie",
+      "/pachete",
+      "/intrebari-frecvente",
+      "/contact",
+      "/blog",
+      "/confidentialitate",
+      "/termeni-si-conditii",
+      "/cookies",
+    ]) {
       await page.goto(route, { waitUntil: "domcontentloaded" });
       const reviews = page.getByTestId("home-reviews");
       await expect(reviews).toBeVisible();

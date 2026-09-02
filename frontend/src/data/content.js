@@ -389,10 +389,10 @@ export const EVENT_TYPES = ["Nuntă", "Corporate", "Festival", "Lansare de produ
 export const NAV_LINKS = [
   { label: "Acasă", href: "#acasa" },
   { label: "Despre noi", href: "#intro" },
-  { label: "Servicii", href: "#spectacole" },
   { label: "Pachete", href: "/pachete" },
   { label: "Galerie", href: "/galerie" },
   { label: "Întrebări", href: "/intrebari-frecvente" },
+  { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
 

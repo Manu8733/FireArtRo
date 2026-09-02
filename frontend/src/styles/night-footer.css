@@ -121,7 +121,7 @@
 
 .fa-footer__bottom {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 1.5rem;
   min-height: 3.25rem;
@@ -132,7 +132,7 @@
 .fa-footer__legal {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 0.15rem;
 }

@@ -222,20 +222,40 @@ export const QuoteForm = () => {
 
           <div className="nr-contact-direct" aria-label="Contact direct">
             {phoneDisplay && (
-              <a href={`tel:${phoneHref}`} aria-label={`Sună la ${phoneDisplay}`}>
+              <NightButton
+                href={`tel:${phoneHref}`}
+                variant="secondary"
+                showArrow={false}
+                className="nr-contact-direct__action"
+                aria-label={`Sună la ${phoneDisplay}`}
+              >
                 <Phone aria-hidden="true" />
                 <span>Telefon</span>
-              </a>
+              </NightButton>
             )}
-            <a href={`mailto:${email}`} aria-label={`Trimite email la ${email}`}>
+            <NightButton
+              href={`mailto:${email}`}
+              variant="secondary"
+              showArrow={false}
+              className="nr-contact-direct__action"
+              aria-label={`Trimite email la ${email}`}
+            >
               <Mail aria-hidden="true" />
               <span>Email</span>
-            </a>
+            </NightButton>
             {whatsAppHref && (
-              <a href={whatsAppHref} target="_blank" rel="noopener noreferrer" aria-label="Scrie pe WhatsApp">
+              <NightButton
+                href={whatsAppHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="secondary"
+                showArrow={false}
+                className="nr-contact-direct__action"
+                aria-label="Scrie pe WhatsApp"
+              >
                 <MessageCircle aria-hidden="true" />
                 <span>WhatsApp</span>
-              </a>
+              </NightButton>
             )}
           </div>
           <p className="nr-contact-hours">{businessHours.label}</p>

@@ -55,6 +55,40 @@ test("keyboard users receive a visible focus treatment", async ({ page }) => {
   expect(outline).not.toBe("none");
 });
 
+test("contact uses the shared Night Glass form and secondary direct actions", async ({ page }) => {
+  await page.goto("/contact", { waitUntil: "domcontentloaded" });
+
+  const form = page.locator(".nr-contact-form-wrap");
+  const actions = page.locator(".nr-contact-direct a");
+
+  await expect(form).toHaveCSS("border-radius", "0px");
+  await expect(form).not.toHaveCSS("clip-path", "none");
+  await expect(actions).toHaveCount(3);
+  for (const action of await actions.all()) {
+    await expect(action).toHaveClass(/nr-button--secondary/);
+    await expect(action).toHaveCSS("min-height", /4[4-9]px|[5-9]\dpx/);
+  }
+
+  await expect(page.locator("#quote-event-type")).toBeVisible();
+  await expect(page.locator("#quote-email")).toBeVisible();
+  await expect(page.locator("#quote-consent")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Trimite cererea/i })).toBeVisible();
+});
+
+test("footer keeps legal controls but omits the public company and CUI string", async ({ page }) => {
+  await page.goto("/contact", { waitUntil: "domcontentloaded" });
+
+  const footer = page.locator("footer.fa-footer");
+  const bottom = footer.locator(".fa-footer__bottom");
+
+  await expect(footer).not.toContainText("1A BEST EVENTS SRL");
+  await expect(footer).not.toContainText("RO37037033");
+  await expect(bottom.locator(":scope > span")).toHaveCount(1);
+  await expect(bottom).toContainText(`© ${new Date().getFullYear()} FireArtRo`);
+  await expect(bottom.locator(".fa-footer__legal a")).toHaveCount(5);
+  await expect(bottom.getByRole("button", { name: "Setări cookies" })).toBeVisible();
+});
+
 test("uses CSS viewport dimensions independently of Retina pixel density", async ({ browser, baseURL }) => {
   const layouts = [];
   for (const deviceScaleFactor of [1, 2, 3]) {

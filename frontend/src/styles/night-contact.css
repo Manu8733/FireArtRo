@@ -84,34 +84,34 @@
   margin-top: 1.15rem;
 }
 
-.nr-contact-direct a {
-  min-height: 2.75rem;
+.nr-contact-direct__action {
+  min-width: clamp(7.25rem, 10vw, 9rem);
+  min-height: 3.25rem;
+  padding-inline: 1rem;
+  color: #e7eff8;
+  border-color: rgba(141, 211, 255, 0.3);
+  background: rgba(4, 7, 13, 0.38);
+}
+
+.nr-contact-direct__action .nr-button__label {
   display: inline-flex;
   align-items: center;
-  gap: 0.48rem;
-  padding: 0 0.8rem;
-  color: #e7eff8;
-  border: 1px solid rgba(141, 211, 255, 0.23);
-  border-radius: 6px;
-  background: #070b12;
-  font-size: var(--nr-type-small);
-  font-weight: 650;
-  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+  gap: 0.55rem;
 }
 
-.nr-contact-direct a:hover {
-  color: #fff;
-  border-color: rgba(141, 211, 255, 0.68);
-  background: #0a1420;
+.nr-contact-direct__action:hover {
+  color: #05070b;
+  border-color: rgba(141, 211, 255, 0.8);
+  background: rgba(141, 211, 255, 0.12);
 }
 
-.nr-contact-direct a:focus-visible,
+.nr-contact-direct__action:focus-visible,
 .nr-contact-optional summary:focus-visible {
   outline: 2px solid #8dd3ff;
   outline-offset: 3px;
 }
 
-.nr-contact-direct svg {
+.nr-contact-direct__action svg {
   width: 0.95rem;
   height: 0.95rem;
   color: #8dd3ff;
@@ -129,8 +129,11 @@
   min-width: 0;
   padding: clamp(1.05rem, 2vw, 1.5rem);
   border: 1px solid rgba(141, 211, 255, 0.2);
-  border-radius: 8px;
-  background: #070b12;
+  border-radius: 0;
+  background: linear-gradient(145deg, rgba(12, 28, 48, 0.74), rgba(3, 6, 12, 0.82));
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px);
+  clip-path: polygon(0 0.7rem, 0.7rem 0, calc(100% - 0.7rem) 0, 100% 0.7rem, 100% 100%, 0.7rem 100%, 0 calc(100% - 0.7rem));
 }
 
 .nr-contact-main__rail {
@@ -214,12 +217,13 @@
 .nr-contact-field select,
 .nr-contact-field textarea {
   width: 100%;
+  box-sizing: border-box;
   min-height: 2.75rem;
   padding: 0.55rem 0.65rem;
   border: 1px solid rgba(141, 211, 255, 0.19);
-  border-radius: 6px;
+  border-radius: 0;
   outline: 0;
-  background: #03060b;
+  background: rgba(3, 6, 11, 0.6);
   color: #f5f8fc;
   font-size: var(--nr-type-small);
   color-scheme: dark;
@@ -250,7 +254,7 @@
 .nr-contact-field select:focus-visible,
 .nr-contact-field textarea:focus-visible {
   border-color: #8dd3ff;
-  background: #07111e;
+  background: rgba(7, 17, 30, 0.76);
 }
 
 .nr-contact-field [aria-invalid="true"] {
@@ -503,7 +507,7 @@
     gap: 0.45rem;
   }
 
-  .nr-contact-direct a {
+  .nr-contact-direct__action {
     flex: 1 1 auto;
     justify-content: center;
   }
@@ -535,7 +539,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nr-contact-direct a,
+  .nr-contact-direct__action,
   .nr-contact-field input,
   .nr-contact-field select,
   .nr-contact-field textarea,

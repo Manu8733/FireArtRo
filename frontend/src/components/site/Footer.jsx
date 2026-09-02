@@ -103,7 +103,6 @@ export const Footer = () => {
               Setări cookies
             </button>
           </nav>
-          <span>{siteDetails.legalName} · CUI {siteDetails.taxId}</span>
         </div>
       </div>
     </footer>

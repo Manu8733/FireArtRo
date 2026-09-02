@@ -17,9 +17,8 @@
   content: "";
   pointer-events: none;
   opacity: 0.3;
-  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat;
+  background: url("../../public/media/gallery/fireartro-drone-show-neversea-show-img-4351.webp") 50% 32% / cover no-repeat fixed;
   filter: blur(18px) saturate(1.4) brightness(0.84);
-  transform: scale(1.08);
 }
 
 .nr-packages-page::after {

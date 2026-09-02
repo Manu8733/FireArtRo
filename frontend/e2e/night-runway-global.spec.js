@@ -89,6 +89,23 @@ test("footer keeps legal controls but omits the public company and CUI string", 
   await expect(bottom.getByRole("button", { name: "Setări cookies" })).toBeVisible();
 });
 
+test("contact keeps the footer at the bottom of a tall tablet viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 1366 });
+  await page.goto("/contact", { waitUntil: "domcontentloaded" });
+  await expect(page.locator(".nr-contact-page .fa-footer")).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const footer = document.querySelector(".nr-contact-page .fa-footer");
+    const rect = footer?.getBoundingClientRect();
+    return {
+      footerBottom: rect ? rect.bottom : 0,
+      viewportHeight: window.innerHeight,
+    };
+  });
+
+  expect(layout.footerBottom).toBeGreaterThanOrEqual(layout.viewportHeight - 1);
+});
+
 test("uses CSS viewport dimensions independently of Retina pixel density", async ({ browser, baseURL }) => {
   const layouts = [];
   for (const deviceScaleFactor of [1, 2, 3]) {

@@ -1,5 +1,16 @@
 .nr-contact-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   background: #03050a;
+}
+
+.nr-contact-page > .nr-contact-main {
+  flex: 1 0 auto;
+}
+
+.nr-contact-page > .fa-footer {
+  margin-top: auto;
 }
 
 .nr-contact-main {

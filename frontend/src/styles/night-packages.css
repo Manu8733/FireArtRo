@@ -30,7 +30,7 @@
   pointer-events: none;
   background:
     radial-gradient(circle at 28% 28%, rgba(201, 58, 49, 0.15), transparent 30rem),
-    linear-gradient(180deg, rgba(2, 4, 8, 0.48), var(--nr-obsidian) 64rem);
+    linear-gradient(180deg, rgba(2, 4, 8, 0.29), rgba(2, 4, 8, 0.6) 64rem);
 }
 
 .nr-package-comparator,

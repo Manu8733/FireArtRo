@@ -31,7 +31,7 @@
   background:
     radial-gradient(circle at 72% 18%, rgba(105, 61, 230, 0.21), transparent 30rem),
     radial-gradient(circle at 28% 32%, rgba(229, 71, 100, 0.1), transparent 25rem),
-    linear-gradient(180deg, rgba(6, 8, 11, 0.34), rgba(6, 8, 11, 0.82) 58rem, #06080b 72rem);
+    linear-gradient(180deg, rgba(6, 8, 11, 0.2), rgba(6, 8, 11, 0.49) 58rem, rgba(6, 8, 11, 0.6) 72rem);
 }
 
 .nr-gallery-stage {

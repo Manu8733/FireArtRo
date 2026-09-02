@@ -31,7 +31,7 @@
   pointer-events: none;
   background:
     radial-gradient(circle at 28% 36%, rgba(191, 52, 71, 0.16), transparent 35%),
-    linear-gradient(90deg, rgba(3, 5, 10, 0.7), rgba(3, 5, 10, 0.9));
+    linear-gradient(90deg, rgba(3, 5, 10, 0.42), rgba(3, 5, 10, 0.54));
 }
 
 .nr-contact-layout {

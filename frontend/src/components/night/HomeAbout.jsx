@@ -13,8 +13,11 @@ export default function HomeAbout() {
       <div className="nr-shell fa-about__inner">
         <p className="fa-kicker">Despre FireArtRo</p>
         <div className="fa-about__copy">
-          <h2 id="fa-about-title">Un moment reușit începe cu o <em>direcție.</em></h2>
-          <p>Data, locul și energia evenimentului sunt reperele din care se construiește spectacolul.</p>
+          <h2 id="fa-about-title">Suntem echipa din spatele <em>spectacolului.</em></h2>
+          <p>
+            FireArtRo planifică și produce în România show-uri cu drone, artificii profesionale și efecte scenice.
+            Coordonăm conceptul, partea tehnică, logistica și execuția pentru fiecare eveniment.
+          </p>
         </div>
       </div>
     </section>

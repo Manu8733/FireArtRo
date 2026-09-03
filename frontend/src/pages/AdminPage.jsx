@@ -16,6 +16,7 @@ import {
   GalleryHorizontalEnd,
   ImagePlus,
   LayoutDashboard,
+  LogOut,
   Menu,
   MessageSquareQuote,
   Newspaper,
@@ -45,6 +46,8 @@ import {
 } from "@/admin/adminConfig";
 import AdminBlogPanel from "@/admin/AdminBlogPanel";
 import { prepareAdminImage } from "@/admin/imageUtils";
+import AdminGate from "../admin/AdminGate";
+import { AdminSessionProvider, useAdminSession } from "../admin/AdminSessionContext";
 import "@/admin.css";
 
 const MODULE_ICONS = {
@@ -238,7 +241,8 @@ function StatusMessage({ status }) {
   );
 }
 
-export default function AdminPage() {
+function AdminWorkspace() {
+  const { admin, logout } = useAdminSession();
   const initial = useMemo(() => ({ ...clone(ADMIN_DEFAULTS), ...readManagedContent() }), []);
   const [active, setActive] = useState("overview");
   const [draft, setDraft] = useState(initial);
@@ -440,6 +444,17 @@ export default function AdminPage() {
     ["Dimensiune locală", formatBytes(draft)],
   ], [draft]);
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch {
+      setStatus({
+        message: "Ieșirea din administrare nu a putut fi confirmată. Încearcă din nou.",
+        tone: "error",
+      });
+    }
+  };
+
   return (
     <main className="admin-shell">
       <header className="admin-appbar">
@@ -473,6 +488,12 @@ export default function AdminPage() {
               </button>
             </>
           )}
+          <span className="admin-session-user" title={admin?.username || "Administrator"}>
+            {admin?.username || "Administrator"}
+          </span>
+          <button type="button" className="admin-session-logout" onClick={handleLogout}>
+            <LogOut aria-hidden="true" /> Ieși
+          </button>
         </div>
       </header>
 
@@ -682,5 +703,15 @@ export default function AdminPage() {
         </footer>
       )}
     </main>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <AdminSessionProvider>
+      <AdminGate>
+        <AdminWorkspace />
+      </AdminGate>
+    </AdminSessionProvider>
   );
 }

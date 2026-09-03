@@ -36,11 +36,6 @@ async function jsonRequest(path, options = {}) {
   return readJson(response);
 }
 
-const adminHeaders = (key, json = false) => ({
-  "X-Admin-Key": key,
-  ...(json ? { "Content-Type": "application/json" } : {}),
-});
-
 export function listPublishedPosts({ limit, signal } = {}) {
   const query = Number.isInteger(limit) ? `?limit=${limit}` : "";
   return jsonRequest(`/blog/posts${query}`, { signal });
@@ -50,44 +45,39 @@ export function getPublishedPost(slug, { signal } = {}) {
   return jsonRequest(`/blog/posts/${encodeURIComponent(slug)}`, { signal });
 }
 
-export function listAdminPosts(key) {
-  return jsonRequest("/admin/blog/posts", {
-    headers: adminHeaders(key),
-  });
+// Protected operations share the Admin session's same-origin cookie/CSRF wrapper.
+export function listAdminPosts(request, { signal } = {}) {
+  return request("/api/admin/blog/posts", { signal });
 }
 
-export function createAdminPost(key, payload) {
-  return jsonRequest("/admin/blog/posts", {
+export function createAdminPost(request, payload) {
+  return request("/api/admin/blog/posts", {
     method: "POST",
-    headers: adminHeaders(key, true),
     body: JSON.stringify(payload),
   });
 }
 
-export function updateAdminPost(key, id, payload) {
-  return jsonRequest(`/admin/blog/posts/${encodeURIComponent(id)}`, {
+export function updateAdminPost(request, id, payload) {
+  return request(`/api/admin/blog/posts/${encodeURIComponent(id)}`, {
     method: "PUT",
-    headers: adminHeaders(key, true),
     body: JSON.stringify(payload),
   });
 }
 
-export function deleteAdminPost(key, id) {
-  return jsonRequest(`/admin/blog/posts/${encodeURIComponent(id)}`, {
+export function deleteAdminPost(request, id) {
+  return request(`/api/admin/blog/posts/${encodeURIComponent(id)}`, {
     method: "DELETE",
-    headers: adminHeaders(key),
   });
 }
 
-export async function uploadAdminCover(key, preparedImage) {
+export async function uploadAdminCover(request, preparedImage) {
   const blob = await fetch(preparedImage.dataUrl).then((response) => response.blob());
   const form = new FormData();
   const baseName = String(preparedImage.originalName || "coperta")
     .replace(/\.[^.]+$/, "");
   form.append("file", blob, `${baseName}.webp`);
-  return jsonRequest("/admin/blog/media", {
+  return request("/api/admin/blog/media", {
     method: "POST",
-    headers: adminHeaders(key),
     body: form,
   });
 }

@@ -1,15 +1,8 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Loader2, Mail, MessageCircle, Phone } from "lucide-react";
 import NightButton from "@/components/night/NightButton";
-import {
-  BUSINESS_HOURS,
-  CONTACT_SETTINGS_DEFAULT,
-  CONTACT_EVENT_TYPES,
-  PACKAGE_ITEMS,
-  SERVICE_INTEREST_OPTIONS,
-  SITE_DETAILS,
-} from "@/data/businessContent";
 import { buildWhatsappLink } from "@/lib/constants";
 import { readContactPrefill } from "@/lib/contactNavigation";
 import useManagedContent from "@/hooks/useManagedContent";
@@ -61,13 +54,13 @@ const postQuote = async (payload) => {
 
 const freshForm = () => ({ ...EMPTY_FORM, services: [] });
 
-const queryPrefill = () => {
+const queryPrefill = (showOptions) => {
   if (typeof window === "undefined") return {};
   const requestedService = new URLSearchParams(window.location.search).get("service");
-  const service = SERVICE_INTEREST_OPTIONS.find(
-    (item) => item.localeCompare(requestedService || "", "ro", { sensitivity: "base" }) === 0,
+  const service = showOptions.find(
+    (item) => item.label.localeCompare(requestedService || "", "ro", { sensitivity: "base" }) === 0,
   );
-  return service ? { services: [service] } : {};
+  return service ? { services: [service.label] } : {};
 };
 
 export const QuoteForm = () => {
@@ -78,10 +71,13 @@ export const QuoteForm = () => {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
-  const packages = useManagedContent("packages", PACKAGE_ITEMS);
-  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
-  const businessHours = useManagedContent("businessHours", BUSINESS_HOURS);
-  const contactSettings = useManagedContent("contactSettings", CONTACT_SETTINGS_DEFAULT);
+  const packages = useManagedContent("packages", CMS_DEFAULTS.packages);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
+  const businessHours = useManagedContent("businessHours", CMS_DEFAULTS.businessHours);
+  const contactSettings = useManagedContent("contactSettings", CMS_DEFAULTS.contactSettings);
+  const contactPage = useManagedContent("contactPage", CMS_DEFAULTS.contactPage);
+  const eventTypes = useMemo(() => contactPage.eventTypes || [], [contactPage.eventTypes]);
+  const showOptions = useMemo(() => contactPage.showOptions || [], [contactPage.showOptions]);
   const phoneDisplay = contactSettings.phoneDisplay || "";
   const phoneHref = contactSettings.phoneTel || phoneDisplay.replace(/\s/g, "");
   const whatsAppHref = buildWhatsappLink(contactSettings.whatsappNumber);
@@ -90,7 +86,7 @@ export const QuoteForm = () => {
 
   useEffect(() => {
     const storedPrefill = readContactPrefill();
-    const urlPrefill = queryPrefill();
+    const urlPrefill = queryPrefill(showOptions);
     if (Object.keys(storedPrefill).length || Object.keys(urlPrefill).length) {
       setForm((current) => ({
         ...current,
@@ -118,7 +114,7 @@ export const QuoteForm = () => {
 
     window.addEventListener("prefill-package", handlePackagePrefill);
     return () => window.removeEventListener("prefill-package", handlePackagePrefill);
-  }, []);
+  }, [showOptions]);
 
   const update = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -216,9 +212,9 @@ export const QuoteForm = () => {
     <section className="nr-contact-main" data-testid="contact-section" aria-labelledby="contact-title">
       <div className="nr-shell nr-contact-layout">
         <header className="nr-contact-intro">
-          <p className="nr-contact-kicker">Brief FireArtRo</p>
-          <h1 id="contact-title">Ai data. Construim restul.</h1>
-          <p className="nr-contact-lead">Spune-ne reperele evenimentului, iar noi pregătim direcția potrivită.</p>
+          <p className="nr-contact-kicker">{contactPage.eyebrow}</p>
+          <h1 id="contact-title">{contactPage.title}</h1>
+          <p className="nr-contact-lead">{contactPage.description}</p>
 
           <div className="nr-contact-direct" aria-label="Contact direct">
             {phoneDisplay && (
@@ -273,7 +269,7 @@ export const QuoteForm = () => {
           ) : (
             <form onSubmit={submit} data-testid="quote-form" aria-busy={loading} noValidate>
               <div className="nr-contact-form-heading">
-                <p>Planificare eveniment</p>
+                <p>{contactPage.formTitle}</p>
                 <span>Câmpurile marcate sunt obligatorii.</span>
               </div>
               <p className="nr-contact-announcement" role="alert" aria-live="polite">{announcement}</p>
@@ -285,7 +281,7 @@ export const QuoteForm = () => {
                   <label htmlFor="quote-event-type">Tip eveniment *</label>
                   <select id="quote-event-type" value={form.event_type} onChange={(event) => update("event_type", event.target.value)} aria-invalid={Boolean(errors.event_type)} aria-describedby={errors.event_type ? "quote-event_type-error" : undefined}>
                     <option value="">Alege tipul</option>
-                    {CONTACT_EVENT_TYPES.map((item) => <option key={item} value={item}>{item}</option>)}
+                    {eventTypes.map((item) => <option key={item.id} value={item.label}>{item.label}</option>)}
                   </select>
                   {fieldError("event_type")}
                 </div>
@@ -306,7 +302,7 @@ export const QuoteForm = () => {
                   <label htmlFor="quote-service">Spectacol dorit *</label>
                   <select id="quote-service" value={form.services[0] || ""} onChange={(event) => updateService(event.target.value)} aria-invalid={Boolean(errors.services)} aria-describedby={errors.services ? "quote-services-error" : undefined}>
                     <option value="">Alege o opțiune</option>
-                    {SERVICE_INTEREST_OPTIONS.map((item) => <option key={item} value={item}>{item}</option>)}
+                    {showOptions.map((item) => <option key={item.id} value={item.label}>{item.label}</option>)}
                   </select>
                   {errors.services && <small className="nr-contact-error" id="quote-services-error">{errors.services}</small>}
                 </div>
@@ -375,7 +371,7 @@ export const QuoteForm = () => {
 
               <label className="nr-contact-consent" htmlFor="quote-consent">
                 <input id="quote-consent" type="checkbox" checked={form.consent} onChange={(event) => update("consent", event.target.checked)} aria-invalid={Boolean(errors.consent)} aria-describedby={errors.consent ? "quote-consent-error" : undefined} />
-                <span>Sunt de acord cu prelucrarea datelor conform <a href="/confidentialitate">politicii de confidențialitate</a>.</span>
+                <span>{contactPage.consentLabel} <a href="/confidentialitate">politicii de confidențialitate</a>.</span>
               </label>
               {fieldError("consent")}
 
@@ -389,7 +385,7 @@ export const QuoteForm = () => {
               <div className="nr-contact-submit-row">
                 <p>Datele sunt folosite doar pentru această solicitare.</p>
                 <NightButton as="button" type="submit" disabled={loading} showArrow={!loading}>
-                  {loading ? <><Loader2 className="nr-contact-spinner" aria-hidden="true" /> Se trimite...</> : "Trimite cererea"}
+                  {loading ? <><Loader2 className="nr-contact-spinner" aria-hidden="true" /> Se trimite...</> : contactPage.submitLabel}
                 </NightButton>
               </div>
             </form>

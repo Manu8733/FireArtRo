@@ -1,5 +1,6 @@
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { useReducedMotion } from "framer-motion";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 
 const KEYWORDS = ["lumină.", "mișcare.", "aer.", "ritm."];
 const INITIAL_DELAY = 450;
@@ -10,9 +11,15 @@ const PAUSE_DELAY = 180;
 
 const sliceCharacters = (value, length) => Array.from(value).slice(0, length).join("");
 
-export const HeroTypingTitle = () => {
+export const HeroTypingTitle = ({
+  titleLead = CMS_DEFAULTS.homePage.hero.titleLead,
+  titleTail = CMS_DEFAULTS.homePage.hero.titleTail,
+}) => {
+  const prefix = titleTail.startsWith("în ") ? "în " : "";
+  const keywords = useMemo(() => titleTail === CMS_DEFAULTS.homePage.hero.titleTail
+    ? KEYWORDS : [titleTail.slice(prefix.length)], [prefix, titleTail]);
+  const sizer = keywords.reduce((longest, word) => word.length > longest.length ? word : longest, "");
   const reduceMotion = useReducedMotion();
-  const [wordIndex, setWordIndex] = useState(0);
   const [displayedWord, setDisplayedWord] = useState("");
   const [phase, setPhase] = useState("typing");
 
@@ -27,7 +34,6 @@ export const HeroTypingTitle = () => {
 
     const publish = () => {
       if (!active) return;
-      setWordIndex(currentWordIndex);
       setDisplayedWord(currentWord);
       setPhase(currentPhase);
     };
@@ -36,7 +42,7 @@ export const HeroTypingTitle = () => {
       timeoutId = window.setTimeout(() => {
         if (!active) return;
 
-        const targetWord = KEYWORDS[currentWordIndex];
+        const targetWord = keywords[currentWordIndex];
 
         if (currentPhase === "typing") {
           const nextLength = Array.from(currentWord).length + 1;
@@ -63,7 +69,7 @@ export const HeroTypingTitle = () => {
           return;
         }
 
-        currentWordIndex = (currentWordIndex + 1) % KEYWORDS.length;
+        currentWordIndex = (currentWordIndex + 1) % keywords.length;
         currentWord = "";
         currentPhase = "typing";
         publish();
@@ -78,19 +84,19 @@ export const HeroTypingTitle = () => {
       active = false;
       window.clearTimeout(timeoutId);
     };
-  }, [reduceMotion]);
+  }, [keywords, reduceMotion]);
 
-  const visualWord = reduceMotion ? KEYWORDS[0] : displayedWord;
+  const visualWord = reduceMotion ? keywords[0] : displayedWord;
   const caretVisible = !reduceMotion && (phase === "typing" || phase === "deleting");
 
   return (
     <h1 id="nr-hero-title" className="nr-hero__title">
-      <span className="nr-hero__accessible-title">Spectacole în lumină.</span>
-      <span className="nr-hero__title-line" aria-hidden="true">Spectacole</span>
+      <span className="nr-hero__accessible-title">{titleLead} {titleTail}</span>
+      <span className="nr-hero__title-line" aria-hidden="true">{titleLead}</span>
       <span className="nr-hero__title-line" aria-hidden="true">
-        în{" "}
+        {prefix}
         <span className="nr-hero__keyword-slot">
-          <span className="nr-hero__keyword-sizer">mișcare.</span>
+          <span className="nr-hero__keyword-sizer">{sizer}</span>
           <span className="nr-hero__keyword-active">
             <span className="nr-hero__keyword" data-phase={phase}>{visualWord}</span>
             {caretVisible && <span className="nr-hero__caret" aria-hidden="true" />}

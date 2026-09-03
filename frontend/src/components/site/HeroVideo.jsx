@@ -14,10 +14,10 @@ const readMediaVariant = () => {
   return ratio >= 2 ? "ultrawide" : "wide";
 };
 
-export const HeroVideo = () => {
+export const HeroVideo = ({ mediaOverride }) => {
   const videoRef = useRef(null);
   const [mediaVariant, setMediaVariant] = useState(readMediaVariant);
-  const media = HERO_MEDIA.variants[mediaVariant] || HERO_MEDIA.variants.wide;
+  const media = mediaOverride || HERO_MEDIA.variants[mediaVariant] || HERO_MEDIA.variants.wide;
   const source = media.src;
   const poster = media.poster || HERO_POSTER;
   const objectPosition = HERO_MEDIA.position || "50% 50%";
@@ -208,10 +208,10 @@ export const HeroVideo = () => {
 
   return (
     <div className="hero-video-stage absolute inset-0 z-0 overflow-hidden">
-      {videoFailed ? (
+      {videoFailed || (mediaOverride && mediaOverride.type !== "video") ? (
         <img
-          src={poster || HERO_POSTER}
-          alt="Spectacol de drone și artificii FireArtRo"
+          src={mediaOverride ? (mediaOverride.type === "youtube" ? poster : source) : poster}
+          alt={mediaOverride?.alt || "Spectacol de drone și artificii FireArtRo"}
           width={media.width}
           height={media.height}
           className="hero-media-surface hero-media-webp absolute inset-0 h-full w-full object-cover"

@@ -71,6 +71,19 @@ def authorize(client):
     return {"X-CSRF-Token": CSRF_TOKEN}
 
 
+def test_bootstrap_is_protected_and_does_not_replace_existing_publication(client):
+    assert client.post("/api/admin/content/bootstrap", json=content_payload()).status_code == 401
+    headers = authorize(client)
+    assert client.post("/api/admin/content/bootstrap", json=content_payload()).status_code == 403
+    before = client.get("/api/content").json()
+    edited = content_payload()
+    edited["siteDetails"]["name"] = "Nu suprascrie"
+    response = client.post("/api/admin/content/bootstrap", json=edited, headers=headers)
+    assert response.status_code == 200
+    assert response.json()["created"] is False
+    assert client.get("/api/content").json() == before
+
+
 def test_public_content_revalidates_by_etag_without_admin_metadata(client):
     first = client.get("/api/content")
 

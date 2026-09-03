@@ -1,4 +1,10 @@
+import useManagedContent from "@/hooks/useManagedContent";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
+
 export default function HomeAbout() {
+  const homePage = useManagedContent("homePage", CMS_DEFAULTS.homePage);
+  const copy = homePage.about;
+  const lastWord = copy.title.lastIndexOf(" ");
   return (
     <section
       id="intro"
@@ -11,13 +17,10 @@ export default function HomeAbout() {
       <div className="fa-about__shade" aria-hidden="true" />
 
       <div className="nr-shell fa-about__inner">
-        <p className="fa-kicker">Despre FireArtRo</p>
+        <p className="fa-kicker">{copy.eyebrow}</p>
         <div className="fa-about__copy">
-          <h2 id="fa-about-title">Suntem echipa din spatele <em>spectacolului.</em></h2>
-          <p>
-            FireArtRo planifică și produce în România show-uri cu drone, artificii profesionale și efecte scenice.
-            Coordonăm conceptul, partea tehnică, logistica și execuția pentru fiecare eveniment.
-          </p>
+          <h2 id="fa-about-title">{copy.title.slice(0, lastWord + 1)}<em>{copy.title.slice(lastWord + 1)}</em></h2>
+          {copy.body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
         </div>
       </div>
     </section>

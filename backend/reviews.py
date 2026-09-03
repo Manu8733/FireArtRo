@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from time import monotonic
+from datetime import datetime, timezone
 from typing import Mapping, Optional
 from urllib.parse import quote
 
@@ -150,6 +151,7 @@ class ReviewsService:
         self.now = now
         self._cached_snapshot = None
         self._cache_expires_at = 0.0
+        self._provider_health = {}
 
     def _provider_jobs(self, client):
         jobs = []
@@ -187,17 +189,20 @@ class ReviewsService:
             return_exceptions=True,
         )
         providers = []
+        checked_at = datetime.now(timezone.utc)
         for (provider_id, _), result in zip(jobs, results):
             if isinstance(result, Exception):
                 logger.warning("Review provider %s is unavailable", provider_id)
+                self._provider_health[provider_id] = {"healthy": False, "checked_at": checked_at}
                 continue
+            self._provider_health[provider_id] = {"healthy": True, "checked_at": checked_at}
             if result:
                 providers.append(result)
         return {"providers": providers}
 
-    async def get_snapshot(self) -> dict:
+    async def get_snapshot(self, *, force=False) -> dict:
         now_value = self.now()
-        if self._cached_snapshot is not None and now_value < self._cache_expires_at:
+        if not force and self._cached_snapshot is not None and now_value < self._cache_expires_at:
             return self._cached_snapshot
 
         if self.http_client is not None:
@@ -209,6 +214,22 @@ class ReviewsService:
         self._cached_snapshot = snapshot
         self._cache_expires_at = now_value + self.ttl_seconds
         return snapshot
+
+    async def integration_health(self, *, refresh=False) -> dict:
+        configured = {
+            "google": bool(_clean_text(self.env.get("GOOGLE_PLACES_API_KEY")) and _clean_text(self.env.get("GOOGLE_PLACE_ID"))),
+            "facebook": bool(_clean_text(self.env.get("META_PAGE_ID")) and _clean_text(self.env.get("META_PAGE_ACCESS_TOKEN"))),
+        }
+        if any(configured.values()):
+            await self.get_snapshot(force=refresh)
+        return {
+            provider: {
+                "configured": is_configured,
+                "healthy": self._provider_health.get(provider, {}).get("healthy") if is_configured else None,
+                "checked_at": self._provider_health.get(provider, {}).get("checked_at") if is_configured else None,
+            }
+            for provider, is_configured in configured.items()
+        }
 
 
 def create_reviews_router(service: ReviewsService) -> APIRouter:

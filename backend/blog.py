@@ -8,10 +8,11 @@ from typing import Literal, Optional, Protocol
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 from fastapi.responses import Response
 from gridfs.errors import NoFile
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from auth import require_admin_session
 
 
 ALLOWED_BLOG_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/avif"}
@@ -286,7 +287,7 @@ class BlogService:
             await self.media_store.delete(deleted["cover_media_id"])
 
 
-def create_blog_router(service, admin_key):
+def create_blog_router(service, admin_dependency=require_admin_session):
     router = APIRouter(prefix="/api")
 
     @router.get("/blog/posts", response_model=list[BlogSummaryResponse])
@@ -310,12 +311,8 @@ def create_blog_router(service, admin_key):
             },
         )
 
-    def require_admin_key(x_admin_key: Optional[str] = Header(default=None)):
-        if not admin_key or x_admin_key != admin_key:
-            raise HTTPException(status_code=401, detail="Acces neautorizat.")
-
     @router.get("/admin/blog/posts", response_model=list[BlogArticleResponse])
-    async def list_admin_posts(_: None = Depends(require_admin_key)):
+    async def list_admin_posts(_=Depends(admin_dependency)):
         return await service.list_admin()
 
     @router.post(
@@ -325,7 +322,7 @@ def create_blog_router(service, admin_key):
     )
     async def create_admin_post(
         payload: BlogArticleCreate,
-        _: None = Depends(require_admin_key),
+        _=Depends(admin_dependency),
     ):
         return await service.create_article(payload)
 
@@ -333,21 +330,21 @@ def create_blog_router(service, admin_key):
     async def update_admin_post(
         article_id: uuid.UUID,
         payload: BlogArticleUpdate,
-        _: None = Depends(require_admin_key),
+        _=Depends(admin_dependency),
     ):
         return await service.update_article(str(article_id), payload)
 
     @router.delete("/admin/blog/posts/{article_id}", status_code=204)
     async def delete_admin_post(
         article_id: uuid.UUID,
-        _: None = Depends(require_admin_key),
+        _=Depends(admin_dependency),
     ):
         await service.delete_article(str(article_id))
 
     @router.post("/admin/blog/media", status_code=201)
     async def upload_blog_media(
         file: UploadFile,
-        _: None = Depends(require_admin_key),
+        _=Depends(admin_dependency),
     ):
         if file.content_type not in ALLOWED_BLOG_IMAGE_TYPES:
             raise HTTPException(

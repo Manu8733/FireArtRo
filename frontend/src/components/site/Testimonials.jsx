@@ -1,12 +1,13 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { ArrowUpRight, Quote } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/cinematic";
-import { SITE_DETAILS, TESTIMONIAL_ITEMS } from "@/data/businessContent";
+
 import useManagedContent from "@/hooks/useManagedContent";
 
 export const Testimonials = () => {
-  const testimonials = useManagedContent("testimonials", TESTIMONIAL_ITEMS);
-  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
+  const testimonials = useManagedContent("testimonials", CMS_DEFAULTS.testimonials);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
 
   return (
     <section className="testimonial-system" data-testid="testimonials-section" aria-labelledby="testimonial-title">

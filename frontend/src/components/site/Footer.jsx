@@ -1,39 +1,23 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { ArrowUpRight, Mail, Phone } from "lucide-react";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/site/CookieConsent";
 import { WhatsAppIcon } from "@/components/site/BrandIcons";
-import { CONTACT_SETTINGS_DEFAULT, SITE_DETAILS, SOCIAL_LINKS } from "@/data/businessContent";
+
 import useManagedContent from "@/hooks/useManagedContent";
 import { buildWhatsappLink, LOGO_URL } from "@/lib/constants";
 import "@/styles/night-footer.css";
 
-const EXPLORE_LINKS = [
-  { label: "Despre noi", href: "/#intro" },
-  { label: "Servicii", href: "/#spectacole" },
-  { label: "Pachete", href: "/pachete" },
-  { label: "Galerie", href: "/galerie" },
-  { label: "Blog", href: "/blog" },
-  { label: "Întrebări", href: "/intrebari-frecvente" },
-  { label: "Contact", href: "/contact" },
-];
-
-const LEGAL_LINKS = [
-  { label: "Confidențialitate", href: "/confidentialitate" },
-  { label: "Termeni și condiții", href: "/termeni-si-conditii" },
-  { label: "Cookies", href: "/cookies" },
-  { label: "ANPC", href: "https://eservicii.anpc.ro/", external: true },
-  { label: "SAL", href: "https://reclamatiisal.anpc.ro/", external: true },
-];
-
 export const Footer = () => {
-  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
-  const managedContactSettings = useManagedContent("contactSettings", CONTACT_SETTINGS_DEFAULT);
-  const socialLinks = useManagedContent("socialLinks", SOCIAL_LINKS).filter((item) => item.href);
-  const phoneDisplay = managedContactSettings.phoneDisplay || CONTACT_SETTINGS_DEFAULT.phoneDisplay;
+  const copy = useManagedContent("footer", CMS_DEFAULTS.footer);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
+  const managedContactSettings = useManagedContent("contactSettings", CMS_DEFAULTS.contactSettings);
+  const socialLinks = useManagedContent("socialLinks", CMS_DEFAULTS.socialLinks).filter((item) => item.href);
+  const phoneDisplay = managedContactSettings.phoneDisplay || CMS_DEFAULTS.contactSettings.phoneDisplay;
   const phoneHref = managedContactSettings.phoneTel
-    || CONTACT_SETTINGS_DEFAULT.phoneTel
+    || CMS_DEFAULTS.contactSettings.phoneTel
     || phoneDisplay.replace(/\s/g, "");
   const whatsAppHref = buildWhatsappLink(
-    managedContactSettings.whatsappNumber || CONTACT_SETTINGS_DEFAULT.whatsappNumber,
+    managedContactSettings.whatsappNumber || CMS_DEFAULTS.contactSettings.whatsappNumber,
   );
   const email = siteDetails.email || "contact@fireart.ro";
   const phoneTarget = phoneDisplay && phoneHref ? `tel:${phoneHref}` : "/contact";
@@ -47,17 +31,17 @@ export const Footer = () => {
             <a className="fa-footer__brand" href="/#acasa" aria-label="FireArtRo, pagina principală">
               <img src={LOGO_URL} alt="FireArtRo" width="720" height="311" loading="lazy" decoding="async" />
             </a>
-            <p>Drone show, artificii și efecte construite pentru momentul potrivit.</p>
+            <p>{copy.tagline}</p>
           </div>
 
           <div className="fa-footer__directory">
             <nav className="fa-footer__column" aria-label="Explorează">
-              <p>Explorează</p>
-              {EXPLORE_LINKS.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
+              <p>{copy.exploreHeading}</p>
+              {copy.exploreLinks.map((item) => <a key={item.id} href={item.href}>{item.label}</a>)}
             </nav>
 
             <div className="fa-footer__column fa-footer__contact">
-              <p>Contact direct</p>
+              <p>{copy.contactHeading}</p>
               <a href={`mailto:${email}`}>
                 <Mail aria-hidden="true" />
                 <span>{email}</span>
@@ -78,7 +62,7 @@ export const Footer = () => {
             </div>
 
             <nav className="fa-footer__column" aria-label="Urmărește">
-              <p>Urmărește</p>
+              <p>{copy.socialHeading}</p>
               {socialLinks.map((item) => (
                 <a key={item.id} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>
               ))}
@@ -87,16 +71,16 @@ export const Footer = () => {
         </div>
 
         <div className="fa-footer__bottom">
-          <span>© {new Date().getFullYear()} FireArtRo</span>
+          <span>© {new Date().getFullYear()} {copy.copyright}</span>
           <nav className="fa-footer__legal" aria-label="Informații legale">
-            {LEGAL_LINKS.map((item) => (
+            {copy.legalLinks.map((item) => (
               <a
-                key={item.href}
+                key={item.id}
                 href={item.href}
-                {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                {...(/^https?:\/\//.test(item.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               >
                 {item.label}
-                {item.external && <ArrowUpRight aria-hidden="true" />}
+                {/^https?:\/\//.test(item.href) && <ArrowUpRight aria-hidden="true" />}
               </a>
             ))}
             <button type="button" onClick={() => window.dispatchEvent(new CustomEvent(OPEN_COOKIE_SETTINGS_EVENT))}>

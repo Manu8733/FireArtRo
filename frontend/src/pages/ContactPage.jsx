@@ -3,13 +3,16 @@ import ScrollProgress from "@/components/site/ScrollProgress";
 import QuoteForm from "@/components/site/QuoteForm";
 import PageEnd from "@/components/site/PageEnd";
 import usePageMeta from "@/hooks/usePageMeta";
+import useManagedContent from "@/hooks/useManagedContent";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import "@/styles/night-contact.css";
 
 export default function ContactPage() {
+  const copy = useManagedContent("contactPage", CMS_DEFAULTS.contactPage);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
   usePageMeta({
-    title: "Solicită ofertă pentru drone show și artificii | FireArtRo",
-    description:
-      "Trimite data, locul și tipul evenimentului pentru o ofertă FireArtRo de drone show, artificii sau efecte speciale.",
+    title: `${copy.title} | ${siteDetails.name}`,
+    description: copy.description,
     path: "/contact",
   });
 

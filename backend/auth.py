@@ -421,7 +421,7 @@ def _request_origin(request):
     return _origin_tuple(f"{scheme}://{request.headers['host']}")
 
 
-def _request_ip(request):
+def request_ip(request):
     # https://vercel.com/docs/headers/request-headers documents XFF overwrite.
     # Only the server-side VERCEL=1 flag activates that trust boundary.
     if os.environ.get("VERCEL") == "1":
@@ -493,7 +493,7 @@ def create_auth_router(service):
         issued = await service.login(
             payload.get("username"),
             payload.get("password"),
-            _request_ip(request),
+            request_ip(request),
             request.headers.get("user-agent", ""),
         )
         response = _session_response(

@@ -1,6 +1,8 @@
 import { ArrowUpRight, Star } from "lucide-react";
 import useSWR from "swr";
 import { getPublicReviews } from "@/lib/reviewsApi";
+import useManagedContent from "@/hooks/useManagedContent";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import "@/styles/night-reviews.css";
 
 
@@ -97,8 +99,9 @@ function ReviewRail({ data }) {
 
 
 export default function HomeReviews() {
+  const settings = useManagedContent("reviewSettings", CMS_DEFAULTS.reviewSettings);
   const { data: providers = [] } = useSWR(
-    "fireart-public-reviews",
+    settings.enabled ? "fireart-public-reviews" : null,
     () => getPublicReviews(),
     {
       dedupingInterval: 60_000,
@@ -107,7 +110,10 @@ export default function HomeReviews() {
     },
   );
 
-  if (!providers.length) return null;
+  const visibleProviders = providers.filter(provider =>
+    (provider.id === "google" && settings.googleEnabled)
+    || (provider.id === "facebook" && settings.facebookEnabled));
+  if (!settings.enabled || !visibleProviders.length) return null;
 
   return (
     <section
@@ -115,8 +121,14 @@ export default function HomeReviews() {
       data-testid="home-reviews"
       aria-label="Recenzii publice verificate"
     >
-      <p className="fa-kicker">Recenzii verificate</p>
-      {providers.map((provider) => <ReviewRail data={provider} key={provider.id} />)}
+      <p className="fa-kicker">{settings.heading}</p>
+      {settings.description ? <p>{settings.description}</p> : null}
+      {visibleProviders.map((provider) => (
+        <ReviewRail
+          data={{ ...provider, reviews: provider.reviews.slice(0, settings.maxItems) }}
+          key={provider.id}
+        />
+      ))}
     </section>
   );
 }

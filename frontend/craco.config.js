@@ -66,6 +66,30 @@ if (config.enableHealthCheck) {
 }
 
 let webpackConfig = {
+  jest: {
+    configure: (jestConfig) => ({
+      ...jestConfig,
+      moduleNameMapper: {
+        ...jestConfig.moduleNameMapper,
+        "^@/(.*)$": "<rootDir>/src/$1",
+        // Jest 27 (bundled by CRA) does not understand React Router 7's
+        // package-export subpath, while Webpack does. Point tests at the
+        // package's matching CommonJS DOM export instead of mocking it per test.
+        "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
+        // The Blob browser SDK depends on newer Web Streams globals than CRA's
+        // Jest 27 sandbox. Unit tests use this inert adapter; Webpack still
+        // resolves the real browser-safe package export for production builds.
+        "^@vercel/blob/client$": "<rootDir>/src/test/vercelBlobClientMock.js",
+      },
+      // CRA expands absolute paths with the worktree's `.codex` segment escaped
+      // as a glob, which makes Jest discover zero tests on Windows. Relative
+      // patterns remain stable in both a linked worktree and a normal checkout.
+      testMatch: [
+        "**/__tests__/**/*.{js,jsx,ts,tsx}",
+        "**/*.{spec,test}.{js,jsx,ts,tsx}",
+      ],
+    }),
+  },
   eslint: {
     configure: {
       extends: ["plugin:react-hooks/recommended"],

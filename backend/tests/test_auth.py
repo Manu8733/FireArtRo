@@ -1163,11 +1163,23 @@ async def test_server_stream_limit_preserves_allowed_payload(
         DB_NAME="fireartro_cms_test_body_" + uuid.uuid4().hex,
     )
     # Wrap the actual server middleware around a consuming endpoint to verify
-    # byte-for-byte replay independently of blog authorization/JSON validation.
+    # byte-for-byte replay independently of route authorization, JSON parsing,
+    # and the media-reference mutex. Those concerns have their own contracts;
+    # this test characterizes the streamed-body limiter only.
     from fastapi import Request
     from fastapi.responses import Response
 
     server.app.router.routes.clear()
+
+    # The real Blog write path adds a session-checked media guard.  Remove it
+    # from this deliberately route-less harness so a valid 128 KiB replay can
+    # reach the echo endpoint without weakening that production guard.
+    server.app.user_middleware = [
+        middleware
+        for middleware in server.app.user_middleware
+        if middleware.cls is not server.MediaWriteGuardMiddleware
+    ]
+    server.app.middleware_stack = server.app.build_middleware_stack()
 
     @server.app.post(path)
     async def echo(request: Request):

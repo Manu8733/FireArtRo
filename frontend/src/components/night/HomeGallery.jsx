@@ -1,16 +1,26 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HOME_GALLERY } from "@/data/homeExperience";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
+import useManagedContent from "@/hooks/useManagedContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const galleryItems = HOME_GALLERY.slice(0, 3);
-
 export default function HomeGallery() {
+  const homePage = useManagedContent("homePage", CMS_DEFAULTS.homePage);
+  const mediaItems = useManagedContent("mediaItems", CMS_DEFAULTS.mediaItems);
+  const copy = homePage.gallery;
+  const galleryItems = useMemo(() => {
+    const byId = new Map(mediaItems.map((item) => [item.id, item]));
+    return homePage.promoSlides.flatMap((slide) => {
+      const media = byId.get(slide.mediaId);
+      if (!media && slide.type !== "youtube") return [];
+      return [{ ...slide, media }];
+    });
+  }, [homePage.promoSlides, mediaItems]);
   const sectionRef = useRef(null);
   const reduceMotion = useReducedMotion();
 
@@ -233,7 +243,7 @@ export default function HomeGallery() {
       cleanupMotion();
       context.revert();
     };
-  }, [reduceMotion]);
+  }, [galleryItems, reduceMotion]);
 
   return (
     <section
@@ -249,12 +259,13 @@ export default function HomeGallery() {
         <div className="fa-work__viewport">
           <div className="fa-work__track">
             <header className="fa-work__intro">
-              <p className="fa-kicker">Selecție FireArtRo</p>
-              <h2 id="fa-work-title">Trei momente.<br />O singură noapte.</h2>
-              <Link className="fa-line-link" to="/galerie">
-                <span>Vezi galeria</span>
+              <p className="fa-kicker">{copy.eyebrow}</p>
+              <h2 id="fa-work-title" style={{ whiteSpace: "pre-line" }}>{copy.title}</h2>
+              {copy.description && <p>{copy.description}</p>}
+              {copy.ctaLabel && <Link className="fa-line-link" to={copy.ctaHref}>
+                <span>{copy.ctaLabel}</span>
                 <ArrowUpRight aria-hidden="true" />
-              </Link>
+              </Link>}
             </header>
 
             {galleryItems.map((item) => (
@@ -266,10 +277,21 @@ export default function HomeGallery() {
               >
                 <div className="fa-work__card-inner" data-gallery-lift>
                   <figure>
-                    <img src={item.image} alt={item.alt} loading="lazy" decoding="async" />
+                    {item.type === "video" ? (
+                      <video src={item.media.src} poster={item.media.poster} controls playsInline preload="metadata" aria-label={item.media.alt} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : item.type === "youtube" ? (
+                      <a href={item.youtubeUrl || item.media?.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label={item.ctaLabel}>
+                        {item.media && <img src={item.media.poster || item.media.thumbnail} alt={item.media.alt} loading="lazy" decoding="async" />}
+                        {!item.media && <span>{item.ctaLabel}</span>}
+                      </a>
+                    ) : (
+                      <Link to={item.ctaHref} aria-label={item.ctaLabel} title={item.shortText}>
+                        <img src={item.media.src} alt={item.media.alt} loading="lazy" decoding="async" />
+                      </Link>
+                    )}
                   </figure>
                   <div className="fa-work__meta">
-                    <p>{item.type}</p>
+                    <p>{item.badge || item.media?.category}</p>
                     <h3>{item.title}</h3>
                   </div>
                 </div>

@@ -1,3 +1,4 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,8 +8,9 @@ import PageEnd from "@/components/site/PageEnd";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
-import { MEDIA_ITEMS, SITE_DETAILS } from "@/data/businessContent";
+
 import "@/styles/night-gallery.css";
+import ManagedPageMedia from "@/components/site/ManagedPageMedia";
 
 const GALLERY_CATEGORIES = ["Artificii de zi", "Artificii de noapte", "Drone show"];
 
@@ -53,10 +55,11 @@ const gallerySchema = (items, siteUrl) => ({
 });
 
 export default function GalleryPage() {
+  const copy = useManagedContent("galleryPage", CMS_DEFAULTS.galleryPage);
   const location = useLocation();
   const navigate = useNavigate();
-  const media = useManagedContent("mediaItems", MEDIA_ITEMS);
-  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
+  const media = useManagedContent("mediaItems", CMS_DEFAULTS.mediaItems);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
   const photos = useMemo(
     () => [...media]
       .filter((item) => item.type === "image")
@@ -64,7 +67,7 @@ export default function GalleryPage() {
     [media],
   );
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const categories = useMemo(() => ["Toate", ...GALLERY_CATEGORIES], []);
+  const categories = useMemo(() => ["Toate", ...new Set([...GALLERY_CATEGORIES, ...photos.map((item) => item.category)])], [photos]);
   const requestedFilter = params.get("filtru") || "Toate";
   const activeFilter = categories.includes(requestedFilter) ? requestedFilter : "Toate";
   const visiblePhotos = useMemo(
@@ -86,8 +89,8 @@ export default function GalleryPage() {
   );
 
   usePageMeta({
-    title: "Galerie drone show si artificii | FireArtRo",
-    description: "Imagini FireArtRo din spectacole cu drone, artificii si efecte scenice.",
+    title: copy.seoTitle,
+    description: copy.seoDescription,
     path: "/galerie",
     schema,
   });
@@ -197,11 +200,12 @@ export default function GalleryPage() {
         <div className="nr-shell nr-gallery-stage__shell">
           <header className="nr-gallery-header">
             <div className="nr-gallery-header__title">
-              <p>Galerie FireArtRo</p>
-              <h1 id="gallery-title">Galerie</h1>
+              <p>{copy.eyebrow}</p>
+              <h1 id="gallery-title">{copy.title}</h1>
             </div>
-            <p className="nr-gallery-header__intro">Cadre reale din spectacole cu drone si artificii de zi sau de noapte.</p>
+            <p className="nr-gallery-header__intro">{copy.description}</p>
           </header>
+          <ManagedPageMedia mediaId={copy.heroMediaId} />
 
           <nav className="nr-gallery-filters" data-testid="gallery-filters" aria-label="Filtre galerie">
             {categories.map((category) => {

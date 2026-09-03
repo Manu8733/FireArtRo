@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
 from blog import (
@@ -11,6 +11,13 @@ from blog import (
     request_size_limit,
     slugify_ro,
 )
+
+
+async def authenticated_admin(x_admin_key: str | None = Header(default=None)):
+    # Route tests inject a tiny auth boundary; production uses require_admin_session.
+    if x_admin_key != "test-admin-key":
+        raise HTTPException(status_code=401, detail="Acces neautorizat.")
+    return object()
 
 
 def article(article_id, slug, status, published_at, title):
@@ -98,7 +105,7 @@ class FakeMediaStore:
 def public_client(posts):
     app = FastAPI()
     service = BlogService(FakeBlogRepository(posts), FakeMediaStore())
-    app.include_router(create_blog_router(service, "test-admin-key"))
+    app.include_router(create_blog_router(service, authenticated_admin))
     return TestClient(app)
 
 
@@ -107,7 +114,7 @@ def admin_client(posts=None):
     media_store = FakeMediaStore()
     service = BlogService(repository, media_store)
     app = FastAPI()
-    app.include_router(create_blog_router(service, "test-admin-key"))
+    app.include_router(create_blog_router(service, authenticated_admin))
     return TestClient(app), repository, media_store
 
 

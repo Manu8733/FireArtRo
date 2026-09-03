@@ -16,8 +16,9 @@ from cms_models import (
     RestoreRequest,
     RevisionResponse,
     RevisionSummary,
+    SiteContent,
 )
-from cms_service import CmsNotInitialized, CmsService, DraftConflict, RevisionNotFound
+from cms_service import BootstrapRefused, CmsNotInitialized, CmsService, DraftConflict, RevisionNotFound
 
 
 REVISION_ID = Annotated[
@@ -82,6 +83,19 @@ def create_cms_router(service: CmsService) -> APIRouter:
     """Build a router around one service instance; mounting belongs to server.py."""
 
     router = APIRouter(tags=["content"])
+
+    @router.post("/api/admin/content/bootstrap")
+    async def bootstrap_content(
+        content: SiteContent,
+        response: Response,
+        identity: AdminIdentity = Depends(require_admin_session),
+    ):
+        _admin_no_store(response)
+        try:
+            result = await service.bootstrap(content, admin_id=identity.username)
+        except BootstrapRefused:
+            raise HTTPException(status_code=409, detail="Inițializarea nu poate suprascrie conținut existent.")
+        return {"created": result.created, "publication": result.publication, "draft": result.draft}
 
     @router.get("/api/content", response_model=PublicationResponse)
     async def get_public_content(request: Request, response: Response):

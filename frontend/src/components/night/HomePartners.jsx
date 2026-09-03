@@ -1,13 +1,23 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PartnerOrbitCanvas from "@/components/night/PartnerOrbitCanvas";
-import { PARTNER_PLACEHOLDERS } from "@/data/homeExperience";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
+import useManagedContent from "@/hooks/useManagedContent";
+import { Link } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HomePartners() {
+  const homePage = useManagedContent("homePage", CMS_DEFAULTS.homePage);
+  const managedPartners = useManagedContent("partners", CMS_DEFAULTS.partners);
+  const mediaItems = useManagedContent("mediaItems", CMS_DEFAULTS.mediaItems);
+  const copy = homePage.partners;
+  const partners = useMemo(() => {
+    const mediaById = new Map(mediaItems.map((item) => [item.id, item]));
+    return managedPartners.map((partner) => ({ ...partner, logo: mediaById.get(partner.logoMediaId)?.src }));
+  }, [managedPartners, mediaItems]);
   const sectionRef = useRef(null);
   const canvasRef = useRef(null);
   const reduceMotion = useReducedMotion();
@@ -40,18 +50,23 @@ export default function HomePartners() {
     >
       <div className="fa-partners__sticky">
         <header className="fa-partners__copy">
-          <p className="fa-kicker">Un show se construiește împreună</p>
-          <h2 id="fa-partners-title">O rețea care prinde formă.</h2>
-          <p>Locații, organizatori și echipe tehnice intră în aceeași orbită.</p>
+          <p className="fa-kicker">{copy.eyebrow}</p>
+          <h2 id="fa-partners-title">{copy.title}</h2>
+          {copy.description && <p>{copy.description}</p>}
+          {copy.ctaLabel && <Link to={copy.ctaHref}>{copy.ctaLabel}</Link>}
         </header>
 
-        {!reduceMotion && (
-          <PartnerOrbitCanvas ref={canvasRef} partners={PARTNER_PLACEHOLDERS} onReady={setReady} />
+        {!reduceMotion && partners.length > 0 && (
+          <PartnerOrbitCanvas ref={canvasRef} partners={partners} onReady={setReady} />
         )}
 
-        <div className="fa-partners__names" aria-label="Spații rezervate pentru partenerii FireArtRo">
-          {PARTNER_PLACEHOLDERS.map((partner) => (
-            <span data-partner-name key={partner.id}>{partner.name}</span>
+        <div className="fa-partners__names" aria-label="Partenerii FireArtRo">
+          {partners.map((partner) => (
+            <span data-partner-name data-placeholder={partner.replaceable || undefined} key={partner.id}>
+              {partner.logo && <img src={partner.logo} alt={partner.name} loading="lazy" style={{ maxWidth: "100%", maxHeight: 80 }} />}
+              {partner.name}
+              {partner.replaceable && <small className="sr-only"> — Spațiu rezervat pentru un partener</small>}
+            </span>
           ))}
         </div>
       </div>

@@ -5,8 +5,9 @@ import NightButton from "@/components/night/NightButton";
 import Navbar from "@/components/site/Navbar";
 import PageEnd from "@/components/site/PageEnd";
 import ScrollProgress from "@/components/site/ScrollProgress";
-import { SITE_DETAILS } from "@/data/businessContent";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import usePageMeta from "@/hooks/usePageMeta";
+import useManagedContent from "@/hooks/useManagedContent";
 import {
   blogMediaUrl,
   getPublishedPost,
@@ -21,6 +22,7 @@ const roDate = new Intl.DateTimeFormat("ro-RO", {
 
 export default function BlogArticlePage() {
   const { slug } = useParams();
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
   const [requestVersion, setRequestVersion] = useState(0);
   const [state, setState] = useState({
     loading: true,
@@ -64,11 +66,11 @@ export default function BlogArticlePage() {
     datePublished: state.post.published_at,
     dateModified: state.post.updated_at,
     image: state.post.cover_media_id ? image : undefined,
-    mainEntityOfPage: `${SITE_DETAILS.siteUrl}/blog/${state.post.slug}`,
-  } : undefined, [image, state.post]);
+    mainEntityOfPage: `${siteDetails.siteUrl}/blog/${state.post.slug}`,
+  } : undefined, [image, siteDetails.siteUrl, state.post]);
 
   usePageMeta({
-    title: state.post ? `${state.post.title} — FireArtRo` : "Articol — FireArtRo",
+    title: state.post ? `${state.post.title} — ${siteDetails.name}` : `Articol — ${siteDetails.name}`,
     description: state.post?.excerpt || "Articol din Blogul FireArtRo.",
     path: `/blog/${slug}`,
     image,

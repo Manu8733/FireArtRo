@@ -1,10 +1,11 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { MessageCircle } from "lucide-react";
 import { buildWhatsappLink } from "@/lib/constants";
-import { CONTACT_SETTINGS_DEFAULT } from "@/data/businessContent";
+
 import useManagedContent from "@/hooks/useManagedContent";
 
 export const WhatsAppFloat = () => {
-  const contactSettings = useManagedContent("contactSettings", CONTACT_SETTINGS_DEFAULT);
+  const contactSettings = useManagedContent("contactSettings", CMS_DEFAULTS.contactSettings);
   const href = buildWhatsappLink(contactSettings.whatsappNumber);
   if (!href) return null;
 

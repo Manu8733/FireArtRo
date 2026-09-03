@@ -4,11 +4,14 @@ import NightButton from "@/components/night/NightButton";
 import Navbar from "@/components/site/Navbar";
 import PageEnd from "@/components/site/PageEnd";
 import ScrollProgress from "@/components/site/ScrollProgress";
-import { SITE_DETAILS } from "@/data/businessContent";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import usePageMeta from "@/hooks/usePageMeta";
 import { listPublishedPosts } from "@/lib/blogApi";
+import useManagedContent from "@/hooks/useManagedContent";
 
 export default function BlogPage() {
+  const copy = useManagedContent("blogPage", CMS_DEFAULTS.blogPage);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
   const [requestVersion, setRequestVersion] = useState(0);
   const [state, setState] = useState({
     loading: true,
@@ -36,20 +39,19 @@ export default function BlogPage() {
   const schema = useMemo(() => ({
     "@context": "https://schema.org",
     "@type": "Blog",
-    name: "Blog FireArtRo",
-    url: `${SITE_DETAILS.siteUrl}/blog`,
+    name: `${copy.title} ${siteDetails.name}`,
+    url: `${siteDetails.siteUrl}/blog`,
     blogPost: state.posts.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       datePublished: post.published_at,
-      url: `${SITE_DETAILS.siteUrl}/blog/${post.slug}`,
+      url: `${siteDetails.siteUrl}/blog/${post.slug}`,
     })),
-  }), [state.posts]);
+  }), [copy.title, siteDetails.name, siteDetails.siteUrl, state.posts]);
 
   usePageMeta({
-    title: "Blog — FireArtRo",
-    description:
-      "Articole FireArtRo despre spectacole cu drone, artificii și producția evenimentelor.",
+    title: copy.seoTitle,
+    description: copy.seoDescription,
     path: "/blog",
     schema,
   });
@@ -61,9 +63,9 @@ export default function BlogPage() {
       <main className="fa-blog-page" data-design="night-runway">
         <header className="fa-blog-hero">
           <div className="nr-shell">
-            <p className="fa-kicker">Jurnal FireArtRo</p>
-            <h1>Blog</h1>
-            <p>Articole publicate de echipa FireArtRo.</p>
+            <p className="fa-kicker">{copy.eyebrow}</p>
+            <h1>{copy.title}</h1>
+            <p>{copy.description}</p>
           </div>
         </header>
 

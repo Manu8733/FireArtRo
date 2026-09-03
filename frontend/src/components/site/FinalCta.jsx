@@ -1,7 +1,8 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import NightButton from "@/components/night/NightButton";
 import SectionSignal from "@/components/night/SectionSignal";
 import MediaFrame from "@/components/night/MediaFrame";
-import { CONTACT_SETTINGS_DEFAULT } from "@/data/businessContent";
+
 import { MEDIA } from "@/data/content";
 import useManagedContent from "@/hooks/useManagedContent";
 import { buildWhatsappLink } from "@/lib/constants";
@@ -9,7 +10,7 @@ import { goToContact } from "@/lib/contactNavigation";
 import "@/styles/night-footer.css";
 
 export const FinalCta = () => {
-  const contactSettings = useManagedContent("contactSettings", CONTACT_SETTINGS_DEFAULT);
+  const contactSettings = useManagedContent("contactSettings", CMS_DEFAULTS.contactSettings);
   const whatsAppHref = buildWhatsappLink(contactSettings.whatsappNumber);
 
   return (

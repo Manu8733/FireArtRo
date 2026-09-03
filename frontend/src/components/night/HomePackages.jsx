@@ -1,3 +1,4 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -5,7 +6,7 @@ import { useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useManagedContent from "@/hooks/useManagedContent";
-import { PACKAGE_ITEMS } from "@/data/businessContent";
+
 import { goToContact } from "@/lib/contactNavigation";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -17,9 +18,11 @@ const FEATURED_PACKAGE_IDS = [
 ];
 
 export default function HomePackages() {
+  const homePage = useManagedContent("homePage", CMS_DEFAULTS.homePage);
+  const copy = homePage.packages;
   const sectionRef = useRef(null);
   const reduceMotion = useReducedMotion();
-  const managedPackages = useManagedContent("packages", PACKAGE_ITEMS);
+  const managedPackages = useManagedContent("packages", CMS_DEFAULTS.packages);
   const featuredPackages = useMemo(
     () => FEATURED_PACKAGE_IDS
       .map((id) => managedPackages.find((item) => item.id === id))
@@ -27,7 +30,9 @@ export default function HomePackages() {
     [managedPackages],
   );
 
-  const requestPackage = (item) => goToContact({
+  const requestPackage = (item) => item.ctaHref && item.ctaHref !== "/contact"
+    ? window.location.assign(item.ctaHref)
+    : goToContact({
     package_id: item.id,
     package_title: item.title,
     services: [item.category],
@@ -88,8 +93,9 @@ export default function HomePackages() {
     >
       <div className="fa-packages__inner nr-shell">
         <header className="fa-packages__header">
-          <p className="fa-kicker">Pachete FireArtRo</p>
-          <h2 id="fa-packages-title">Fiecare noapte cere alt spectacol.</h2>
+          <p className="fa-kicker">{copy.eyebrow}</p>
+          <h2 id="fa-packages-title">{copy.title}</h2>
+          {copy.description && <p>{copy.description}</p>}
         </header>
 
         <div className="fa-packages__triptych" data-package-triptych>
@@ -110,15 +116,15 @@ export default function HomePackages() {
                 <ul>{item.highlights.slice(0, 3).map((value) => <li key={value}>{value}</li>)}</ul>
               </div>
               <button type="button" data-package-request onClick={() => requestPackage(item)}>
-                <span>Cere ofertă</span><ArrowUpRight aria-hidden="true" />
+                <span>{item.cta}</span><ArrowUpRight aria-hidden="true" />
               </button>
             </article>
           ))}
         </div>
 
-        <Link className="fa-line-link fa-packages__all" to="/pachete">
-          <span>Vezi toate pachetele</span><ArrowUpRight aria-hidden="true" />
-        </Link>
+        {copy.ctaLabel && <Link className="fa-line-link fa-packages__all" to={copy.ctaHref}>
+          <span>{copy.ctaLabel}</span><ArrowUpRight aria-hidden="true" />
+        </Link>}
       </div>
     </section>
   );

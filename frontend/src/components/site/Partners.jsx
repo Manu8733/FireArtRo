@@ -1,6 +1,7 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { motion, useReducedMotion } from "framer-motion";
 import { Building2, CalendarDays, MapPinned, UsersRound } from "lucide-react";
-import { PARTNER_ITEMS } from "@/data/businessContent";
+
 import useManagedContent from "@/hooks/useManagedContent";
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -13,7 +14,7 @@ const COLLABORATIONS = [
 
 export default function Partners() {
   const reduce = useReducedMotion();
-  const partners = useManagedContent("partners", PARTNER_ITEMS);
+  const partners = useManagedContent("partners", CMS_DEFAULTS.partners);
 
   return (
     <section className="home-collaboration" aria-labelledby="partners-title">

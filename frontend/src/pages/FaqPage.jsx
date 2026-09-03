@@ -4,12 +4,15 @@ import Faq from "@/components/site/Faq";
 import PageEnd from "@/components/site/PageEnd";
 import usePageMeta from "@/hooks/usePageMeta";
 import "@/styles/night-faq.css";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
+import useManagedContent from "@/hooks/useManagedContent";
+import ManagedPageMedia from "@/components/site/ManagedPageMedia";
 
 export default function FaqPage() {
+  const copy = useManagedContent("faqPage", CMS_DEFAULTS.faqPage);
   usePageMeta({
-    title: "Întrebări frecvente despre drone show și artificii — FireArtRo",
-    description:
-      "Răspunsuri despre rezervare, autorizații, vreme, siguranță, durată și costuri pentru spectacole cu drone, artificii și efecte speciale.",
+    title: copy.seoTitle,
+    description: copy.seoDescription,
     path: "/intrebari-frecvente",
   });
 
@@ -22,14 +25,15 @@ export default function FaqPage() {
         <header className="nr-faq-hero">
           <div className="nr-shell nr-faq-hero__inner">
             <div>
-              <p className="nr-faq-hero__eyebrow">Întrebări</p>
-              <h1>Întrebări.</h1>
+              <p className="nr-faq-hero__eyebrow">{copy.eyebrow}</p>
+              <h1>{copy.title}</h1>
             </div>
             <p className="nr-faq-hero__description">
-              Ce contează înainte de rezervare.
+              {copy.description}
             </p>
           </div>
         </header>
+        <ManagedPageMedia mediaId={copy.heroMediaId} />
 
         <Faq />
       </main>

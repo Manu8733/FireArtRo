@@ -3,10 +3,16 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import HeroVideo from "@/components/site/HeroVideo";
 import HeroTypingTitle from "@/components/site/HeroTypingTitle";
 import NightButton from "@/components/night/NightButton";
+import useManagedContent from "@/hooks/useManagedContent";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 
 const EASE = [0.16, 1, 0.3, 1];
 
 export const Hero = () => {
+  const homePage = useManagedContent("homePage", CMS_DEFAULTS.homePage);
+  const mediaItems = useManagedContent("mediaItems", CMS_DEFAULTS.mediaItems);
+  const copy = homePage.hero;
+  const background = mediaItems.find((item) => item.id === copy.backgroundMediaId);
   const heroRef = useRef(null);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -29,7 +35,7 @@ export const Hero = () => {
         className="nr-hero__media"
         aria-hidden="true"
       >
-        <HeroVideo />
+        <HeroVideo mediaOverride={background} />
       </motion.div>
       <div className="nr-hero__veil" aria-hidden="true" />
 
@@ -41,15 +47,15 @@ export const Hero = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduceMotion ? 0 : 0.9, delay: 0.12, ease: EASE }}
       >
-        <p className="nr-hero__eyebrow">Drone · artificii · efecte scenice</p>
-        <HeroTypingTitle />
+        <p className="nr-hero__eyebrow">{copy.eyebrow}</p>
+        <HeroTypingTitle titleLead={copy.titleLead} titleTail={copy.titleTail} />
         <p className="nr-hero__description">
-          Momente care rămân.
+          {copy.description}
         </p>
         <div className="nr-hero__actions">
-          <NightButton to="/contact" data-testid="hero-primary-cta">Cere oferta</NightButton>
-          <NightButton to="/galerie" variant="secondary" data-testid="hero-secondary-cta">
-            Vezi galeria
+          <NightButton to={copy.primaryCtaHref} data-testid="hero-primary-cta">{copy.primaryCtaLabel}</NightButton>
+          <NightButton to={copy.secondaryCtaHref} variant="secondary" data-testid="hero-secondary-cta">
+            {copy.secondaryCtaLabel}
           </NightButton>
         </div>
       </motion.div>

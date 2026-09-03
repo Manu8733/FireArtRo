@@ -6,6 +6,7 @@ import Home from "@/pages/Home";
 import CookieConsent from "@/components/site/CookieConsent";
 import RouteShutter from "@/components/night/RouteShutter";
 import { scrollToHash, scrollToTop, syncScrollOffset } from "@/lib/scrollNavigation";
+import { ManagedContentProvider, useManagedContentSnapshot } from "@/content/ManagedContentProvider";
 
 const GalleryPage = lazy(() => import("@/pages/GalleryPage"));
 const PackagesPage = lazy(() => import("@/pages/PackagesPage"));
@@ -44,6 +45,13 @@ function GlobalUi() {
 
 function AppRoutes() {
   const location = useLocation();
+  const content = useManagedContentSnapshot();
+
+  if (location.pathname !== "/admin" && !["ready", "fallback"].includes(content.status)) {
+    return <main className="route-loading" role="status" aria-live="polite">
+      {content.status === "unavailable" ? "Site-ul este în curs de inițializare. Revino în câteva momente." : "Se încarcă versiunea publicată…"}
+    </main>;
+  }
 
   return (
     <div className="route-stage">
@@ -95,6 +103,7 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
+        <ManagedContentProvider>
         <RouteShutter>
           <a className="skip-link" href="#main-content">Sari la conținut</a>
           <RouteScrollManager />
@@ -103,6 +112,7 @@ function App() {
           </div>
           <GlobalUi />
         </RouteShutter>
+        </ManagedContentProvider>
       </BrowserRouter>
     </div>
   );

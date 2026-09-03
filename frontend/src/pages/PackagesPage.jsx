@@ -1,20 +1,21 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import Navbar from "@/components/site/Navbar";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import Packages from "@/components/site/Packages";
 import PageEnd from "@/components/site/PageEnd";
 import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
-import { PACKAGE_ITEMS, SITE_DETAILS } from "@/data/businessContent";
+
 import "@/styles/night-packages.css";
 
 export default function PackagesPage() {
-  const packages = useManagedContent("packages", PACKAGE_ITEMS);
-  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
+  const copy = useManagedContent("packagesPage", CMS_DEFAULTS.packagesPage);
+  const packages = useManagedContent("packages", CMS_DEFAULTS.packages);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
 
   usePageMeta({
-    title: "Pachete pentru drone show și artificii | FireArtRo",
-    description:
-      "Compară formatele FireArtRo pentru drone show, artificii și efecte scenice, apoi cere o configurație adaptată evenimentului.",
+    title: copy.seoTitle,
+    description: copy.seoDescription,
     path: "/pachete",
     schema: {
       "@context": "https://schema.org",

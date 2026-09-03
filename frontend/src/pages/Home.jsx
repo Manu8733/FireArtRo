@@ -1,3 +1,4 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
 import PageEnd from "@/components/site/PageEnd";
@@ -6,19 +7,18 @@ import ScrollProgress from "@/components/site/ScrollProgress";
 import HomeRunway from "@/components/night/HomeRunway";
 import usePageMeta from "@/hooks/usePageMeta";
 import useManagedContent from "@/hooks/useManagedContent";
-import { BUSINESS_HOURS, SITE_DETAILS, SOCIAL_LINKS } from "@/data/businessContent";
+
 import "@/styles/night-home.css";
 import "@/styles/night-home-film.css";
 
 export default function Home() {
-  const siteDetails = useManagedContent("siteDetails", SITE_DETAILS);
-  const businessHours = useManagedContent("businessHours", BUSINESS_HOURS);
-  const socialLinks = useManagedContent("socialLinks", SOCIAL_LINKS);
+  const siteDetails = useManagedContent("siteDetails", CMS_DEFAULTS.siteDetails);
+  const businessHours = useManagedContent("businessHours", CMS_DEFAULTS.businessHours);
+  const socialLinks = useManagedContent("socialLinks", CMS_DEFAULTS.socialLinks);
 
   usePageMeta({
-    title: "Spectacole cu drone și artificii pentru evenimente | FireArtRo",
-    description:
-      "FireArtRo creează spectacole cu drone, artificii și efecte scenice pentru nunți, evenimente corporate și festivaluri din România.",
+    title: siteDetails.seoTitle,
+    description: siteDetails.seoDescription,
     path: "/",
     schema: {
       "@context": "https://schema.org",

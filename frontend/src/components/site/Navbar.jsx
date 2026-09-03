@@ -9,7 +9,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { NAV_LINKS } from "@/data/content";
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
+import useManagedContent from "@/hooks/useManagedContent";
 import { LOGO_URL } from "@/lib/constants";
 import { getHeaderOffset, navigateToHref, scrollToHash, syncScrollOffset } from "@/lib/scrollNavigation";
 
@@ -30,6 +31,7 @@ const Logo = ({ onClick }) => (
 );
 
 export const Navbar = () => {
+  const navigation = useManagedContent("navigation", CMS_DEFAULTS.navigation);
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [open, setOpen] = useState(false);
@@ -64,9 +66,10 @@ export const Navbar = () => {
     window.setTimeout(() => goTo(href, "auto"), 150);
   }, [goTo]);
 
-  const desktopLinks = NAV_LINKS.filter((link) => link.href !== "#acasa");
-  const leftLinks = desktopLinks.slice(0, 3);
-  const rightLinks = desktopLinks.slice(3, 6);
+  const desktopLinks = navigation.links.filter((link) => link.href !== "#acasa");
+  const midpoint = Math.ceil(desktopLinks.length / 2);
+  const leftLinks = desktopLinks.slice(0, midpoint);
+  const rightLinks = desktopLinks.slice(midpoint);
 
   useEffect(() => {
     const updateNavigation = () => {
@@ -122,7 +125,7 @@ export const Navbar = () => {
       return;
     }
 
-    const hashLinks = NAV_LINKS.filter((link) => link.href.startsWith("#"));
+    const hashLinks = navigation.links.filter((link) => link.href.startsWith("#"));
     const requestedHash = hashLinks.some((link) => link.href === location.hash)
       ? location.hash
       : "";
@@ -184,13 +187,13 @@ export const Navbar = () => {
       window.removeEventListener("orientationchange", schedule);
       window.removeEventListener("hashchange", schedule);
     };
-  }, [location.hash, location.pathname]);
+  }, [location.hash, location.pathname, navigation.links]);
 
   const renderDesktopLink = (link) => {
     const isActive = active === link.href;
     return (
       <a
-        key={link.href}
+        key={link.id}
         href={publicHref(link.href)}
         onClick={(event) => {
           event.preventDefault();
@@ -264,9 +267,9 @@ export const Navbar = () => {
                 </div>
 
                 <div className="mobile-nav-links">
-                  {NAV_LINKS.filter((link) => link.href !== "#acasa").map((link, index) => (
+                  {navigation.links.filter((link) => link.href !== "#acasa").map((link, index) => (
                     <motion.a
-                      key={link.href}
+                      key={link.id}
                       href={publicHref(link.href)}
                       onClick={(event) => {
                         event.preventDefault();

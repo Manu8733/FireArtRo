@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends, Header, HTTPException, Request
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -14,8 +14,6 @@ from pydantic import BaseModel, Field, ConfigDict, field_validator
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
-from collections import defaultdict, deque
-from time import monotonic
 
 from blog import (
     BlogService,
@@ -35,7 +33,11 @@ from auth import (
     MongoSessionRepository,
     MongoLoginAttemptRepository,
     create_auth_router,
+    request_ip,
 )
+from quote_admin import MongoQuoteRateLimiter, MongoQuoteRepository, create_quote_admin_router
+from media import MediaService, MediaWriteGuardMiddleware, MongoMediaRepository, VercelBlobClient, create_media_router
+from integrations import IntegrationsService, create_integrations_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -77,6 +79,13 @@ cms_repository = MongoCmsRepository(
     client=client,
 )
 cms_service = CmsService(cms_repository)
+quote_repository = MongoQuoteRepository(db.quotes if db is not None else None)
+quote_rate_limiter = MongoQuoteRateLimiter(
+    db.quote_rate_limits if db is not None else None,
+    os.environ.get("ADMIN_SESSION_SECRET", ""),
+)
+media_repository = MongoMediaRepository(db)
+media_service = MediaService(media_repository, VercelBlobClient())
 
 
 async def ensure_indexes():
@@ -86,6 +95,9 @@ async def ensure_indexes():
     await db.admin_sessions.create_index("token_hash", unique=True)
     await db.admin_login_attempts.create_index("expires_at", expireAfterSeconds=0)
     await cms_repository.create_indexes()
+    await quote_repository.create_indexes()
+    await quote_rate_limiter.create_indexes()
+    await media_repository.create_indexes()
 
 
 @asynccontextmanager
@@ -205,6 +217,10 @@ class Quote(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class QuoteAcknowledgement(BaseModel):
+    accepted: bool = True
+
+
 # ---------- Routes ----------
 @api_router.get("/")
 async def root():
@@ -241,36 +257,26 @@ async def health():
     )
 
 
-@api_router.post("/quotes", response_model=Quote)
+@api_router.post("/quotes", response_model=QuoteAcknowledgement)
 async def create_quote(input: QuoteCreate, request: Request):
     if not input.consent:
         raise HTTPException(status_code=422, detail="Consimțământul este obligatoriu.")
-    enforce_rate_limit(request)
+    await quote_rate_limiter.enforce(request_ip(request))
     payload = input.model_dump(exclude={"company_website"})
     quote = Quote(**payload)
     if input.company_website:
-        quote.status = "accepted"
-        return quote
+        return QuoteAcknowledgement()
     doc = quote.model_dump()
-    doc['created_at'] = doc['created_at'].isoformat()
+    doc["internal_note"] = ""
+    doc["version"] = 0
     await db.quotes.insert_one(doc)
-    return quote
-
-
-@api_router.get("/quotes", response_model=List[Quote])
-async def get_quotes(x_admin_key: Optional[str] = Header(default=None)):
-    admin_key = os.environ.get("ADMIN_API_KEY")
-    if not admin_key or x_admin_key != admin_key:
-        raise HTTPException(status_code=401, detail="Acces neautorizat.")
-    quotes = await db.quotes.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
-    for q in quotes:
-        if isinstance(q.get('created_at'), str):
-            q['created_at'] = datetime.fromisoformat(q['created_at'])
-    return quotes
+    return QuoteAcknowledgement()
 
 
 # Include the router in the main app
 app.include_router(api_router)
+app.include_router(create_quote_admin_router(quote_repository))
+app.include_router(create_media_router(media_service))
 
 blog_repository = MongoBlogRepository(db.blog_posts if db is not None else None)
 blog_media_store = GridFsBlogMediaStore(
@@ -278,27 +284,14 @@ blog_media_store = GridFsBlogMediaStore(
 )
 blog_service = BlogService(blog_repository, blog_media_store)
 app.include_router(
-    create_blog_router(blog_service, os.environ.get("ADMIN_API_KEY", ""))
+    create_blog_router(blog_service)
 )
 
 reviews_service = ReviewsService(os.environ)
 app.include_router(create_reviews_router(reviews_service))
-
-rate_windows = defaultdict(deque)
-RATE_LIMIT = 5
-RATE_WINDOW_SECONDS = 600
-
-
-def enforce_rate_limit(request: Request):
-    client_ip = request.client.host if request.client else "unknown"
-    now = monotonic()
-    attempts = rate_windows[client_ip]
-    while attempts and now - attempts[0] > RATE_WINDOW_SECONDS:
-        attempts.popleft()
-    if len(attempts) >= RATE_LIMIT:
-        raise HTTPException(status_code=429, detail="Prea multe solicitări. Încearcă din nou mai târziu.")
-    attempts.append(now)
-
+integration_service = IntegrationsService(db, reviews_service, os.environ)
+app.state.integration_service = integration_service
+app.include_router(create_integrations_router(integration_service))
 
 class RequestSecurityMiddleware:
     """Bound the streamed body before any parser or login can consume it."""
@@ -390,13 +383,17 @@ allowed_origins = [
     if origin.strip()
 ]
 
+# Starlette adds the newest middleware as the outermost layer.  Keep the
+# streamed-body limiter outside the media write guard: an oversized request
+# must be rejected before authentication or a write lock can inspect it.
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=allowed_origins,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "X-Admin-Key", "X-CSRF-Token"],
+    allow_headers=["Content-Type", "X-CSRF-Token"],
 )
+app.add_middleware(MediaWriteGuardMiddleware, service=media_service)
 app.add_middleware(RequestSecurityMiddleware)
 
 # Configure logging

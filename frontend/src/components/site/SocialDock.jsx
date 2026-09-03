@@ -1,3 +1,4 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Phone } from "lucide-react";
@@ -9,10 +10,7 @@ import {
 } from "@/components/site/BrandIcons";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import useManagedContent from "@/hooks/useManagedContent";
-import {
-  CONTACT_SETTINGS_DEFAULT,
-  SOCIAL_LINKS,
-} from "@/data/businessContent";
+
 import { buildWhatsappLink } from "@/lib/constants";
 
 const EASE = [0.22, 1, 0.36, 1];
@@ -65,8 +63,8 @@ const MobileDock = ({ items }) => (
 export const SocialDock = () => {
   const mobile = useIsMobile();
   const [visible, setVisible] = useState(true);
-  const socialLinks = useManagedContent("socialLinks", SOCIAL_LINKS);
-  const contactSettings = useManagedContent("contactSettings", CONTACT_SETTINGS_DEFAULT);
+  const socialLinks = useManagedContent("socialLinks", CMS_DEFAULTS.socialLinks);
+  const contactSettings = useManagedContent("contactSettings", CMS_DEFAULTS.contactSettings);
   const items = useMemo(() => {
     const socialMap = Object.fromEntries(socialLinks.map((item) => [item.id, item.href]));
     const whatsappHref = buildWhatsappLink(contactSettings.whatsappNumber);

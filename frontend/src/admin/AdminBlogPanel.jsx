@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ImagePlus, Plus, Save, Trash2 } from "lucide-react";
+import { useAdminSession } from "@/admin/AdminSessionContext";
 import { prepareAdminImage } from "@/admin/imageUtils";
 import {
-  BlogApiError,
   blogMediaUrl,
   createAdminPost,
   deleteAdminPost,
@@ -31,15 +31,16 @@ const articlePayload = (article) => ({
 });
 
 const errorMessage = (error) => {
-  if (error instanceof BlogApiError && error.status === 401) {
-    return "Cheia Admin nu este validă.";
+  if (error?.status === 401) {
+    return "Sesiunea Admin a expirat. Autentifică-te din nou.";
   }
   return error?.message || "Operațiunea nu a putut fi finalizată.";
 };
 
 export default function AdminBlogPanel() {
-  const [adminKey, setAdminKey] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
+  const { request, status } = useAdminSession();
+  const [loadState, setLoadState] = useState("loading");
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [posts, setPosts] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [draft, setDraft] = useState(null);
@@ -52,28 +53,36 @@ export default function AdminBlogPanel() {
     setTone(nextTone);
   };
 
-  const accessBlog = async (event) => {
-    event.preventDefault();
-    setBusy(true);
-    setNotice("");
-    try {
-      const result = await listAdminPosts(adminKey);
-      setPosts(result);
-      setAuthenticated(true);
-      if (result.length) {
-        setSelectedId(result[0].id);
-        setDraft(result[0]);
-      } else {
-        setSelectedId("");
-        setDraft(null);
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    let active = true;
+    const controller = new AbortController();
+    setLoadState("loading");
+    setMessage("");
+    setTone("neutral");
+
+    async function loadArticles() {
+      try {
+        const result = await listAdminPosts(request, { signal: controller.signal });
+        if (!active) return;
+        setPosts(result);
+        setSelectedId(result[0]?.id || "");
+        setDraft(result[0] || null);
+        setLoadState("ready");
+      } catch (error) {
+        if (!active) return;
+        setMessage(errorMessage(error));
+        setTone("error");
+        setLoadState("error");
       }
-    } catch (error) {
-      setAuthenticated(false);
-      setNotice(errorMessage(error), "error");
-    } finally {
-      setBusy(false);
     }
-  };
+
+    loadArticles();
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [request, status, loadAttempt]);
 
   const newArticle = () => {
     setSelectedId("");
@@ -99,7 +108,7 @@ export default function AdminBlogPanel() {
     setNotice("Imaginea se optimizează și se încarcă…");
     try {
       const prepared = await prepareAdminImage(file);
-      const media = await uploadAdminCover(adminKey, prepared);
+      const media = await uploadAdminCover(request, prepared);
       setDraft((current) => ({ ...current, cover_media_id: media.id }));
       setNotice("Imaginea a fost încărcată.", "success");
     } catch (error) {
@@ -116,11 +125,11 @@ export default function AdminBlogPanel() {
     setNotice("");
     try {
       const saved = draft.id
-        ? await updateAdminPost(adminKey, draft.id, {
+        ? await updateAdminPost(request, draft.id, {
             ...articlePayload(draft),
             status: draft.status,
           })
-        : await createAdminPost(adminKey, articlePayload(draft));
+        : await createAdminPost(request, articlePayload(draft));
 
       setPosts((current) => {
         const exists = current.some((article) => article.id === saved.id);
@@ -143,7 +152,7 @@ export default function AdminBlogPanel() {
     setBusy(true);
     setNotice("");
     try {
-      await deleteAdminPost(adminKey, draft.id);
+      await deleteAdminPost(request, draft.id);
       const remaining = posts.filter((article) => article.id !== draft.id);
       setPosts(remaining);
       setSelectedId(remaining[0]?.id || "");
@@ -156,35 +165,6 @@ export default function AdminBlogPanel() {
     }
   };
 
-  if (!authenticated) {
-    return (
-      <div className="admin-blog-view">
-        <header className="admin-page-heading">
-          <div>
-            <span>Publicare online</span>
-            <h1>Blog</h1>
-            <p>Articolele salvate aici apar pe site după ce le marchezi ca publicate.</p>
-          </div>
-        </header>
-        <form className="admin-blog-login" onSubmit={accessBlog}>
-          <label htmlFor="admin-blog-key">Cheie Admin</label>
-          <input
-            id="admin-blog-key"
-            type="password"
-            value={adminKey}
-            onChange={(event) => setAdminKey(event.target.value)}
-            autoComplete="current-password"
-            required
-          />
-          <button type="submit" className="admin-button is-primary" disabled={busy}>
-            {busy ? "Se verifică…" : "Accesează Blogul"}
-          </button>
-          {message && <p className={`admin-blog-message is-${tone}`} role="status">{message}</p>}
-        </form>
-      </div>
-    );
-  }
-
   return (
     <div className="admin-blog-view">
       <header className="admin-page-heading admin-module-heading">
@@ -195,14 +175,24 @@ export default function AdminBlogPanel() {
         </div>
         {draft && (
           <div>
-            <button type="button" className="admin-button is-primary" onClick={newArticle}>
+            <button type="button" className="admin-button is-primary" onClick={newArticle} disabled={busy}>
               <Plus aria-hidden="true" /> Articol nou
             </button>
           </div>
         )}
       </header>
 
-      {!draft && (
+      {!draft && message && <p className={`admin-blog-message is-${tone}`} role="status">{message}</p>}
+
+      {loadState === "loading" && <p role="status">Se încarcă articolele…</p>}
+
+      {loadState === "error" && (
+        <button type="button" className="admin-button" onClick={() => setLoadAttempt((current) => current + 1)}>
+          Reîncearcă
+        </button>
+      )}
+
+      {loadState === "ready" && !draft && (
         <section className="admin-blog-empty">
           <p>Nu există articole. Creează primul articol.</p>
           <button type="button" className="admin-button is-primary" onClick={newArticle}>
@@ -220,6 +210,7 @@ export default function AdminBlogPanel() {
                 type="button"
                 className={selectedId === article.id ? "is-active" : ""}
                 onClick={() => selectArticle(article)}
+                disabled={busy}
               >
                 <strong>{article.title || "Fără titlu"}</strong>
                 <span>{article.slug}</span>

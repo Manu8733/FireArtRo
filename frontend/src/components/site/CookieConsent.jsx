@@ -1,6 +1,7 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { useEffect, useRef, useState } from "react";
 import { Cookie, Settings2, X } from "lucide-react";
-import { COOKIE_SETTINGS_DEFAULT } from "@/data/businessContent";
+
 import useManagedContent from "@/hooks/useManagedContent";
 
 export const COOKIE_CONSENT_STORAGE_KEY = "fireartro-cookie-consent-v1";
@@ -35,7 +36,7 @@ const persistConsent = (choice, retentionDays) => {
 };
 
 export default function CookieConsent() {
-  const settings = useManagedContent("cookieSettings", COOKIE_SETTINGS_DEFAULT);
+  const settings = useManagedContent("cookieSettings", CMS_DEFAULTS.cookieSettings);
   const [visible, setVisible] = useState(false);
   const [customizing, setCustomizing] = useState(false);
   const [choice, setChoice] = useState(defaultChoice);

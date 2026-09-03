@@ -1,11 +1,13 @@
+import { CMS_DEFAULTS } from "@/data/cmsDefaults";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { PACKAGE_CATEGORIES, PACKAGE_ITEMS } from "@/data/businessContent";
+import { PACKAGE_CATEGORIES } from "@/data/businessContent";
 import { MEDIA } from "@/data/content";
 import useManagedContent from "@/hooks/useManagedContent";
 import { goToContact } from "@/lib/contactNavigation";
+import ManagedPageMedia from "@/components/site/ManagedPageMedia";
 
 const visualByCategory = {
   "Artificii de zi": MEDIA.corporate,
@@ -55,15 +57,18 @@ const getYouTubeThumbnailUrl = (value) => {
   return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
 };
 
-const getPackageVisual = (item) => (
-  getYouTubeThumbnailUrl(item?.videoUrl?.trim())
-  || item?.image
+const getPackageVisual = (item, mediaById) => (
+  mediaById?.get(item?.imageMediaId)?.src
+  || getYouTubeThumbnailUrl(item?.videoUrl?.trim())
   || visualByCategory[item?.category]
   || MEDIA.fireworksSky
 );
 
 export const Packages = ({ items }) => {
-  const managedPackages = useManagedContent("packages", PACKAGE_ITEMS);
+  const copy = useManagedContent("packagesPage", CMS_DEFAULTS.packagesPage);
+  const mediaItems = useManagedContent("mediaItems", CMS_DEFAULTS.mediaItems);
+  const mediaById = useMemo(() => new Map(mediaItems.map((item) => [item.id, item])), [mediaItems]);
+  const managedPackages = useManagedContent("packages", CMS_DEFAULTS.packages);
   const packages = Array.isArray(items) ? items : managedPackages;
   const categories = useMemo(
     () => PACKAGE_CATEGORIES.filter(
@@ -94,13 +99,26 @@ export const Packages = ({ items }) => {
   const activePackage = packages.find((item) => item.id === displayedId) || variants[0] || packages[0];
   const primaryVideoUrl = activePackage?.videoUrl?.trim() || "";
   const videoEmbedUrl = getYouTubeEmbedUrl(primaryVideoUrl);
-  const packageThumbnail = getPackageVisual(activePackage);
+  const packageThumbnail = getPackageVisual(activePackage, mediaById);
   const additionalVideos = Array.isArray(activePackage?.moreVideoUrls)
     ? activePackage.moreVideoUrls.filter(Boolean)
     : [];
   const isVideoOpen = Boolean(primaryVideoUrl) && videoPackageId === activePackage?.id;
 
   useEffect(() => () => timersRef.current.forEach(window.clearTimeout), []);
+
+  useEffect(() => {
+    const nextCategory = categories.includes(category) ? category : categories[0];
+    const nextVariants = packages.filter((item) => item.category === nextCategory);
+    if (nextCategory !== category) setCategory(nextCategory);
+    if (!nextVariants.some((item) => item.id === selectedId)) {
+      timersRef.current.forEach(window.clearTimeout);
+      setSelectedId(nextVariants[0]?.id || "");
+      setDisplayedId(nextVariants[0]?.id || "");
+      setTransitionState("idle");
+      setVideoPackageId("");
+    }
+  }, [categories, category, packages, selectedId]);
 
   const swapPackage = (nextPackage) => {
     if (!nextPackage || nextPackage.id === selectedId) return;
@@ -150,6 +168,10 @@ export const Packages = ({ items }) => {
 
   const requestPackage = () => {
     if (!activePackage) return;
+    if (activePackage.ctaHref && activePackage.ctaHref !== "/contact") {
+      window.location.assign(activePackage.ctaHref);
+      return;
+    }
     goToContact({
       package_id: activePackage.id,
       package_title: activePackage.title,
@@ -161,18 +183,17 @@ export const Packages = ({ items }) => {
     goToContact({ services: [DRONE_REQUEST_CATEGORY] });
   };
 
-  if (!activePackage && !isDroneShowCategory) return null;
-
   return (
     <section className="nr-package-comparator" data-testid="package-comparator" aria-labelledby="packages-title">
       <div className="nr-shell nr-package-comparator__shell">
         <header className="nr-package-comparator__header">
           <div>
-            <p>Formate FireArtRo</p>
-            <h1 id="packages-title">Pachete</h1>
+            <p>{copy.eyebrow}</p>
+            <h1 id="packages-title">{copy.title}</h1>
           </div>
-          <p>Alege o direcție. Configurația finală se construiește după spațiu, ritm și brief.</p>
+          <p>{copy.description}</p>
         </header>
+        <ManagedPageMedia mediaId={copy.heroMediaId} />
 
         <nav className="nr-package-categories" role="tablist" aria-label="Categorii de spectacol">
           {categories.map((item) => (
@@ -290,7 +311,7 @@ export const Packages = ({ items }) => {
                       data-testid="packages-direct-cta"
                       onClick={requestPackage}
                     >
-                      Cere o configurație <ArrowUpRight aria-hidden="true" />
+                      {activePackage.cta} <ArrowUpRight aria-hidden="true" />
                     </button>
                   </div>
                 </div>

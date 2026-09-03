@@ -46,7 +46,7 @@ class MongoCmsRepository:
         self.drafts = drafts
         self.publications = publications
         self.revisions = revisions
-        self.client = client or drafts.database.client
+        self.client = client or (drafts.database.client if drafts is not None else None)
 
     async def create_indexes(self) -> None:
         await self.drafts.create_index("id", unique=True)

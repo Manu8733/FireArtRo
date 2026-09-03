@@ -614,3 +614,9 @@ class RevisionSummary(StrictModel):
 
 class RevisionResponse(RevisionSummary):
     content: SiteContent
+
+
+class PublishResponse(StrictModel):
+    publication: PublicationResponse
+    draft: DraftResponse
+    revision: RevisionResponse

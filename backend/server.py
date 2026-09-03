@@ -24,6 +24,9 @@ from blog import (
     create_blog_router,
     request_size_limit,
 )
+from cms_repository import MongoCmsRepository
+from cms_routes import CMS_CONTENT_WRITE_MAX_BYTES, create_cms_router, is_cms_content_write
+from cms_service import CmsService
 from reviews import ReviewsService, create_reviews_router
 from auth import (
     AuthError,
@@ -67,6 +70,14 @@ if not database_configuration_errors:
             client.close()
             client = None
 
+cms_repository = MongoCmsRepository(
+    drafts=db.site_content_drafts if db is not None else None,
+    publications=db.site_content_publications if db is not None else None,
+    revisions=db.site_content_revisions if db is not None else None,
+    client=client,
+)
+cms_service = CmsService(cms_repository)
+
 
 async def ensure_indexes():
     await db.blog_posts.create_index("slug", unique=True)
@@ -74,6 +85,7 @@ async def ensure_indexes():
     await db.admin_sessions.create_index("expires_at", expireAfterSeconds=0)
     await db.admin_sessions.create_index("token_hash", unique=True)
     await db.admin_login_attempts.create_index("expires_at", expireAfterSeconds=0)
+    await cms_repository.create_indexes()
 
 
 @asynccontextmanager
@@ -107,6 +119,7 @@ auth_service = AuthService(
     session_secret=os.environ.get("ADMIN_SESSION_SECRET", ""),
 )
 app.state.auth_service = auth_service
+app.state.cms_service = cms_service
 
 
 async def require_auth_ready():
@@ -117,6 +130,7 @@ async def require_auth_ready():
 app.include_router(
     create_auth_router(auth_service), dependencies=[Depends(require_auth_ready)]
 )
+app.include_router(create_cms_router(cms_service))
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -300,6 +314,8 @@ class RequestSecurityMiddleware:
         maximum = (
             4096
             if path.startswith("/api/admin/auth/")
+            else CMS_CONTENT_WRITE_MAX_BYTES
+            if is_cms_content_write(path, scope["method"])
             else request_size_limit(path, scope["method"])
         )
 
@@ -309,7 +325,10 @@ class RequestSecurityMiddleware:
                 headers["X-Content-Type-Options"] = "nosniff"
                 headers["X-Frame-Options"] = "DENY"
                 headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-                if not path.startswith("/api/blog/media/") or message["status"] >= 400:
+                if (
+                    path not in {"/api/content"}
+                    and not path.startswith("/api/blog/media/")
+                ) or message["status"] >= 400:
                     headers["Cache-Control"] = "no-store"
             await send(message)
 
@@ -346,7 +365,10 @@ class RequestSecurityMiddleware:
             if not message.get("more_body", False):
                 break
 
-        if db is None and path.startswith(("/api/quotes", "/api/blog/", "/api/admin/")):
+        if db is None and (
+            path == "/api/content"
+            or path.startswith(("/api/quotes", "/api/blog/", "/api/admin/"))
+        ):
             await reject(503, "Serviciul nu este disponibil momentan.")
             return
 

@@ -3,11 +3,13 @@
 import asyncio
 import hashlib
 import hmac
+import importlib.util
 import os
 import threading
 import uuid
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from types import SimpleNamespace
 
 import bcrypt
@@ -860,3 +862,378 @@ async def test_real_mongo_rolling_window_and_success_preserve_pending_budget(
     assert error.value.status_code == 429
     real_mongo.clock.now += timedelta(minutes=10)
     assert await repository.reserve(key, real_mongo.clock.now)
+
+
+# Task 3: exercise the actual server composition, not a router-only test app.
+@pytest.fixture
+def server_loader(monkeypatch, password_hash):
+    import dotenv
+
+    monkeypatch.setattr(dotenv, "load_dotenv", lambda *args, **kwargs: None)
+    for name in ("MONGODB_URI", "MONGO_URL", "DB_NAME", "VERCEL"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("ADMIN_USERNAME", "admin")
+    monkeypatch.setenv("ADMIN_PASSWORD_HASH", password_hash)
+    monkeypatch.setenv("ADMIN_SESSION_SECRET", "task3-test-secret-at-least-32-bytes")
+    monkeypatch.setenv("CORS_ORIGINS", "https://fireart.test")
+    modules = []
+
+    def load(**environment):
+        for name, value in environment.items():
+            monkeypatch.setenv(name, value)
+        spec = importlib.util.spec_from_file_location(
+            "fireart_task3_" + uuid.uuid4().hex,
+            Path(__file__).resolve().parents[1] / "server.py",
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        modules.append(module)
+        return module
+
+    yield load
+    for module in modules:
+        if module.client is not None:
+            module.client.close()
+
+
+def server_client(server):
+    return httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=server.app), base_url="https://fireart.test"
+    )
+
+
+@pytest.mark.asyncio
+async def test_server_missing_env_imports_and_fails_closed(server_loader, monkeypatch):
+    for name in ("ADMIN_USERNAME", "ADMIN_PASSWORD_HASH", "ADMIN_SESSION_SECRET"):
+        monkeypatch.delenv(name)
+    server = server_loader(VERCEL="1")
+    assert server.client is None  # Never implicitly connect to localhost.
+    async with server.app.router.lifespan_context(server.app):
+        async with server_client(server) as client:
+            assert (await client.get("/api/")).status_code == 200
+            health = await client.get("/api/health")
+            assert health.status_code == 503
+            assert health.json() == {
+                "status": "not_ready",
+                "configuration_errors": [
+                    "MONGODB_URI",
+                    "DB_NAME",
+                    "ADMIN_USERNAME",
+                    "ADMIN_PASSWORD_HASH",
+                    "ADMIN_SESSION_SECRET",
+                ],
+                "database": "not_configured",
+                "indexes": "not_ready",
+            }
+            for path, method in [
+                ("/api/admin/auth/login", "POST"),
+                ("/api/admin/auth/session", "GET"),
+                ("/api/admin/auth/logout", "POST"),
+                ("/api/blog/posts", "GET"),
+                ("/api/quotes", "GET"),
+            ]:
+                response = await client.request(method, path)
+                assert response.status_code == 503
+                assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("MONGODB_URI", "invalid://secret-uri-value"),
+        ("DB_NAME", "invalid/database"),
+        ("ADMIN_PASSWORD_HASH", "secret-invalid-hash"),
+        ("ADMIN_SESSION_SECRET", "short-secret"),
+    ],
+)
+async def test_server_health_invalid_config_is_safe(server_loader, field, value):
+    environment = {
+        "MONGODB_URI": "mongodb://127.0.0.1:27183/?replicaSet=testset",
+        "DB_NAME": "fireartro_cms_test_config_" + uuid.uuid4().hex,
+        field: value,
+    }
+    server = server_loader(**environment)
+    async with server_client(server) as client:
+        response = await client.get("/api/health")
+    assert response.status_code == 503
+    assert field in response.json()["configuration_errors"]
+    assert value not in response.text
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("primary", [False, True])
+async def test_server_mongo_alias_preference(server_loader, primary):
+    environment = {
+        "MONGO_URL": "mongodb://127.0.0.1:27183/?replicaSet=testset",
+        "DB_NAME": "fireartro_cms_test_alias_" + uuid.uuid4().hex,
+    }
+    if primary:
+        environment.update(
+            MONGODB_URI=environment["MONGO_URL"], MONGO_URL="invalid://alias"
+        )
+    server = server_loader(**environment)
+    async with server_client(server) as client:
+        response = await client.get("/api/health")
+    assert "MONGODB_URI" not in response.json()["configuration_errors"]
+    assert "MONGO_URL" not in response.json()["configuration_errors"]
+
+
+@pytest_asyncio.fixture
+async def wired_server(server_loader):
+    uri = os.environ.get("FIREART_AUTH_TEST_MONGO_URI")
+    if not uri:
+        pytest.skip("Explicit isolated Mongo opt-in required")
+    assert uri == "mongodb://127.0.0.1:27183/?replicaSet=testset"
+    name = "fireartro_cms_test_wiring_" + uuid.uuid4().hex
+    server = server_loader(MONGODB_URI=uri, MONGO_URL=uri, DB_NAME=name)
+    cleanup = AsyncIOMotorClient(uri, serverSelectionTimeoutMS=3000)
+    try:
+        assert (await cleanup.admin.command("hello"))["setName"] == "testset"
+        async with server.app.router.lifespan_context(server.app):
+            yield server
+    finally:
+        assert name.startswith("fireartro_cms_test_wiring_")
+        assert len(name.removeprefix("fireartro_cms_test_wiring_")) == 32
+        await cleanup.drop_database(name)
+        cleanup.close()
+        print(f"Removed disposable database {name}")
+
+
+@pytest.mark.asyncio
+async def test_server_wired_login_session_csrf_logout(wired_server):
+    async with server_client(wired_server) as client:
+        denied = await client.post(
+            "/api/admin/auth/login", json={"username": "admin", "password": "wrong"}
+        )
+        assert denied.status_code == 401
+        assert denied.json() == {"detail": "Datele de autentificare nu sunt valide."}
+        assert denied.headers["cache-control"] == "no-store"
+        response = await client.post(
+            "/api/admin/auth/login",
+            json={"username": "admin", "password": "correct horse"},
+        )
+        assert response.status_code == 200
+        for attribute in ("HttpOnly", "Secure", "SameSite=strict", "Path=/api/admin"):
+            assert attribute in response.headers["set-cookie"]
+        assert response.json()["admin"] == {"username": "admin"}
+        csrf = response.json()["csrf_token"]
+        raw = client.cookies[ADMIN_COOKIE_NAME]
+        restored = await client.get("/api/admin/auth/session")
+        assert restored.status_code == 200
+        assert restored.json()["csrf_token"] == csrf
+        assert restored.headers["cache-control"] == "no-store"
+        assert (await client.post("/api/admin/auth/logout")).status_code == 403
+        logout = await client.post(
+            "/api/admin/auth/logout", headers={"X-CSRF-Token": csrf}
+        )
+        assert logout.status_code == 200
+        assert "Max-Age=0" in logout.headers["set-cookie"]
+        client.cookies.set(ADMIN_COOKIE_NAME, raw)
+        assert (await client.get("/api/admin/auth/session")).status_code == 401
+    stored = await wired_server.db.admin_sessions.find_one({})
+    assert stored["revoked_at"] is not None
+    assert stored["token_hash"] != raw
+
+
+@pytest.mark.asyncio
+async def test_server_startup_creates_real_indexes_and_is_ready(wired_server):
+    sessions = await wired_server.db.admin_sessions.index_information()
+    attempts = await wired_server.db.admin_login_attempts.index_information()
+    assert sessions["expires_at_1"]["expireAfterSeconds"] == 0
+    assert sessions["token_hash_1"]["unique"] is True
+    assert attempts["expires_at_1"]["expireAfterSeconds"] == 0
+    blog = await wired_server.db.blog_posts.index_information()
+    assert blog["slug_1"]["unique"] is True
+    async with server_client(wired_server) as client:
+        response = await client.get("/api/health")
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "ready",
+        "configuration_errors": [],
+        "database": "ready",
+        "indexes": "ready",
+    }
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("failure", ["error", "timeout"])
+async def test_server_health_database_failure_is_bounded_and_nonleaking(
+    wired_server, monkeypatch, failure
+):
+    async def command(*args, **kwargs):
+        if failure == "timeout":
+            await asyncio.sleep(60)
+        raise AutoReconnect("mongodb://secret:password@private-host/database")
+
+    monkeypatch.setattr(wired_server.db, "command", command)
+    started = asyncio.get_running_loop().time()
+    async with server_client(wired_server) as client:
+        response = await asyncio.wait_for(client.get("/api/health"), timeout=3)
+    assert asyncio.get_running_loop().time() - started < 3
+    assert response.status_code == 503
+    assert response.json() == {
+        "status": "not_ready",
+        "configuration_errors": [],
+        "database": "unavailable",
+        "indexes": "ready",
+    }
+
+
+@pytest.mark.asyncio
+async def test_server_cors_allows_csrf_and_patch(server_loader):
+    server = server_loader(
+        MONGO_URL="mongodb://127.0.0.1:27183",
+        DB_NAME="fireartro_cms_test_cors_" + uuid.uuid4().hex,
+    )
+    async with server_client(server) as client:
+        response = await client.options(
+            "/api/admin/auth/logout",
+            headers={
+                "Origin": "https://fireart.test",
+                "Access-Control-Request-Method": "PATCH",
+                "Access-Control-Request-Headers": "X-CSRF-Token,Content-Type",
+            },
+        )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "https://fireart.test"
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "path,limit",
+    [
+        ("/api/admin/auth/login", 32_768),
+        ("/api/admin/blog/posts", 128 * 1024),
+        ("/api/admin/blog/media", 6 * 1024 * 1024),
+    ],
+)
+@pytest.mark.parametrize("declared", [None, "1"])
+async def test_server_stream_limit_stops_at_overflow_before_route(
+    server_loader, path, limit, declared
+):
+    server = server_loader(
+        MONGO_URL="mongodb://127.0.0.1:27183",
+        DB_NAME="fireartro_cms_test_body_" + uuid.uuid4().hex,
+    )
+    # The real app must reject before routing or reading any of the huge tail.
+    consumed = 0
+
+    async def chunks():
+        nonlocal consumed
+        for _ in range(limit // 1024 + 10_000):
+            consumed += 1024
+            yield b"x" * 1024
+
+    headers = {"Content-Type": "application/json"}
+    if declared is not None:
+        headers["Content-Length"] = declared
+    async with server_client(server) as client:
+        response = await client.post(path, headers=headers, content=chunks())
+    assert response.status_code == 413
+    assert consumed <= limit + 1024
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "path,limit",
+    [
+        ("/api/admin/auth/login", 32_768),
+        ("/api/admin/blog/posts", 128 * 1024),
+        ("/api/admin/blog/media", 6 * 1024 * 1024),
+    ],
+)
+async def test_server_stream_limit_preserves_allowed_payload(
+    server_loader, path, limit
+):
+    server = server_loader(
+        MONGO_URL="mongodb://127.0.0.1:27183",
+        DB_NAME="fireartro_cms_test_body_" + uuid.uuid4().hex,
+    )
+    # Wrap the actual server middleware around a consuming endpoint to verify
+    # byte-for-byte replay independently of blog authorization/JSON validation.
+    from fastapi import Request
+    from fastapi.responses import Response
+
+    server.app.router.routes.clear()
+
+    @server.app.post(path)
+    async def echo(request: Request):
+        return Response(await request.body())
+
+    payload = b"a" * (limit - 1) + b"z"
+
+    async def chunks():
+        for offset in range(0, len(payload), 1024):
+            yield payload[offset : offset + 1024]
+
+    async with server_client(server) as client:
+        response = await client.post(path, content=chunks())
+    assert response.status_code == 200
+    assert response.content == payload
+
+
+@pytest.mark.asyncio
+async def test_server_failed_index_startup_keeps_health_and_auth_closed(
+    server_loader, monkeypatch
+):
+    server = server_loader(
+        MONGODB_URI="mongodb://127.0.0.1:27183/?replicaSet=testset",
+        DB_NAME="fireartro_cms_test_index_failure_" + uuid.uuid4().hex,
+    )
+
+    async def fail_index(*args, **kwargs):
+        raise AutoReconnect("private-connection-error")
+
+    async def ping(*args, **kwargs):
+        return {"ok": 1}
+
+    monkeypatch.setattr(server, "db", SimpleNamespace(
+        blog_posts=SimpleNamespace(create_index=fail_index), command=ping,
+    ))
+    async with server.app.router.lifespan_context(server.app):
+        async with server_client(server) as client:
+            health = await client.get("/api/health")
+            assert health.status_code == 503
+            assert health.json()["indexes"] == "not_ready"
+            assert "private-connection-error" not in health.text
+            response = await client.post(
+                "/api/admin/auth/login",
+                json={"username": "admin", "password": "correct horse"},
+            )
+            assert response.status_code == 503
+            assert "set-cookie" not in response.headers
+            assert response.headers["cache-control"] == "no-store"
+            assert (await client.get("/api/")).status_code == 200
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "length,status",
+    [
+        ("-1", 400),
+        ("nope", 400),
+        ("9" * 5000, 413),
+        ("32769", 413),
+    ],
+)
+async def test_server_rejects_invalid_or_oversized_declared_length_without_reading(
+    server_loader, length, status
+):
+    server = server_loader()
+
+    async def unread_body():
+        pytest.fail("Rejected Content-Length must not consume the body")
+        yield b"unreachable"
+
+    async with server_client(server) as client:
+        response = await client.post(
+            "/api/admin/auth/login",
+            headers={"Content-Length": length},
+            content=unread_body(),
+        )
+    assert response.status_code == status
+    assert response.headers["cache-control"] == "no-store"

@@ -1,8 +1,12 @@
-from fastapi import FastAPI, APIRouter, Header, HTTPException, Request
+from fastapi import FastAPI, APIRouter, Depends, Header, HTTPException, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
+from starlette.datastructures import MutableHeaders
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
+from pymongo.errors import PyMongoError
+import asyncio
+from contextlib import asynccontextmanager
 import os
 import logging
 from pathlib import Path
@@ -21,18 +25,98 @@ from blog import (
     request_size_limit,
 )
 from reviews import ReviewsService, create_reviews_router
+from auth import (
+    AuthError,
+    AUTH_UNAVAILABLE,
+    AuthService,
+    MongoSessionRepository,
+    MongoLoginAttemptRepository,
+    create_auth_router,
+)
 
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / ".env")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# Missing/invalid configuration must leave a diagnosable app, never an implicit
+# localhost connection. MONGO_URL is a temporary compatibility alias.
+mongo_url = os.environ.get("MONGODB_URI") or os.environ.get("MONGO_URL", "")
+database_name = os.environ.get("DB_NAME", "")
+database_configuration_errors = []
+client = None
+db = None
+if not mongo_url.strip():
+    database_configuration_errors.append("MONGODB_URI")
+if not database_name.strip():
+    database_configuration_errors.append("DB_NAME")
+if not database_configuration_errors:
+    try:
+        client = AsyncIOMotorClient(
+            mongo_url,
+            serverSelectionTimeoutMS=2000,
+            connectTimeoutMS=2000,
+            socketTimeoutMS=2000,
+        )
+    except (PyMongoError, ValueError):
+        database_configuration_errors.append("MONGODB_URI")
+    if client is not None:
+        try:
+            db = client[database_name]
+        except (PyMongoError, ValueError):
+            database_configuration_errors.append("DB_NAME")
+            client.close()
+            client = None
+
+
+async def ensure_indexes():
+    await db.blog_posts.create_index("slug", unique=True)
+    await db.blog_posts.create_index([("status", 1), ("published_at", -1)])
+    await db.admin_sessions.create_index("expires_at", expireAfterSeconds=0)
+    await db.admin_sessions.create_index("token_hash", unique=True)
+    await db.admin_login_attempts.create_index("expires_at", expireAfterSeconds=0)
+
+
+@asynccontextmanager
+async def lifespan(application):
+    application.state.indexes_ready = False
+    try:
+        if db is not None:
+            try:
+                await asyncio.wait_for(ensure_indexes(), timeout=5)
+                application.state.indexes_ready = True
+            except (PyMongoError, asyncio.TimeoutError):
+                # No exception text: it can contain connection strings/hosts.
+                logger.error("Database index initialization unavailable")
+        yield
+    finally:
+        application.state.indexes_ready = False
+        if client is not None:
+            client.close()
+
 
 # Create the main app without a prefix
-app = FastAPI(title="FireArtRo API")
+app = FastAPI(title="FireArtRo API", lifespan=lifespan)
+app.state.indexes_ready = False
+auth_service = AuthService(
+    sessions=MongoSessionRepository(db.admin_sessions if db is not None else None),
+    attempts=MongoLoginAttemptRepository(
+        db.admin_login_attempts if db is not None else None
+    ),
+    username=os.environ.get("ADMIN_USERNAME", ""),
+    password_hash=os.environ.get("ADMIN_PASSWORD_HASH", ""),
+    session_secret=os.environ.get("ADMIN_SESSION_SECRET", ""),
+)
+app.state.auth_service = auth_service
+
+
+async def require_auth_ready():
+    if db is None or not app.state.indexes_ready:
+        raise AuthError(AUTH_UNAVAILABLE, 503)
+
+
+app.include_router(
+    create_auth_router(auth_service), dependencies=[Depends(require_auth_ready)]
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -113,6 +197,36 @@ async def root():
     return {"message": "FireArtRo API"}
 
 
+@api_router.get("/health")
+async def health():
+    configuration_errors = [
+        *database_configuration_errors,
+        *auth_service.configuration_errors,
+    ]
+    database_state = "not_configured" if db is None else "not_checked"
+    if db is not None and not configuration_errors:
+        try:
+            await asyncio.wait_for(db.command("ping"), timeout=2)
+            database_state = "ready"
+        except (PyMongoError, asyncio.TimeoutError):
+            database_state = "unavailable"
+    ready = (
+        not configuration_errors
+        and database_state == "ready"
+        and app.state.indexes_ready
+    )
+    return JSONResponse(
+        status_code=200 if ready else 503,
+        content={
+            "status": "ready" if ready else "not_ready",
+            "configuration_errors": configuration_errors,
+            "database": database_state,
+            "indexes": "ready" if app.state.indexes_ready else "not_ready",
+        },
+        headers={"Cache-Control": "no-store"},
+    )
+
+
 @api_router.post("/quotes", response_model=Quote)
 async def create_quote(input: QuoteCreate, request: Request):
     if not input.consent:
@@ -144,9 +258,9 @@ async def get_quotes(x_admin_key: Optional[str] = Header(default=None)):
 # Include the router in the main app
 app.include_router(api_router)
 
-blog_repository = MongoBlogRepository(db.blog_posts)
+blog_repository = MongoBlogRepository(db.blog_posts if db is not None else None)
 blog_media_store = GridFsBlogMediaStore(
-    AsyncIOMotorGridFSBucket(db, bucket_name="blog_media")
+    AsyncIOMotorGridFSBucket(db, bucket_name="blog_media") if db is not None else None
 )
 blog_service = BlogService(blog_repository, blog_media_store)
 app.include_router(
@@ -172,23 +286,76 @@ def enforce_rate_limit(request: Request):
     attempts.append(now)
 
 
-@app.middleware("http")
-async def security_headers(request: Request, call_next):
-    max_request_bytes = request_size_limit(request.url.path, request.method)
-    content_length = request.headers.get("content-length")
-    if content_length:
-        try:
-            if int(content_length) > max_request_bytes:
-                return JSONResponse(status_code=413, content={"detail": "Cererea este prea mare."})
-        except ValueError:
-            return JSONResponse(status_code=400, content={"detail": "Content-Length invalid."})
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    if not request.url.path.startswith("/api/blog/media/"):
-        response.headers["Cache-Control"] = "no-store"
-    return response
+class RequestSecurityMiddleware:
+    """Bound the streamed body before any parser or login can consume it."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        path = scope["path"]
+        maximum = request_size_limit(path, scope["method"])
+
+        async def secure_send(message):
+            if message["type"] == "http.response.start":
+                headers = MutableHeaders(scope=message)
+                headers["X-Content-Type-Options"] = "nosniff"
+                headers["X-Frame-Options"] = "DENY"
+                headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+                if not path.startswith("/api/blog/media/") or message["status"] >= 400:
+                    headers["Cache-Control"] = "no-store"
+            await send(message)
+
+        async def reject(status, detail):
+            await JSONResponse(status_code=status, content={"detail": detail})(
+                scope, receive, secure_send
+            )
+
+        lengths = [
+            value
+            for name, value in scope["headers"]
+            if name.lower() == b"content-length"
+        ]
+        if lengths:
+            if len(lengths) != 1 or not lengths[0].isdigit():
+                await reject(400, "Content-Length invalid.")
+                return
+            # Avoid int() on an arbitrarily long attacker-controlled digit string.
+            length = lengths[0].lstrip(b"0") or b"0"
+            if len(length) > len(str(maximum)) or int(length) > maximum:
+                await reject(413, "Cererea este prea mare.")
+                return
+
+        body = bytearray()
+        while True:
+            message = await receive()
+            if message["type"] == "http.disconnect":
+                return
+            chunk = message.get("body", b"")
+            if len(body) + len(chunk) > maximum:
+                await reject(413, "Cererea este prea mare.")
+                return
+            body.extend(chunk)
+            if not message.get("more_body", False):
+                break
+
+        if db is None and path.startswith(("/api/quotes", "/api/blog/", "/api/admin/")):
+            await reject(503, "Serviciul nu este disponibil momentan.")
+            return
+
+        replayed = False
+
+        async def replay():
+            nonlocal replayed
+            if not replayed:
+                replayed = True
+                return {"type": "http.request", "body": bytes(body), "more_body": False}
+            return await receive()
+
+        await self.app(scope, replay, secure_send)
 
 
 allowed_origins = [
@@ -201,9 +368,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=allowed_origins,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "X-Admin-Key"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Admin-Key", "X-CSRF-Token"],
 )
+app.add_middleware(RequestSecurityMiddleware)
 
 # Configure logging
 logging.basicConfig(
@@ -211,14 +379,3 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-
-@app.on_event("startup")
-async def ensure_blog_indexes():
-    await db.blog_posts.create_index("slug", unique=True)
-    await db.blog_posts.create_index([("status", 1), ("published_at", -1)])
-
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()

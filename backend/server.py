@@ -297,7 +297,11 @@ class RequestSecurityMiddleware:
             await self.app(scope, receive, send)
             return
         path = scope["path"]
-        maximum = request_size_limit(path, scope["method"])
+        maximum = (
+            4096
+            if path.startswith("/api/admin/auth/")
+            else request_size_limit(path, scope["method"])
+        )
 
         async def secure_send(message):
             if message["type"] == "http.response.start":

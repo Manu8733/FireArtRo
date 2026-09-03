@@ -1105,12 +1105,15 @@ async def test_server_cors_allows_csrf_and_patch(server_loader):
 @pytest.mark.parametrize(
     "path,limit",
     [
-        ("/api/admin/auth/login", 32_768),
+        ("/api/admin/auth/login", 4096),
+        ("/api/admin/auth/session", 4096),
+        ("/api/admin/auth/logout", 4096),
+        ("/api/quotes", 32_768),
         ("/api/admin/blog/posts", 128 * 1024),
         ("/api/admin/blog/media", 6 * 1024 * 1024),
     ],
 )
-@pytest.mark.parametrize("declared", [None, "1"])
+@pytest.mark.parametrize("declared", [None, "1", "actual"])
 async def test_server_stream_limit_stops_at_overflow_before_route(
     server_loader, path, limit, declared
 ):
@@ -1123,17 +1126,19 @@ async def test_server_stream_limit_stops_at_overflow_before_route(
 
     async def chunks():
         nonlocal consumed
-        for _ in range(limit // 1024 + 10_000):
-            consumed += 1024
-            yield b"x" * 1024
+        consumed += limit
+        yield b"x" * limit
+        consumed += 1
+        yield b"x"
+        pytest.fail("Read past the first byte exceeding the route limit")
 
     headers = {"Content-Type": "application/json"}
     if declared is not None:
-        headers["Content-Length"] = declared
+        headers["Content-Length"] = str(limit + 1) if declared == "actual" else declared
     async with server_client(server) as client:
         response = await client.post(path, headers=headers, content=chunks())
     assert response.status_code == 413
-    assert consumed <= limit + 1024
+    assert consumed == (0 if declared == "actual" else limit + 1)
     assert response.headers["cache-control"] == "no-store"
 
 
@@ -1141,13 +1146,17 @@ async def test_server_stream_limit_stops_at_overflow_before_route(
 @pytest.mark.parametrize(
     "path,limit",
     [
-        ("/api/admin/auth/login", 32_768),
+        ("/api/admin/auth/login", 4096),
+        ("/api/admin/auth/session", 4096),
+        ("/api/admin/auth/logout", 4096),
+        ("/api/quotes", 32_768),
         ("/api/admin/blog/posts", 128 * 1024),
         ("/api/admin/blog/media", 6 * 1024 * 1024),
     ],
 )
+@pytest.mark.parametrize("declared", [None, "1", "actual"])
 async def test_server_stream_limit_preserves_allowed_payload(
-    server_loader, path, limit
+    server_loader, path, limit, declared
 ):
     server = server_loader(
         MONGO_URL="mongodb://127.0.0.1:27183",
@@ -1170,8 +1179,11 @@ async def test_server_stream_limit_preserves_allowed_payload(
         for offset in range(0, len(payload), 1024):
             yield payload[offset : offset + 1024]
 
+    headers = {}
+    if declared is not None:
+        headers["Content-Length"] = str(limit) if declared == "actual" else declared
     async with server_client(server) as client:
-        response = await client.post(path, content=chunks())
+        response = await client.post(path, headers=headers, content=chunks())
     assert response.status_code == 200
     assert response.content == payload
 

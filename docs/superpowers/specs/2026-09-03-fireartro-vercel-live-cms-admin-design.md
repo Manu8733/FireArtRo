@@ -2,6 +2,10 @@
 
 ## Objective
 
+### Approved execution boundary (2026-09-03 amendment)
+
+The owner requested that implementation now prepare everything for Vercel connection, without connecting to Vercel yet. Complete source code, local validation, environment templates and runbooks only. Do not log in, link a project, provision cloud resources, upload source, deploy, bootstrap remote content or promote production during this phase. Platform verification remains a documented future acceptance step, not a claimed result.
+
 Replace the browser-local FireArtRo Admin with a production content-management system. A non-technical operator signs in at `/admin`, edits an automatically saved draft, previews it, and publishes one coherent version that becomes visible on the public site without a Git commit, push, or frontend redeploy.
 
 The implementation remains in the existing React/FastAPI repository and is deployed as one Vercel project. MongoDB Atlas and Vercel Blob are provisioned and connected from the Vercel dashboard.

@@ -10,6 +10,8 @@
 
 ## Global Constraints
 
+- Owner amendment 2026-09-03: prepare and verify locally only; do not connect or deploy to Vercel yet.
+
 - Every field change autosaves to the server-side draft after a short debounce.
 - Autosave never changes the public site.
 - `Publică modificările` atomically promotes the complete valid draft.

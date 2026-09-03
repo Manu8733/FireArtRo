@@ -10,6 +10,8 @@
 
 ## Global Constraints
 
+- Owner amendment 2026-09-03: this phase prepares code, templates, runbooks and local acceptance only. Skip all live Vercel login/link/build/provisioning/deployment commands, remote bootstrap and production promotion. Task 5 is a future owner-approved runbook, not an action to execute now. Completion claims must distinguish local readiness from unverified cloud deployment.
+
 - Bootstrap cannot overwrite an existing publication.
 - The first public API snapshot must render the same content as the checked-in fallback.
 - Preview data must never modify Production data.

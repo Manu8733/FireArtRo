@@ -10,6 +10,8 @@
 
 ## Global Constraints
 
+- Owner amendment 2026-09-03: prepare locally only; no Vercel login/link/provisioning/deployment. Vercel-build/platform checks remain documented for the later connection phase. Local API/frontend and database tests are authorized.
+
 - Keep the existing React/FastAPI repository and deploy it as one Vercel project.
 - Autosave never changes the public site; only `Publică modificările` publishes.
 - No password, password hash, API key, session token, CSRF token, or Blob token may be stored in localStorage or a `REACT_APP_*` variable.

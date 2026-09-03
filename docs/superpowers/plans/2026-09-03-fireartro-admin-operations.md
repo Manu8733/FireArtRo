@@ -10,6 +10,8 @@
 
 ## Global Constraints
 
+- Owner amendment 2026-09-03: prepare and verify locally only; do not connect or deploy to Vercel or provision Blob yet. Use isolated test providers where a real cloud resource would be required and disclose the remaining platform acceptance checks.
+
 - Preserve the current FireArtRo public visual design; Admin is an operational extension, not a generic dashboard template.
 - Typed fields are the primary editor; raw JSON is restricted to validated import/export.
 - Every autosave status reflects a confirmed server result.
